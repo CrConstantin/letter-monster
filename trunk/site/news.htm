@@ -1,0 +1,919 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+    <title>- Letter Monster :: News -</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+    <meta name="Keywords" content="letter,letters,monster,lettermonster,letter-monster,letter monster,letters monster,python">
+    <meta name="Description" content="Letter Monster text rendering engine">
+    <meta name="author" content="Cristi Constantin">
+    <style type="text/css" media="all">@import url(style.css);</style>
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+</head>
+<body>
+
+<!-- Menu starts here. -->
+<div class="menubox">
+    <div align="center" class="boxbody" id="#"><br />
+        <a href="">Home</a> | 
+        <a href="about.htm">About</a> | 
+        <a href="gallery.htm">Gallery</a>
+    </div>
+</div>
+
+<!-- News start here. -->
+
+
+<div class="contentbox">
+    <div class="lu_corner"><pre>
+ M
+ MMWWBBHHAASSIIii++;;,,..
+ W
+ B
+ H
+ A
+ S
+ I
+ +
+ ;
+ ,
+ .
+    </pre></div>
+    <div class="ld_corner"><pre>
+ .
+ ,
+ ;
+ +
+ I
+ S
+ A
+ H
+ B
+ W
+ MMWWBBHHAASSIIii++;;,,..
+ M
+    </pre></div>
+    <div class="ru_corner"><pre>
+                       M
+..,,;;++iiIISSAAHHBBWWMM 
+                       W 
+                       B 
+                       H 
+                       A 
+                       S 
+                       I 
+                       + 
+                       ; 
+                       , 
+                       . 
+    </pre></div>
+    <div class="rd_corner"><pre>
+                       . 
+                       , 
+                       ; 
+                       + 
+                       I 
+                       S 
+                       A 
+                       H 
+                       B 
+                       W 
+..,,;;++iiIISSAAHHBBWWMM 
+                       M
+    </pre></div>
+    <div class="boxhead"><h2>[28 Apr 2009] <a href="#">&circ;</a></h2></div>
+    <div class="boxbody">
+        <p>Created Load and Save LMGL, functions Bite and Spawn.<br />
+        LMGL = Letter Monster Graphical Letters. It's basically an XML file that contains all data necesarry for creating ASCII text, ASCII animations, ASCII based applications.
+        </p>
+    </div>
+</div>
+<br />
+
+<div class="contentbox">
+    <div class="lu_corner"><pre>
+ M
+ MMWWBBHHAASSIIii++;;,,..
+ W
+ B
+ H
+ A
+ S
+ I
+ +
+ ;
+ ,
+ .
+    </pre></div>
+    <div class="ld_corner"><pre>
+ .
+ ,
+ ;
+ +
+ I
+ S
+ A
+ H
+ B
+ W
+ MMWWBBHHAASSIIii++;;,,..
+ M
+    </pre></div>
+    <div class="ru_corner"><pre>
+                       M
+..,,;;++iiIISSAAHHBBWWMM 
+                       W 
+                       B 
+                       H 
+                       A 
+                       S 
+                       I 
+                       + 
+                       ; 
+                       , 
+                       . 
+    </pre></div>
+    <div class="rd_corner"><pre>
+                       . 
+                       , 
+                       ; 
+                       + 
+                       I 
+                       S 
+                       A 
+                       H 
+                       B 
+                       W 
+..,,;;++iiIISSAAHHBBWWMM 
+                       M
+    </pre></div>
+    <div class="boxhead"><h2>[26 Apr 2009] - Python 2.6 <a href="#">&circ;</a></h2></div>
+    <div class="boxbody">
+        <p>Tested Letter Monster on Python 2.6 and it works okay.<br />
+        Added a "bytes" algorithm for transforming images into plain ASCII, but i don't know if i will keep it.<br />
+        Discovered a stupid bug in Consume function. After fixing it, Consume takes only 17 seconds without Psyco and 8 seconds with Psyco for a 1600x1200 image.
+        Before fixing the bug, it took 34 seconds without Psyco and 17 seconds with Psyco. This is a huge boost and it proves how important is to code correctly...
+        </p>
+    </div>
+</div>
+<br />
+
+<div class="contentbox">
+    <div class="lu_corner"><pre>
+ M
+ MMWWBBHHAASSIIii++;;,,..
+ W
+ B
+ H
+ A
+ S
+ I
+ +
+ ;
+ ,
+ .
+    </pre></div>
+    <div class="ld_corner"><pre>
+ .
+ ,
+ ;
+ +
+ I
+ S
+ A
+ H
+ B
+ W
+ MMWWBBHHAASSIIii++;;,,..
+ M
+    </pre></div>
+    <div class="ru_corner"><pre>
+                       M
+..,,;;++iiIISSAAHHBBWWMM 
+                       W 
+                       B 
+                       H 
+                       A 
+                       S 
+                       I 
+                       + 
+                       ; 
+                       , 
+                       . 
+    </pre></div>
+    <div class="rd_corner"><pre>
+                       . 
+                       , 
+                       ; 
+                       + 
+                       I 
+                       S 
+                       A 
+                       H 
+                       B 
+                       W 
+..,,;;++iiIISSAAHHBBWWMM 
+                       M
+    </pre></div>
+    <div class="boxhead"><h2>[16 Apr 2009] - LMGL tests <a href="#">&circ;</a></h2></div>
+    <div class="boxbody">
+        <p>Didn't have that much time to work in the past few days.<br />
+        Renamed Spawn function into Consume. Loading and saving LMGL files are now called Bite and Spawn.<br />
+        Anyway, i've built the rules for internal representations of Letter Monster. There are 4 distinct structures : Raster, Vector, Event and Macro. 
+        Only Raster and Vector are rendered on the screen. Vector takes a Raster and modifies it, or draws some shapes. 
+        Event is used as a trigger to call one, or more macros. Macros can also be called from Python.<br />
+        Started to work on a basic LMGL file. It's pretty okay.<br />
+        Can't wait to see PIL 1.1.7 final.
+        </p>
+    </div>
+</div>
+<br />
+
+<div class="contentbox">
+    <div class="lu_corner"><pre>
+ M
+ MMWWBBHHAASSIIii++;;,,..
+ W
+ B
+ H
+ A
+ S
+ I
+ +
+ ;
+ ,
+ .
+    </pre></div>
+    <div class="ld_corner"><pre>
+ .
+ ,
+ ;
+ +
+ I
+ S
+ A
+ H
+ B
+ W
+ MMWWBBHHAASSIIii++;;,,..
+ M
+    </pre></div>
+    <div class="ru_corner"><pre>
+                       M
+..,,;;++iiIISSAAHHBBWWMM 
+                       W 
+                       B 
+                       H 
+                       A 
+                       S 
+                       I 
+                       + 
+                       ; 
+                       , 
+                       . 
+    </pre></div>
+    <div class="rd_corner"><pre>
+                       . 
+                       , 
+                       ; 
+                       + 
+                       I 
+                       S 
+                       A 
+                       H 
+                       B 
+                       W 
+..,,;;++iiIISSAAHHBBWWMM 
+                       M
+    </pre></div>
+    <div class="boxhead"><h2>[04 Apr 2009] - News <a href="#">&circ;</a></h2></div>
+    <div class="boxbody">
+        <p>Removed filters Contour and Find Edges. Noone will use them anyway.<br />
+        Added psyco.full() before starting to define Letter Monster class. I've noticed that it makes Spawn function 3 times faster.<br />
+        Tested a few compression libraries. I am very pleased by bz2, so i will use it in my LMGL files.
+        </p>
+    </div>
+</div>
+<br />
+
+<div class="contentbox">
+    <div class="lu_corner"><pre>
+ M
+ MMWWBBHHAASSIIii++;;,,..
+ W
+ B
+ H
+ A
+ S
+ I
+ +
+ ;
+ ,
+ .
+    </pre></div>
+    <div class="ld_corner"><pre>
+ .
+ ,
+ ;
+ +
+ I
+ S
+ A
+ H
+ B
+ W
+ MMWWBBHHAASSIIii++;;,,..
+ M
+    </pre></div>
+    <div class="ru_corner"><pre>
+                       M
+..,,;;++iiIISSAAHHBBWWMM 
+                       W 
+                       B 
+                       H 
+                       A 
+                       S 
+                       I 
+                       + 
+                       ; 
+                       , 
+                       . 
+    </pre></div>
+    <div class="rd_corner"><pre>
+                       . 
+                       , 
+                       ; 
+                       + 
+                       I 
+                       S 
+                       A 
+                       H 
+                       B 
+                       W 
+..,,;;++iiIISSAAHHBBWWMM 
+                       M
+    </pre></div>
+    <div class="boxhead"><h2>[03 Apr 2009] - "about" and "gallery" <a href="#">&circ;</a></h2></div>
+    <div class="boxbody">
+        <p>Added About and Gallery pages.<br />
+        They are not complete, but it's okay for now.
+        </p>
+    </div>
+</div>
+<br />
+
+<div class="contentbox">
+    <div class="lu_corner"><pre>
+ M
+ MMWWBBHHAASSIIii++;;,,..
+ W
+ B
+ H
+ A
+ S
+ I
+ +
+ ;
+ ,
+ .
+    </pre></div>
+    <div class="ld_corner"><pre>
+ .
+ ,
+ ;
+ +
+ I
+ S
+ A
+ H
+ B
+ W
+ MMWWBBHHAASSIIii++;;,,..
+ M
+    </pre></div>
+    <div class="ru_corner"><pre>
+                       M
+..,,;;++iiIISSAAHHBBWWMM 
+                       W 
+                       B 
+                       H 
+                       A 
+                       S 
+                       I 
+                       + 
+                       ; 
+                       , 
+                       . 
+    </pre></div>
+    <div class="rd_corner"><pre>
+                       . 
+                       , 
+                       ; 
+                       + 
+                       I 
+                       S 
+                       A 
+                       H 
+                       B 
+                       W 
+..,,;;++iiIISSAAHHBBWWMM 
+                       M
+    </pre></div>
+    <div class="boxhead"><h2>[18 Mar 2009] - More algorithms and filters <a href="#">&circ;</a></h2></div>
+    <div class="boxbody">
+        <p>Added smooth and sharp algorithms, vertical and horizontal algorithms, DOS, numbers and letters algorithms.<br />
+        Added filter option when transforming an image into ASCII. One or more filters can be specified. Available filters are : BLUR, CONTOUR, DETAIL, EDGE_ENHANCE, EDGE_ENHANCE_MORE, EMBOSS, FIND_EDGES, SMOOTH, SMOOTH_MORE, and SHARPEN, exactly the filters available in PIL.
+        </p>
+    </div>
+</div>
+<br />
+
+<div class="contentbox">
+    <div class="lu_corner"><pre>
+ M
+ MMWWBBHHAASSIIii++;;,,..
+ W
+ B
+ H
+ A
+ S
+ I
+ +
+ ;
+ ,
+ .
+    </pre></div>
+    <div class="ld_corner"><pre>
+ .
+ ,
+ ;
+ +
+ I
+ S
+ A
+ H
+ B
+ W
+ MMWWBBHHAASSIIii++;;,,..
+ M
+    </pre></div>
+    <div class="ru_corner"><pre>
+                       M
+..,,;;++iiIISSAAHHBBWWMM 
+                       W 
+                       B 
+                       H 
+                       A 
+                       S 
+                       I 
+                       + 
+                       ; 
+                       , 
+                       . 
+    </pre></div>
+    <div class="rd_corner"><pre>
+                       . 
+                       , 
+                       ; 
+                       + 
+                       I 
+                       S 
+                       A 
+                       H 
+                       B 
+                       W 
+..,,;;++iiIISSAAHHBBWWMM 
+                       M
+    </pre></div>
+    <div class="boxhead"><h2>[15 Mar 2009] - Defined classes <a href="#">&circ;</a></h2></div>
+    <div class="boxbody">
+        <p>Implemented class LetterMonster and class Backpack. :&gt;<br />
+        Wrote two examples for using each class : first example transforms an image into ASCII and second example takes some text, strips the extra spaces, centers it and adds a border, all in ASCII.
+        </p>
+    </div>
+</div>
+<br />
+
+<div class="contentbox">
+    <div class="lu_corner"><pre>
+ M
+ MMWWBBHHAASSIIii++;;,,..
+ W
+ B
+ H
+ A
+ S
+ I
+ +
+ ;
+ ,
+ .
+    </pre></div>
+    <div class="ld_corner"><pre>
+ .
+ ,
+ ;
+ +
+ I
+ S
+ A
+ H
+ B
+ W
+ MMWWBBHHAASSIIii++;;,,..
+ M
+    </pre></div>
+    <div class="ru_corner"><pre>
+                       M
+..,,;;++iiIISSAAHHBBWWMM 
+                       W 
+                       B 
+                       H 
+                       A 
+                       S 
+                       I 
+                       + 
+                       ; 
+                       , 
+                       . 
+    </pre></div>
+    <div class="rd_corner"><pre>
+                       . 
+                       , 
+                       ; 
+                       + 
+                       I 
+                       S 
+                       A 
+                       H 
+                       B 
+                       W 
+..,,;;++iiIISSAAHHBBWWMM 
+                       M
+    </pre></div>
+    <div class="boxhead"><h2>[13 Mar 2009] - News <a href="#">&circ;</a></h2></div>
+    <div class="boxbody">
+        <p>It's 1 AM. I am wandering what the fuck am i doing on my computer at this late hour.<br />
+        Guess i'm just following my dream...<br /><br />
+        I am trying to migrate all the code in Python 3 but PIL doesn't play nice with Python 3.<br />
+        After i made some research on Google, i realised i will never be able to make my own alternative solution, implement my own algorithm for reading pixel colors from images.
+        So i am stuck with Python 2 for now.<br />
+        </p>
+    </div>
+</div>
+<br />
+
+<div class="contentbox">
+    <div class="lu_corner"><pre>
+ M
+ MMWWBBHHAASSIIii++;;,,..
+ W
+ B
+ H
+ A
+ S
+ I
+ +
+ ;
+ ,
+ .
+    </pre></div>
+    <div class="ld_corner"><pre>
+ .
+ ,
+ ;
+ +
+ I
+ S
+ A
+ H
+ B
+ W
+ MMWWBBHHAASSIIii++;;,,..
+ M
+    </pre></div>
+    <div class="ru_corner"><pre>
+                       M
+..,,;;++iiIISSAAHHBBWWMM 
+                       W 
+                       B 
+                       H 
+                       A 
+                       S 
+                       I 
+                       + 
+                       ; 
+                       , 
+                       . 
+    </pre></div>
+    <div class="rd_corner"><pre>
+                       . 
+                       , 
+                       ; 
+                       + 
+                       I 
+                       S 
+                       A 
+                       H 
+                       B 
+                       W 
+..,,;;++iiIISSAAHHBBWWMM 
+                       M
+    </pre></div>
+    <div class="boxhead"><h2>[25 Feb 2009] - Backpack... <a href="#">&circ;</a></h2></div>
+    <div class="boxbody">
+        <p>Modified all the functions defined so far so that they accept a string and return a string. Also made small optimizations.<br />
+        Made functions for Left Border and Right Border.<br /><br />
+        Now, the complete list of functions is : Rotate 90 right, Rotate 90 left, Flip horizontal, Flip vertical, Reverse, Strip right space, Strip left space, Align right, Align left, Center, Crop, Full border, Right Border and Left border.
+        </p>
+    </div>
+</div>
+<br />
+
+<div class="contentbox">
+    <div class="lu_corner"><pre>
+ M
+ MMWWBBHHAASSIIii++;;,,..
+ W
+ B
+ H
+ A
+ S
+ I
+ +
+ ;
+ ,
+ .
+    </pre></div>
+    <div class="ld_corner"><pre>
+ .
+ ,
+ ;
+ +
+ I
+ S
+ A
+ H
+ B
+ W
+ MMWWBBHHAASSIIii++;;,,..
+ M
+    </pre></div>
+    <div class="ru_corner"><pre>
+                       M
+..,,;;++iiIISSAAHHBBWWMM 
+                       W 
+                       B 
+                       H 
+                       A 
+                       S 
+                       I 
+                       + 
+                       ; 
+                       , 
+                       . 
+    </pre></div>
+    <div class="rd_corner"><pre>
+                       . 
+                       , 
+                       ; 
+                       + 
+                       I 
+                       S 
+                       A 
+                       H 
+                       B 
+                       W 
+..,,;;++iiIISSAAHHBBWWMM 
+                       M
+    </pre></div>
+    <div class="boxhead"><h2>[24 Feb 2009] - Backpack... <a href="#">&circ;</a></h2></div>
+    <div class="boxbody">
+        <p>Made functions for ASCII Rotate 90 right, Rotate 90 left, Strip right space, Strip left space, Align right, Align left, Full border.<br />
+        Fixed 2 minor bugs in functions Flip horizontal and Flip vertical.
+        </p>
+    </div>
+</div>
+<br />
+
+<div class="contentbox">
+    <div class="lu_corner"><pre>
+ M
+ MMWWBBHHAASSIIii++;;,,..
+ W
+ B
+ H
+ A
+ S
+ I
+ +
+ ;
+ ,
+ .
+    </pre></div>
+    <div class="ld_corner"><pre>
+ .
+ ,
+ ;
+ +
+ I
+ S
+ A
+ H
+ B
+ W
+ MMWWBBHHAASSIIii++;;,,..
+ M
+    </pre></div>
+    <div class="ru_corner"><pre>
+                       M
+..,,;;++iiIISSAAHHBBWWMM 
+                       W 
+                       B 
+                       H 
+                       A 
+                       S 
+                       I 
+                       + 
+                       ; 
+                       , 
+                       . 
+    </pre></div>
+    <div class="rd_corner"><pre>
+                       . 
+                       , 
+                       ; 
+                       + 
+                       I 
+                       S 
+                       A 
+                       H 
+                       B 
+                       W 
+..,,;;++iiIISSAAHHBBWWMM 
+                       M
+    </pre></div>
+    <div class="boxhead"><h2>[20 Feb 2009] - Backpack... <a href="#">&circ;</a></h2></div>
+    <div class="boxbody">
+        <p>Made functions for ASCII Flip Vertical, Flip Horizontal, Reverse and Crop.<br />
+        They all act as expected : take a text file as input and write a modified text file as output.
+        </p>
+    </div>
+</div>
+<br />
+
+<div class="contentbox">
+    <div class="lu_corner"><pre>
+ M
+ MMWWBBHHAASSIIii++;;,,..
+ W
+ B
+ H
+ A
+ S
+ I
+ +
+ ;
+ ,
+ .
+    </pre></div>
+    <div class="ld_corner"><pre>
+ .
+ ,
+ ;
+ +
+ I
+ S
+ A
+ H
+ B
+ W
+ MMWWBBHHAASSIIii++;;,,..
+ M
+    </pre></div>
+    <div class="ru_corner"><pre>
+                       M
+..,,;;++iiIISSAAHHBBWWMM 
+                       W 
+                       B 
+                       H 
+                       A 
+                       S 
+                       I 
+                       + 
+                       ; 
+                       , 
+                       . 
+    </pre></div>
+    <div class="rd_corner"><pre>
+                       . 
+                       , 
+                       ; 
+                       + 
+                       I 
+                       S 
+                       A 
+                       H 
+                       B 
+                       W 
+..,,;;++iiIISSAAHHBBWWMM 
+                       M
+    </pre></div>
+    <div class="boxhead"><h2>[19 Feb 2009] - Updates <a href="#">&circ;</a></h2></div>
+    <div class="boxbody">
+        <p>Made a lot of updates to official site.<br />
+        Added easy pattern changing and tested 2 more patterns for transforming images into ASCII : "standard" and "sharp". The pattern used by Patrick T. Cossette is called "original pattern".<br /><br />
+        Then, i tested faster methods to fill the memory with ASCII characters and write the result back in a text file. The string concaternation method used before i thought to be very slow.<br />
+        So i used a dark picture, 1600x1200 pixels, Python 2.5.4 with PIL 1.1.6 installed, standard pattern 12 characters.<br />
+        Results :<br />
+        - string concaternation, then write tempString to output : 12 seconds;<br />
+        - StringIO.write, then tempString.getvalue() into output : 12 seconds;<br />
+        - directly write each character into output text file : 12 seconds;<br />
+        - list append to tempList, tempList added to finalList each line, then ''.join(finalList) into output : 11 seconds;<br />
+        - tuple concaternation to tempTuple, tempTuple concaternation to finalTuple each line, then ''.join(finalTuple) into output : 19 seconds.<br />
+        Pretty uneXpected. :><br />
+        I decided to eliminate string concat, tuple concat and writing directly to file. So i will keep list append and StringIO algorithms for now.
+        </p>
+    </div>
+</div>
+<br />
+
+<div class="contentbox">
+    <div class="lu_corner"><pre>
+ M
+ MMWWBBHHAASSIIii++;;,,..
+ W
+ B
+ H
+ A
+ S
+ I
+ +
+ ;
+ ,
+ .
+    </pre></div>
+    <div class="ld_corner"><pre>
+ .
+ ,
+ ;
+ +
+ I
+ S
+ A
+ H
+ B
+ W
+ MMWWBBHHAASSIIii++;;,,..
+ M
+    </pre></div>
+    <div class="ru_corner"><pre>
+                       M
+..,,;;++iiIISSAAHHBBWWMM 
+                       W 
+                       B 
+                       H 
+                       A 
+                       S 
+                       I 
+                       + 
+                       ; 
+                       , 
+                       . 
+    </pre></div>
+    <div class="rd_corner"><pre>
+                       . 
+                       , 
+                       ; 
+                       + 
+                       I 
+                       S 
+                       A 
+                       H 
+                       B 
+                       W 
+..,,;;++iiIISSAAHHBBWWMM 
+                       M
+    </pre></div>
+    <div class="boxhead"><h2>[17 Feb 2009] - Site launched <a href="#">&circ;</a></h2></div>
+    <div class="boxbody">
+        <p>Welcome to Official site for Letter Monster. There is much to do before the site is completed, but you can come back to check the news. Updates will be made pretty often.<br /><br />
+        Today i implemented the first algorithm for transforming images (tested with JPG and PNG) to ASCII.<br />
+        At first i used a little program made by Patrick T. Cossette [cold_soul79078@yahoo.com], but it was pretty buggy so i fixed it and transformed it more and more... until it was completely different from the original program.<br />
+        Anyway, Letter Monster started as a tiny application.
+        </p>
+    </div>
+</div>
+
+<!-- Google Analytics -->
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-7512228-6");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+
+</body>
+</html>
