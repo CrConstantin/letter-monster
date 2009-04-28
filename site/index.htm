@@ -1,0 +1,423 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+    <title>- Letter Monster :: News -</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+    <meta name="Keywords" content="letter,letters,monster,lettermonster,letter-monster,letter monster,letters monster,python">
+    <meta name="Description" content="Letter Monster text rendering engine">
+    <meta name="author" content="Cristi Constantin">
+    <style type="text/css" media="all">@import url(style.css);</style>
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+</head>
+<body>
+
+<!-- Corners must be first -->
+
+<div id="lu_corner"><pre class="small">
+MMMMMMMMMMMMMMMMMMMMMMWWWMMBHHHWWHABWWWBHHASSSSSSSSI;;;;,,;;,,,,,,,,,.,,,...
+MMMMMWMMMMWMMMMMMMMMWMSSMHABWBBI,+MHWMMWHAAMIAA;  .       +          ,;
+MMMMMMMWWABMMSBHWMMB ,+,  .WBMBI,   HWHW+++,A;IIIIA     ;        .II.
+MMWMMMMMMMHBBMAM;,HMMW+I+II,I.    ,HB;W.I  WM    .,M. +;      .+I.
+MMMMM+MMMMM M;M;AB;,+AMHMS  + .+. SII +.ISBH+S   M;WWB A   ,A+
+MMMMMMMB;MMBWM; WWA. ISISMBII .+;S  BA;HBII .I  +HSMI++SHH.;
+MBWMMMBBHWMA;;SB+W+H+ ; .;.HWMB+H   .;MM+S  ,I I,,SI.+, ; ;
+WMMMMM+WBMB,,AIIBS;  +;.  S   HABMMMMWB +   HII;.;;, ;+. ,
+AMWIWMMMMIIB WSW+ I+,  .;    S      B .,.  SBB+.   . .,..,
+HM+IWWMSI;+SISS  I,. .;  + ,;       I .,  HB       . .+ ;
+AM,MSMWM+WS,AB.; I,,,   , S         I.SI+          .;+ ;
+AW.M+H.MM+.AS+   IH.    A,         ,HI             ,. ;
+BBIHM.W+MBWB,   H AA   S        ;I  I              ,+ ;
+HAMWHI.IWMBI  ,A. BA IS      +,     S              ; ,
+IHMM.A.WBMB  I+;  I S    .+.        S              + .
+SMABIHS.;MH..; .  +. I,I.           I              I;
+IBWISSSISWM . +  S .A.              +              A,
+IWBBIWIIHHM + .,+S; ;               +              H.
+IBW HW.A IMS +S+   A                ,              A
+IMAA.,B  AMHAA    .S                               S
++MBABII,BBM;S     +.                               ;
+SBAWBH+..SM ;    I.                                ,
+WMMAWMH +MMA W   +.                                .
+IBSHM AAWMBMMW  W ,                               .
+;HIMHHWSMMAW MB;B ,                               .
+;BHAM+,MMWMWWW,II ;                               .
+;WAS+MMM;;. BH. ; ;                               ,
+,WB  ABI A  S+; , ;                               ,
+SHI AB , ;,+,I  . .                               .
+;H ,W.  ;. HSB
+,W MH ; I.  I+
+.A;A+ I. .   + .
+.SM;  +I   S + .
+.+BI   .  ;  + ,
+,+B  .+   +  . ,
+..A  ;,  I;    ,
+.,,  A  . ;    ;
+.I+  S  S ,    ;
+.IH WS ,       ;
+.;A,SB I       ;
+. ;;B;I        ;
+. ;I+H.        ;
+. ;;BS         ;
+ .; A          ;
+ .A B          ,
+ . ,I          ,
+ S B+          ,
+ .++S          .
+ .;II
+ A SI
+  . +
+ . S;
+ ,  .
+ ,,            .
+ ,+            ,
+ ,I            .
+ ,I
+ ;S
+ ;S
+ ;S
+ ;S
+ ;I
+ ;;
+ ;;
+ I
+ S
+ S
+ H
+ B
+ W
+ B
+ B
+ H
+ I
+ I
+ I
+ I
+ I
+ I
+ I
+ I
+ I
+ S
+ I
+ S
+ I
+ S
+ I
+ S
+ S
+ S
+ S
+ S
+ B
+ W
+ M
+</pre></div>
+<div id="ru_corner"><pre class="small">
+.......,.,,,,,,,,,;;,,;;;;;SSSSSSSSAHHBWWWBAHWWHHHBMMWWWMMMMMMMMMMMMMMMMMMMMMM
+       ;,          +       .  ;AAIMAAHWMMWHM+,IBBWBAHMSSMWMMMMMMMMMWMMMMWMMMMM
+         .II.        ;     AIIII;A,+++WHWH   ,IBMBW.  ,+, BMMWHBSMMBAWWMMMMMMM
+            .I+.      ;+ .M,.    MW  I.W;BH,    .I,II+I+WMMH,;MAMBBHMMMMMMMWMM
+                +A,   A BWW;M   S+HBSI.+ IIS .+. +  SMHMA+,;BA;M;M MMMMM+MMMMM
+                  ;.HHS++IMSH+  I. IIBH;AB  S;+. IIBMSISI .AWW ;MWBMM;BMMMMMMM
+                   ; ; ,+.IS,,I I,  S+MM;.   H+BMWH.;. ; +H+W+BS;;AMWHBBMMMWBM
+                    , .+; ,;;.;IIH   + BWMMMMBAH   S  .;+  ;SBIIA,,BMBW+MMMMMW
+                     ..,. .   .+BBS  .,. B      S    ;.  ,+I +WSW BIIMMMMWIWMA
+                     . +. .       BH  ,. I       ;, +  ;. .,I  SSIS+;ISMWWI+MH
+                      ; +;.          +IS.I         S ,   ,,,I ;.BA,SW+MWMSM,MA
+                       . .,             IH,         ,A    .HI   +SA.+MM.H+M.WA
+                       ; +,              I  I;        S   AA H   ,BWBM+W.MHIBB
+                        ; ;              S     ,+      SI AB .A,  IBMWI.IHWMAH
+                        . +              S        .+.    S I  ;+I  BMBW.A.MMHI
+                         ;I              I           .I,I .+  . ;..HM;.SHIBAMS
+                         ,A              +              .A. S  + . MWSISSSIWBI
+                          H              +               ; ;S+,. + MHHIIWIBBWI
+                          A              ,                A   +S+ SMI A.WH WBI
+                          S                               S.    AAHMA  B,.AAMI
+                          ;                               .+     S;MBB,IIBABM+
+                          ,                                .I    ; MS..+HBWABS
+                          .                                .+   W AMM+ HMWAMMW
+                           .                               , W  WMMBMWAA MHSBI
+                           .                               , B;BM WAMMSWHHMIH;
+                           .                               ; II,WWWMWMM,+MAHB;
+                           ,                               ; ; .HB .;;MMM+SAW;
+                           ,                               ; , ;+S  A IBA  BW,
+                           .                               . .  I,+,; , BA IHS
+                                                                BSH .;  .W, H;
+                                                                +I  .I ; HM W,
+                                                              . +   . .I +A;A.
+                                                              . + S   I+  ;MS.
+                                                              , +  ;  .   IB+.
+                                                              , .  +   +.  B+,
+                                                              ,    ;I  ,;  A..
+                                                              ;    ; .  A  ,,.
+                                                              ;    , S  S  +I.
+                                                              ;       , SW HI.
+                                                              ;       I BS,A;.
+                                                              ;        I;B;;,
+                                                              ;        .H+I;,
+                                                              ;         SB;;,
+                                                              ;          A ;.
+                                                              ,          B A.
+                                                              ,          I, .
+                                                              ,          +B S
+                                                              .          S++.
+                                                                         II;.
+                                                                         IS A
+                                                                         + . 
+                                                                         ;S .
+                                                                         .  ,
+                                                              .            ,,
+                                                              ,            +,
+                                                              .            I,
+                                                                           I,
+                                                                           S;
+                                                                           S;
+                                                                           S;
+                                                                           S;
+                                                                           I;
+                                                                           ;;
+                                                                           ;;
+                                                                            I
+                                                                            S
+                                                                            S
+                                                                            H
+                                                                            B
+                                                                            W
+                                                                            B
+                                                                            B
+                                                                            H
+                                                                            I
+                                                                            I
+                                                                            I
+                                                                            I
+                                                                            I
+                                                                            I
+                                                                            I
+                                                                            I
+                                                                            I
+                                                                            S
+                                                                            I
+                                                                            S
+                                                                            I
+                                                                            S
+                                                                            I
+                                                                            S
+                                                                            S
+                                                                            S
+                                                                            S
+                                                                            S
+                                                                            B
+                                                                            W
+                                                                            M
+</pre></div>
+<div id="ld_corner"><pre class="small">
+.
+,
+;
+;
++
++
++
++
++
+I
+I
+I
+I
+S
+I
+S
+B
+A
+A
+H
+S.
+S,
+SS
+SS
+SS
+HW.
+AM,
+HMS
+WMI,
+A , ,SI
+I  H. SW
+. .   ,B
+I+ SB ; M.
+IS ABB ,W,
+A, IA  .M;
+H  + A;BM;
+A ., HMMH;
+I ++MMMM;
++ SMM  WM
++.WMIW. MS
++,MWM H MW
++ IMSW  MW.
++BMIIMSWMI.
++MA,I;MMI,
+IM  I  S.
+MM  A  +
+MH  H  ;
+M,, ;  ,
+M,; ,  .
+M ;, , .
+M H. S .
+M + +,
+M,I+,..;
+MW,  SI
+M.. +,,
+M H  +,
+M A. S A
+M ,; A ,
+M  A+I; I
+MS A +  A;
+M,IAII I
+MBIH;.+ ;I
+BMIHI, .II
+HM A H  ,.
+BM;I .+,+.+
+HW;A  B. IS
+M+WI  ;S .W
+WIMI  ,B;+,+.
+M+MW .;I.+SB
+WIWMH A  BBS+,+
+W ,M. S+SAM+.II;
+WAIWMSS A+ ..I;+,
+W. IMSW  A. H  +;S
+H SBMIA, ;A;+ + I+.
+A.HH.WIH. ;I;. . I+I
+B  SAMS.S.; AS ,  ;S.+
+WW A HMI,SS+..  I  ,.;;
+MWWI SMS;S,;  B,    ,  +S
+M,SHM+BM,,..+.;  A;  A   ,I
+MAWAS;SMA,H+A;;;  , ;,.   ++
+WA.W+,IMMSIH IIB+S+   .I.  ..S
+MH WIW++M+A;B ,+S. A SBH+II  ++
+M+H,WWSHMW++,.S;HA .SI. I  I.S+, ;;
+.MS,SWSM;MMBA+W II B +    .  I   S,;+ S
+.W,MMMMIHMM;IA.HBII S A   ;; HI    ;;; .,H,
+.MBWBM,MWMMB  BW,+A.HH +   II;.H ,  ;  IS  ++
+.MABB MMHMMHW,I.SB II,;;A.  .SS+BWS   I  AW+ .+.
+.MBWM;HWMMS.H.AIIWSB.H AAS ;I WSIM S,   I ,+I;;  ,;
+,M,SMMMMMMHMMM.S+ MHAI;S+;S  A;MMWI   +SSMI ;.  I,   +;
+,BMBM+MMMMMMH; WB+W.;W, SAAIH  , W,;W;    ;; W  .   I    ;+
+;WMWWMMIABMMMMAAW+WHHHS   WMH ,  SI HSI,S S  ;+ .    .+.    .;;
+IMMWMMMMAI,WMBI;MWMBM. WH+ ,WABH  ;  M   H+. +  +;       I.     .I.
+IMBSWMHMWAISMMHA A;WIMMSA. ;+B HHSH HMMM+...,MI  ; ;I       ;+      ;+;
+AMIMMAWAMBW;AM+AH;H+IWISWMMMWSIWMWMMMMI.    WHSA+ I   S.       ;+.     +II,
+IBMWWMWWMHMWWMMMWWMWWAWMIIHBMMMMMMWS...IWBWH+WIM.  S;    ,A         +I   ;  ,.IS
++;,.S,,I;W;+.;BAIAMIBHBWWW.            ....SI,,,;+;+IIIAHHBBWWWBBHHASSIABH+++,I   .S.
+                       +;,.              +;,.             +;,.           ..,,;;;,,;;++;;,,;;++IIISISI
+</pre></div>
+<div id="rd_corner"><pre class="small">
+                                                                                                   ;
+                                                                                                   ;
+                                                                                                   +
+                                                                                                   ;
+                                                                                                   +
+                                                                                                   +
+                                                                                                   +
+                                                                                                   +
+                                                                                                   +
+                                                                                                   I
+                                                                                                   I
+                                                                                                   I
+                                                                                                   I
+                                                                                                   I
+                                                                                                   I
+                                                                                                   S
+                                                                                                   B
+                                                                                                   A
+                                                                                                   A
+                                                                                                   H
+                                                                                                  .S
+                                                                                                  ,S
+                                                                                                  SS
+                                                                                                  SS
+                                                                                                  .S
+                                                                                                   H
+                                                                                                 , A
+                                                                                                 S H
+                                                                                                 I W
+                                                                                              IS, , A
+                                                                                             WS .H  I
+                                                                                            B,   . .I
+                                                                                            M ; BS +I
+                                                                                           +W, BBA SI
+                                                                                           ;M.  AI ,A
+                                                                                            MB;A +  H
+                                                                                            HMMH ,. A
+                                                                                            ;MMMM++ I
+                                                                                            MW  MMS +
+                                                                                           SM .WIMW.+
+                                                                                           WM H MWM,+
+                                                                                           WM   WSMI+
+                                                                                           IMWSMIIMB+
+                                                                                           ,IMM;I,AM+
+                                                                                           ..S  I  MI
+                                                                                             +  A  MM
+                                                                                             ;  H  HM
+                                                                                             ,  ; ,,M
+                                                                                             .  , ;,M
+                                                                                             . , ,; M
+                                                                                          .  . S .H M
+                                                                                          .    ,+ + M
+                                                                                              .  +I,M
+                                                                                              IS  ,WM
+                                                                                              ,,+ ..M
+                                                                                              ,+  H M
+                                                                                             A S .A M
+                                                                                             , A ;, M
+                                                                                            I ;I+A  M
+                                                                                           ;A  + A SM
+                                                                                             I IIAI,M
+                                                                                          I;  +.;HIBM
+                                                                                         . II. ,IHIMB
+                                                                                         . .   H A MH
+                                                                                        + ,+, +. I;MB
+                                                                                          SI .B  A;WH
+                                                                                       ,  W. S;  IW+M
+                                                                                      ;  ,+; B,  IMIW
+                                                                                         BS+.I;. WM+M
+                                                                                     + ,+SBB  A HMWIW
+                                                                                    ; II.+MAS+S .M, W
+                                                                                    ,+;I.. +A SSMWIAW
+                                                                                   S;+  H .A  WSMI .W
+                                                                                 .+ I + +;A; ,AIMBS H
+                                                                                I+ I . .;I; .HIW.HH.A
+                                                                              + .S;  , SA ;.S.SMAS  B
+                                                                             ;; .,  I  ..+SS,IMH A WW
+                                                                           S +  ,    ,B  ;,S;SMS IWWM
+                                                                         I ,   A  ;A  ;.+..,,MB+MHS,M
+                                                                       +  +   .,; ,  ;;;A+H,AMS;SAWAM
+                                                                     S  ..  .I.   +S+BII HISMMI,+W.AW
+                                                                   +   +  II+HBS A .S+, B;A+M++WIW HM
+                                                                ;;   ,+S.I  I .IS. AH;S.,++WMHSWW,H+M
+                                                              S  +;,S   I  .    + B II W+ABMM;MSWS,SM
+                                                           ,H,. ;;;    IH ;;   A S IIBH.AI;MMHIMMMM,W
+                                                        ++   SI  ;  , H.;II   + HH.A+,WB  BMMWM,MBWBM
+                                                    .+.   +WA  I   SWB+SS.  .A;;,II BS.I,WHMMHMM BBAM
+                                                 ;,    ;;I+, I   ,S MISW I; SAA H.BSWIIA.H.SMMWH;MWBM
+                                             ;+     ,I  .; IMSS+   IWMM;A  S;+S;IAHM +S.MMMHMMMMMMS,M
+                                         +;       I   .  W ;;    ;W;,W ,  HIAAS ,W;.W+BW ;HMMMMMM+MBM
+                                     ;;.      .+.    . +;  S S,ISH IS  , HMW   SHHHW+WAAMMMMBAIMMWWMW+
+                                 .I.       .I       ;+  + .+H   M  ;  HBAW, +HW .MBMWM;IBMW,IAMMMMWMMI
+                              ;+        +;       I; ;  IM,...+MMMH HSHH B+; .ASMMIW;A AHMMSIAWMHMWSBMI
+                          ,II +     .+;       .S   I +ASHW    .IMMMMWMWISWMMMWSIWI+H;HA+MA;WBMAWAMMIMA
+                       SI.,  ;   I+         A,    ;S  .MIW+HWBWI...SWMMMMMMBHIIMWAWWMWWMMMWWMHMWWMWWMB
+                   .S.  I,+++HBAISSAHHBBWWWBBHHAIII+;+;,,,IS....            .WWWBHBIMAIAB;.+;W;I,,S.;
+ISISIII++;;,,;;++;;,,;;;,,..           .,;+             .,;+   .,;+                   +++;;;''',,,...
+</pre></div>
+
+<!-- Site content -->
+<iframe src="news.htm" scrolling="yes" marginwidth="0" marginheight="0" style="width:757px; height:78%; position:absolute; top:16%; left:20%;">
+Iframe blocked. News should be here. Sorry.
+</iframe>
+
+<!-- Copyright -->
+<div id="copyright">
+    <font size="1" color="green"><small>Webmaster: Cristi Constantin</small><br />
+    <b>(C) 2009, Cristi Constantin, Letter Monster</b></font><br />
+</div>
+
+</body>
+</html>
