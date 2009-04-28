@@ -1,0 +1,7 @@
+<?xml version="1.0" ?>
+<lmgl version="1">
+    <raster name="rast1" data="asdrasterghj" visible="1" lock="0" origin="1,1" />
+    <vector name="vect1" data="vectorrr data" origin="2,2" />
+    <event name="evnt1" data="some event data" />
+    <macro name="macro1" data="macro asd" />
+</lmgl>
