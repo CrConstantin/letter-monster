@@ -6,14 +6,13 @@ class Raster:
     "Raster objects class"
     #
     def __init__(self):
-        self.name = None
-        self.data = None
-        self.origin = '0,0'
+        self.name = ''
+        self.data = ''
+        self.origin = (0,0)
         self.visible = False
         self.lock = False
     #
     def __str__(self):
-        '''String representation.'''
         return 'raster'
     #
 #
@@ -22,14 +21,13 @@ class Vector:
     "Vector objects class"
     #
     def __init__(self):
-        self.name = None
-        self.data = None
-        self.origin = '0,0'
+        self.name = ''
+        self.data = ''
+        self.origin = (0,0)
         self.visible = False
         self.lock = False
     #
     def __str__(self):
-        '''String representation.'''
         return 'vector'
     #
 #
@@ -38,12 +36,11 @@ class Event:
     "Event objects class"
     #
     def __init__(self):
-        self.name = None
-        self.data = None
-        self.affect_macro = None
+        self.name = ''
+        self.data = ''
+        self.affect_macro = ''
     #
     def __str__(self):
-        '''String representation.'''
         return 'event'
     #
 #
@@ -52,11 +49,10 @@ class Macro:
     "Macro objects class"
     #
     def __init__(self):
-        self.name = None
-        self.data = None
+        self.name = ''
+        self.data = ''
     #
     def __str__(self):
-        '''String representation.'''
         return 'macro'
     #
 #
@@ -71,9 +67,9 @@ class Backpack:
         '''String representation of this abstract class.'''
         return 'I am the Evil Backpack. Baaah!'
     #
-    def __repr__(self):
-        '''Scientific representation of this abstract class.'''
-        return 'I am scientific Evil Backpack. Baaah!'
+    #def __repr__(self):
+    #    '''Scientific representation of this abstract class.'''
+    #    return 'I am scientific Evil Backpack. Baaah!'
     #
     def Rotate90Right( self, vInput, Compress=True ):
         print( "Starting Rotation to Right..." )

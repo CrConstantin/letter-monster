@@ -10,17 +10,17 @@ print( 'Starting to read LMGL file...\n' )
 lm = LetterMonster()
 lm.DEBUG = True
 
-lm.Bite( 'test_lmgl.xml' )
+lm.Bite( 'test_lmgl.yaml' )
 print( 'LMGL successfully loaded.' )
 
 lm.body['vect1'].data = 'My NEW data'
-lm.body['vect1'].origin = '99,10'
+lm.body['vect1'].origin = (99,10)
 print( 'Changing some data...' )
 
-try: os.remove( 'test_lmgl_s.xml' )
+try: os.remove( 'test_lmgl_n.yaml' )
 except: pass
 
-lm.Spawn( 'test_lmgl_s.xml' )
+lm.Spawn( 'test_lmgl_n.yaml' )
 print( 'New LMGL successfully modified.' )
 
 #
