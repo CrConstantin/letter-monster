@@ -19,7 +19,11 @@ lm.DEBUG = True
 #lm.Consume( image='..\\Ana_by_Prahaai.jpg', text='Example_Consume.txt', x=0, y=175, pattern='sharp', filter='smooth|detail', algorithm='listappend' )
 #lm.Consume( image='..\\garbov_by_Arukasme.jpg', text='Example_Consume.txt', x=0, y=175, pattern='standard', filter='sharp|smooth', algorithm='listappend' )
 
-lm.Consume( image='..\\wallpaper.jpg', text='Example_Consume.txt', x=0, y=0, pattern='default', algorithm='listappend' )
+lm.Consume( image='d:/[Projects]/_Me/Letter-Monster-Old/Moon.jpg', x=100, y=100, pattern='default' )
+
+try: os.remove( 'test_lmgl_n.yaml' )
+except: pass
+lm.Spawn( 'test_lmgl_c.yaml' )
 
 #
 

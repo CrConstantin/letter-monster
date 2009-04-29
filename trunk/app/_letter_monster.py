@@ -3,12 +3,12 @@
 #    Main Class    #
 
 import Image, ImageFilter
-from os import getcwd                # Get currend directory.
-from cStringIO import StringIO       # Used for StringIO algorithm.
-from xml.dom.minidom import parse    # Used for reading XML data.
-from xml.dom.minidom import Document # Used for creating XML data.
-from time import clock               # Used for timing operations.
-from psyco import full ; full ()     # Performance boost.
+from os import getcwd            # Get currend directory.
+from cStringIO import StringIO   # Used for StringIO algorithm.
+from yaml import load, dump      # Used for reading XML data.
+from bz2 import compress         # Compress data in raster.
+from time import clock           # Used for timing operations.
+from psyco import full ; full () # Performance boost.
 
 import sys ; sys.path.insert(0, getcwd() )
 from _classes import * # Need to add current directory as path to import classes.
@@ -48,13 +48,11 @@ class LetterMonster:
     #
 #---------------------------------------------------------------------------------------------------
     #
-    def Consume(self, image='image.jpg', text='DooDoo.txt', x=0, y=0, pattern='default', filter='', algorithm='stringio'):
-        '''Takes an image and transforms it into ASCII code.'''
+    def Consume(self, image='image.jpg', x=0, y=0, pattern='default', filter=''):
+        '''Takes an image, transforms it into ASCII and stores it internally.'''
         #
         try: vInput = Image.open( image )
         except: print( '"%s" is not a valid image path! Exiting function!' % image ) ; return
-        try: vOutput = open( text, mode='w', buffering=-1 )
-        except: print( '"%s" cannot be open for writing! Exiting function!' % text ) ; return
         #
         if x and not y:     # If x has a value.
             if self.DEBUG: print( "Resizing to X = %i." % x )
@@ -98,76 +96,48 @@ class LetterMonster:
             print( '"%s" is not a valid pattern! Using default pattern.' % pattern )
             vPattern = Patterns['default']
         #
-        if algorithm=='stringio':
-            file_str = StringIO()
-        elif algorithm=='listappend':
-            vResult = []
-        else:
-            print( '"%s" is not a valid algorithm! Using default algorithm.' % algorithm )
-            algorithm = 'stringio'
-            file_str = StringIO()
+        vResult = []
 
         ti = clock()
-        if self.DEBUG: print( "Starting spawn..." )
+        if self.DEBUG: print( "Starting consume..." )
         #
-        if algorithm=='stringio':
-            #
-            vLen = len( vPattern )
-            #
-            for py in range( vInput.size[1] ): # Cycle through the image's pixels, one by one
-                file_str.write( '\n' )
-                for px in xrange( vInput.size[0] ):
-                    #
-                    RGB = vInput.getpixel((px, py))   # Retrieve pixel RGB values
-                    vColor = RGB[0] + RGB[1] + RGB[2] # Find the general darkness of the pixel
-                    #
-                    for vp in range( vLen ): # For each element in the string pattern...
-                        if vColor <= ( 255 * 3 / vLen * (vp+1) ): # Return matching character from pattern.
-                            file_str.write( vPattern[vp].encode('utf8') )
-                            break
-                        elif vColor > ( 255 * 3 / vLen * vLen ) and vColor <= ( 255 * 3 ): # If not in range, return last character from pattern.
-                            file_str.write( vPattern[-1].encode('utf8') )
-                            break
-                        #
-                    #
-                #
-            vOutput.write( file_str.getvalue() ) # Write the ASCII result to file.
-            #self.body = file_str.getvalue().split('\n')
-            file_str.close() ; del file_str
+        vLen = len( vPattern )
         #
-        elif algorithm=='listappend':
+        for py in range(vInput.size[1]): # Cycle through the image's pixels, one by one
             #
-            vLen = len( vPattern )
+            vTempRez = []
             #
-            for py in range(vInput.size[1]): # Cycle through the image's pixels, one by one
+            for px in range(vInput.size[0]):
+                RGB = vInput.getpixel((px, py))   # Retrieve pixel RGB values
+                vColor = RGB[0] + RGB[1] + RGB[2] # Find the general darkness of the pixel
                 #
-                vTempRez = []
-                #
-                for px in range(vInput.size[0]):
-                    RGB = vInput.getpixel((px, py))   # Retrieve pixel RGB values
-                    vColor = RGB[0] + RGB[1] + RGB[2] # Find the general darkness of the pixel
-                    #
-                    for vp in range( vLen ): # For each element in the string pattern...
-                        if vColor <= ( 255 * 3 / vLen * (vp+1) ): # Return matching character from pattern.
-                            vTempRez.append( vPattern[vp].encode('utf8') )
-                            break
-                        elif vColor > ( 255 * 3 / vLen * vLen ) and vColor <= ( 255 * 3 ): # If not in range, return last character from pattern.
-                            vTempRez.append( vPattern[-1].encode('utf8') )
-                            break
-                        #
+                for vp in range( vLen ): # For each element in the string pattern...
+                    if vColor <= ( 255 * 3 / vLen * (vp+1) ): # Return matching character from pattern.
+                        vTempRez.append( vPattern[vp].encode('utf8') )
+                        break
+                    elif vColor > ( 255 * 3 / vLen * vLen ) and vColor <= ( 255 * 3 ): # If not in range, return last character from pattern.
+                        vTempRez.append( vPattern[-1].encode('utf8') )
+                        break
                     #
                 #
-                vResult.append( ''.join( vTempRez ) )
-                #
-            vOutput.write( '\n'.join( vResult ) ) # Write the ASCII result to file.
-            #self.body = vResult
-            del vResult
-
+            #
+            vResult.append( ''.join( vTempRez ) )
+            #
+        #
+        for x in range(1, 9999):
+            if not self.body.get('raster'+str(x)): # If raster+x is null.
+                Elem = Raster()
+                Elem.name = 'raster'+str(x)
+                Elem.data = compress('\n'.join( vResult ), 9)
+                Elem.visible = False
+                Elem.lock = False
+                self.body['raster'+str(x)] = Elem # Save raster in body.
+                break
+            #
         tf = clock()
+
+        del vResult ; del vInput
         if self.DEBUG: print( 'Done.\nTransformation took %.4f seconds.' % (tf-ti) )
-        #
-        del vInput
-        vOutput.close() ; del vOutput
         #
     #
 #---------------------------------------------------------------------------------------------------
@@ -175,39 +145,14 @@ class LetterMonster:
     def Bite(self, lmgl):
         '''Load a LMGL (Letter Monster Graphical Letters) file.\n\
         All defined class variables are loaded from XML, all extra variables in XML are ignored.'''
-        try: vInput = open( lmgl )
+        try: vInput = open( lmgl, 'r' )
         except: print( '"%s" is not a valid LMGL path! Exiting!' % lmgl ) ; return
+        #
+        try: vLmgl = load( vInput )
+        except: print( '"%s" cannot be parsed! Invalid YAML file! Exiting function!' % lmgl ) ; return
+        #
+        self.body = vLmgl
         vInput.close ; del vInput
-        #
-        try: vLmgl = parse( lmgl )
-        except: print( '"%s" cannot be parsed! Invalid XML file! Exiting function!' % lmgl ) ; return
-        #
-        for data_type in self.data_types: # For each type (raster, vector, event, macro)
-            #
-            for xml in vLmgl.getElementsByTagName(data_type):
-                #
-                if data_type=='raster':
-                    Elem = Raster()
-                elif data_type=='vector':
-                    Elem = Vector()
-                elif data_type=='event':
-                    Elem = Event()
-                elif data_type=='macro':
-                    Elem = Macro()
-                #
-                name = xml.getAttribute('name')
-                #
-                for Attr in [ v for v in dir(Elem) if '__' not in v ]: # For each variable in current class...
-                    setattr( Elem, Attr, xml.getAttribute(Attr) ) # Set a value from LMGL to that variable.
-                    print Attr, '=', xml.getAttribute(Attr) # Display all data.
-                #
-                if name and (not getattr(self, name, 0)): # If element has a name and name is not taken.
-                    self.body[str(name)] = Elem # After loading all data, store the element in LM dict.
-                else:
-                    print( '"%s" is invalid name, or already exists! Exiting function' % name )
-                    return
-                #
-            #
         #
     #
 #---------------------------------------------------------------------------------------------------
@@ -219,19 +164,9 @@ class LetterMonster:
             print( '"%s" is a valid LMGL file! Will not overwrite. Exiting!' % lmgl ) ; return
         except: pass # If file exists, pass.
         #
-        LmglDoc = Document()                     # Creating document.
-        lmglRoot = LmglDoc.createElement('lmgl') # Creating LMGL root.
-        lmglRoot.setAttribute('version','1')
-        #
-        for vv in sorted(self.body.values()):
-            lmglChild = LmglDoc.createElement( str(vv) ) # Create child type of data.
-            for key, val in sorted(vars( vv ).items()):  # For each class instance in body, get pairs : var name, var value.
-                lmglChild.setAttribute(key, val) # Append name and value in LMGL.
-            lmglRoot.appendChild( lmglChild )
-        #
-        LmglDoc.appendChild( lmglRoot )
         vInput = open( lmgl, 'w' )
-        vInput.write( LmglDoc.toprettyxml() )
+        vInput.write( dump(self.body, width=99, indent=4, canonical=False, default_flow_style=False,
+            explicit_start=True, explicit_end=True) )
         vInput.close() ; del vInput
     #
 #---------------------------------------------------------------------------------------------------
@@ -244,7 +179,7 @@ class LetterMonster:
 #---------------------------------------------------------------------------------------------------
     #
     def Morph(self): # Mutate
-        '''Moves the internal engine layers, thus making Spit (Render) return different images.'''
+        '''Changes the internal engine layers, thus making Spit (Render) return different images.'''
         pass
     #
 #---------------------------------------------------------------------------------------------------
