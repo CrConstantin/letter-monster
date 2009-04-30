@@ -10,7 +10,7 @@ print( 'Starting to read LMGL file...\n' )
 lm = LetterMonster()
 lm.DEBUG = True
 
-lm.Bite( 'test_lmgl.yaml' )
+lm.Load( 'test_lmgl.yaml' )
 print( 'LMGL successfully loaded.' )
 
 lm.body['vect1'].data = 'My NEW data'
@@ -20,7 +20,7 @@ print( 'Changing some data...' )
 try: os.remove( 'test_lmgl_n.yaml' )
 except: pass
 
-lm.Spawn( 'test_lmgl_n.yaml' )
+lm.Save( 'test_lmgl_n.yaml' )
 print( 'New LMGL successfully modified.' )
 
 #
