@@ -11,6 +11,7 @@ class Raster:
         self.origin = (0,0)
         self.visible = False
         self.lock = False
+        self.z = 0
     #
     def __str__(self):
         return 'raster'
@@ -26,6 +27,7 @@ class Vector:
         self.origin = (0,0)
         self.visible = False
         self.lock = False
+        self.z = -1
     #
     def __str__(self):
         return 'vector'
@@ -39,6 +41,7 @@ class Event:
         self.name = ''
         self.data = ''
         self.affect_macro = ''
+        self.z = -1
     #
     def __str__(self):
         return 'event'
@@ -51,6 +54,7 @@ class Macro:
     def __init__(self):
         self.name = ''
         self.data = ''
+        self.z = 0
     #
     def __str__(self):
         return 'macro'
@@ -58,7 +62,8 @@ class Macro:
 #
 
 class Backpack:
-    "This is helper functions class."
+    "This is helper functions class.\n\
+    It uses no arguments for initialization."
     #
     def __init__(self):
         self.vContent = None
@@ -66,10 +71,6 @@ class Backpack:
     def __str__(self):
         '''String representation of this abstract class.'''
         return 'I am the Evil Backpack. Baaah!'
-    #
-    #def __repr__(self):
-    #    '''Scientific representation of this abstract class.'''
-    #    return 'I am scientific Evil Backpack. Baaah!'
     #
     def Rotate90Right( self, vInput, Compress=True ):
         print( "Starting Rotation to Right..." )

@@ -1,28 +1,29 @@
 ---
 raster1: !!python/object:_classes.Raster
     name: raster1
-    data: "asdfghjkl"
+    data: "raster1\n0000000\nxxxxxdata"
     origin: 1,1
     visible: False
     lock: True
-
+    z: 1
 raster2: !!python/object:_classes.Raster
     name: raster2
-    data: "123123123123"
+    data: "123\n456321\n789\n000\nlast-line"
     origin: 2,2
     visible: True
     lock: False
-
+    z: 2
 vect1: !!python/object:_classes.Vector
     name: vect1
     data: "some vector data"
     origin: 9,9
     visible: False
     lock: False
-
+    z: 3
 evnt1: !!python/object:_classes.Event
     name: evnt1
     data: "event data..."
     visible: False
     affect_macro: ''
+    z: -1
 ...
