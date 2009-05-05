@@ -4,11 +4,11 @@
 
 import Image, ImageFilter
 from os import getcwd                # Get currend directory.
+from array import array              # Arrays.
 from yaml import load, dump          # Used for reading XML data.
 from bz2 import compress, decompress # Compress data in raster.
 from time import clock               # Used for timing operations.
 from psyco import full ; full ()     # Performance boost.
-
 import sys ; sys.path.insert(0, getcwd() ) # Save current dir in path.
 from _classes import * # Need to add curr dir as path to import classes.
 
@@ -104,7 +104,7 @@ class LetterMonster:
         #
         for py in range(vInput.size[1]): # Cycle through the image's pixels, one by one
             #
-            vTempRez = []
+            vTempRez = array('u',[])
             #
             for px in range(vInput.size[0]):
                 RGB = vInput.getpixel((px, py))   # Retrieve pixel RGB values
@@ -112,10 +112,10 @@ class LetterMonster:
                 #
                 for vp in range( vLen ): # For each element in the string pattern...
                     if vColor <= ( 255 * 3 / vLen * (vp+1) ): # Return matching character from pattern.
-                        vTempRez.append( vPattern[vp].encode('utf8') )
+                        vTempRez.append( vPattern[vp] )
                         break
                     elif vColor > ( 255 * 3 / vLen * vLen ) and vColor <= ( 255 * 3 ): # If not in range, return last character from pattern.
-                        vTempRez.append( vPattern[-1].encode('utf8') )
+                        vTempRez.append( vPattern[-1] )
                         break
                     #
                 #
