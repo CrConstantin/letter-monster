@@ -79,15 +79,15 @@ class LetterMonster:
             #
         #
         Patterns = {
-        'default'    : u'&80$21|;:\' ',                        # Original Patrick T. Cossette pattern
-        'cro'        : u'MWBHASI+;,. ',                        # Cristi Constantin pattern
-        'dos'        : u'\u2588\u2593\u2592\u2665\u2666\u263b\u256c\u263a\u25ca\u25cb\u2591 ', # Cristi Constantin DOS pattern.
-        'sharp'      : u'#w4Axv^*\"\'` ',                      # Cristi Constantin Sharp
-        'smooth'     : u'a@\u00a9\u0398O90c\u00a4\u2022. ',    # Cristi Constantin Smooth
-        'vertical'   : u'\u00b6\u0132I|}\u00ce!VAi; ',         # Cristi Constantin Vertical
-        'horizontal' : u'\u25ac\u039e\u00ac\u2261=\u2248~-. ', # Cristi Constantin Horizontal
-        'numbers'    : u'0684912357',
-        'letters'    : u'NADXEIQOVJL ',
+        'default'    : array('u',u'&80$21|;:\' '),                        # Original Patrick T. Cossette pattern
+        'cro'        : array('u',u'MWBHASI+;,. '),                        # Cristi Constantin pattern
+        'dos'        : array('u',u'\u2588\u2593\u2592\u2665\u2666\u263b\u256c\u263a\u25ca\u25cb\u2591 '), # Cristi Constantin DOS pattern.
+        'sharp'      : array('u',u'#w4Axv^*\"\'` '),                      # Cristi Constantin Sharp
+        'smooth'     : array('u',u'a@\u00a9\u0398O90c\u00a4\u2022. '),    # Cristi Constantin Smooth
+        'vertical'   : array('u',u'\u00b6\u0132I|}\u00ce!VAi; '),         # Cristi Constantin Vertical
+        'horizontal' : array('u',u'\u25ac\u039e\u00ac\u2261=\u2248~-. '), # Cristi Constantin Horizontal
+        'numbers'    : array('u',u'0684912357'),
+        'letters'    : array('u',u'NADXEIQOVJL '),
         }
 
         if pattern.lower() in Patterns.keys():
@@ -101,16 +101,17 @@ class LetterMonster:
         if self.DEBUG: print( "Starting consume..." )
         #
         vLen = len( vPattern )
+        getpx = vInput.getpixel
         #
         for py in range(vInput.size[1]): # Cycle through the image's pixels, one by one
             #
-            vTempRez = array('u',[])
+            vTempRez = array('u',u'')
             #
             for px in range(vInput.size[0]):
-                RGB = vInput.getpixel((px, py))   # Retrieve pixel RGB values
+                RGB = getpx((px, py))             # Retrieve pixel RGB values
                 vColor = RGB[0] + RGB[1] + RGB[2] # Find the general darkness of the pixel
                 #
-                for vp in range( vLen ): # For each element in the string pattern...
+                for vp in range( vLen ):                      # For each element in the string pattern...
                     if vColor <= ( 255 * 3 / vLen * (vp+1) ): # Return matching character from pattern.
                         vTempRez.append( vPattern[vp] )
                         break
@@ -120,14 +121,17 @@ class LetterMonster:
                     #
                 #
             #
-            vResult.append( ''.join( vTempRez ) )
+            vResult.append( vTempRez.tostring() )
+            del vTempRez
             #
+        print type(vResult)
+        print type(vResult[0])
         #
-        for x in range(1, 9999):
-            if not self.body.get('raster'+str(x)): # If raster+x is null.
+        for x in range(1, 999):
+            if not self.body.get('raster'+str(x)): # If "raster+x" doesn't exist.
                 Elem = Raster()
                 Elem.name = 'raster'+str(x)
-                Elem.data = compress('\n'.join( vResult ), 9)
+                Elem.data = compress( '\n'.join( vResult ), 6 )
                 Elem.visible = False
                 Elem.lock = False
                 self.body['raster'+str(x)] = Elem # Save raster in body.
@@ -169,8 +173,8 @@ class LetterMonster:
         #
         ti = clock()
         vInput = open( lmgl, 'w' )
-        vInput.write( dump(self.body, width=99, indent=4, canonical=False, default_flow_style=False,
-            explicit_start=True, explicit_end=True) )
+        dump(self.body, stream=vInput, width=99, indent=4, canonical=False, default_flow_style=False,
+            explicit_start=True, explicit_end=True)
         vInput.close() ; del vInput
         tf = clock()
         #
