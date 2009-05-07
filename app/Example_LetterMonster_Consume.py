@@ -19,7 +19,7 @@ lm.DEBUG = True
 #lm.Consume( image='..\\Ana_by_Prahaai.jpg', text='Example_Consume.txt', x=0, y=175, pattern='sharp', filter='smooth|detail' )
 #lm.Consume( image='..\\garbov_by_Arukasme.jpg', text='Example_Consume.txt', x=0, y=175, pattern='standard', filter='sharp|smooth' )
 
-lm.Consume( image='../Moon.jpg', x=0, y=0, pattern='default' )
+lm.Consume( image='../Moon.jpg', x=0, y=0, pattern='dos' )
 
 try: os.remove( 'test_lmgl_c.yaml' )
 except: pass
