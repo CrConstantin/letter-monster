@@ -15,18 +15,18 @@ from psyco import full ; full ()     # Performance boost.
 import sys ; sys.path.insert(0, getcwd() ) # Save current dir in path.
 from _classes import * # Need to add curr dir as path to import classes.
 
-print 'I am Python!'
+print 'I am Python r16!'
 
 #
 # Define YAML represent for numpy ndarray.
 def ndarray_repr(dumper, data):
-    return dumper.represent_scalar(u'!ndarray', compress(data.dumps()).decode('iso-8859-15'))
+    return dumper.represent_scalar(u'!ndarray', compress(data.dumps()).decode('latin_1'))
 add_representer(np.ndarray, ndarray_repr)
 #
 # Define YAML construct data for numpy ndarray.
-def ndarray_construc(loader, node):
-    return np.loads(decompress(loader.construct_scalar(node).encode('iso-8859-15')))
-add_constructor(u'!ndarray', ndarray_construc)
+def ndarray_construct(loader, node):
+    return np.loads(decompress(loader.construct_scalar(node).encode('latin_1')))
+add_constructor(u'!ndarray', ndarray_construct)
 #
 def sort_zorder(x):
     return x.z
@@ -116,7 +116,8 @@ class LetterMonster:
             print( '"%s" is not a valid pattern! Using default pattern.' % pattern )
             vPattern = Patterns['default']
         #
-        ti = clock()
+        ti = clock() # Global counter.
+        tti = clock() # Local counter.
         vResult = []
         if self.DEBUG: print( "Starting consume..." )
         #
@@ -145,9 +146,8 @@ class LetterMonster:
             del vTempRez ; del RGB ; del vColor
             #
         #
-        tf = clock()
-        if self.DEBUG: print( 'Transformation took %.4f seconds.' % (tf-ti) )
-        ti = clock()
+        ttf = clock()
+        if self.DEBUG: print( 'Transformation took %.4f seconds.' % (ttf-tti) )
         for x in range(1, 999):
             if not 'raster'+str(x) in self.body: # If "raster+x" doesn't exist.
                 Elem = Raster()
@@ -163,7 +163,7 @@ class LetterMonster:
         del vResult ; del vInput
         tf = clock()
         #
-        if self.DEBUG: print( 'Saving to self.body took %.4f seconds.' % (tf-ti) )
+        if self.DEBUG: print( 'Consume took %.4f seconds total.' % (tf-ti) )
         #
     #
 #---------------------------------------------------------------------------------------------------
@@ -178,10 +178,10 @@ class LetterMonster:
         #
         ti = clock()
         self.body = vLmgl
-        vInput.close ; del vInput
+        vInput.close() ; del vInput
         tf = clock()
         #
-        if self.DEBUG: print( 'Load took %.4f seconds.' % (tf-ti) )
+        if self.DEBUG: print( 'Loading LMGL took %.4f seconds total.' % (tf-ti) )
         #
     #
 #---------------------------------------------------------------------------------------------------
@@ -200,7 +200,7 @@ class LetterMonster:
         vInput.close() ; del vInput
         tf = clock()
         #
-        if self.DEBUG: print( 'Save took %.4f seconds.' % (tf-ti) )
+        if self.DEBUG: print( 'Saving LMGL took %.4f seconds total.' % (tf-ti) )
         #
     #
 #---------------------------------------------------------------------------------------------------
@@ -224,59 +224,68 @@ class LetterMonster:
     #
 #---------------------------------------------------------------------------------------------------
     #
-    def Spawn(self, lmgl=None, type='txt', filename='Out'):
+    def Spawn(self, lmgl=None, out='txt', filename='Out'):
         '''Export function. Saves the current reprezentation of the engine.\n\
     Can also transform one LMGL.'''
         if lmgl: # If a LMGL file is specified, export only the LMGL, don't change self.body.
+            ti = clock() # Global counter.
+            tti = clock() # Local counter.
             try: vInput = open( lmgl, 'r' )
             except: print( '"%s" is not a valid path! Exiting function!' % lmgl ) ; return
             #
             try: vLmgl = load( vInput )
             except: print( '"%s" cannot be parsed! Invalid YAML file! Exiting function!' % lmgl ) ; return
             #
-            vInput.close ; del vInput
+            vInput.close() ; del vInput
+            ttf = clock()
+            if self.DEBUG: print( 'Loading LMGL (Spawn) took %.4f seconds.' % (ttf-tti) )
         else: vLmgl = self.body
         #
-        if type=='txt':
+        if out=='txt':
             pass
-        elif type=='xls':
+        elif out=='xls':
             pass
-        elif type=='html':
+        elif out=='html':
             pass
-        else: print( '"%s" is not a valid export type! Exiting function!' % type ) ; return
+        else: print( '"%s" is not a valid export type! Exiting function!' % out ) ; return
         #
-        ti = clock()
-        TempA = [[]]
-        for elem in sorted(vLmgl.values(), key=sort_zorder): # For each data type in body, sorted by Z-order.
-            if str(elem)=='raster':
-                tdi = clock()
-                Data = elem.data
+        TempA = [np.empty(0,'U')]
+        for elem in sorted(vLmgl.values(), key=sort_zorder):
+            if str(elem)=='raster': # For each raster in body, sorted by Z-order.
+                tti = clock()
+                Data = elem.data    # This is a list of numpy ndarrays.
                 #
-                for nr_row in range( len(Data) ): # For each row in Data.
+                for nr_row in range( len(Data) ):  # For each row in Data.
                     #
-                    TempB = TempA[nr_row:nr_row+1] or [[]]       # Save old temp row. If no row defined, use one default.
-                    TempB[0][0:len(Data[nr_row])] = Data[nr_row] # Replace old temp nr_row with new data.
-                    TempA[nr_row:nr_row+1] = TempB               # Save replaced nr_row.
+                    NData = Data[nr_row]           # New data, to be written over old data.
+                    OData = TempA[nr_row:nr_row+1] # This is old data.
+                    #
+                    if len(NData) >= len(OData):
+                        # TempB = New data.
+                        TempB = NData
+                    else: # If old data is longer than new data.
+                        # TempB = old data, resized to New length, or = with empty Unicode array of New length.
+                        TempB = np.resize( OData, len(NData) )
+                        TempB.put( (0,len(NData)-1), NData )
+                    #
+                    TempA[nr_row:nr_row+1] = [TempB] # Save replaced row as new, or overwrite existing.
                     #
                     del TempB
                     #
                 #
-                del Data
-                #
-                tdf = clock()
-                print( 'Overwrite data took %.4f seconds.' % (tdf-tdi) )
+                ttf = clock()
+                if self.DEBUG: print( 'Overwriting data took %.4f seconds.' % (ttf-tti) )
             # If not raster, pass.
         #
-        self.cache = TempA
-        del TempA
-        #
+        tti = clock()
         vOut = open( filename+'.txt', 'w' )
-        vOut.write( '\n'.join( [ ''.join([j.encode('utf8') for j in i]) for i in self.cache ] ) )
-        vOut.close() ; del vOut
-        self.cache = [] # Empty cache.
-        tf = clock()
+        vOut.write( '\n'.join([ ''.join([j.encode('utf8') for j in i]) for i in TempA ]) )
+        vOut.close() ; del TempA ; del vOut
+        ttf = clock()
+        if self.DEBUG: print( 'Unite arrays and lists took %.4f seconds.' % (ttf-tti) )
         #
-        if self.DEBUG: print( 'Spawn took %.4f seconds.' % (tf-ti) )
+        tf = clock()
+        if self.DEBUG: print( 'Spawn took %.4f seconds total.' % (tf-ti) )
         #
     #
 
