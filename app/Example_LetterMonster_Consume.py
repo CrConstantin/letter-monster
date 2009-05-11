@@ -7,7 +7,7 @@ from _letter_monster import LetterMonster
 lm = LetterMonster()
 lm.DEBUG = True
 #
-lm.Consume( image='../Wallpaper.jpg', x=0, y=0, pattern='default' )
+lm.Consume( image='../Wallpaper4.jpg', x=0, y=0, pattern='default' )
 #
 try: os.remove( 'test_lmgl_cons.yaml' )
 except: pass
@@ -20,15 +20,15 @@ print 'Inside Data, is type:', type(lm.body['raster1'].data[0])
 print 'Data is len:', len(lm.body['raster1'].data)
 print 'Data 0-10:', lm.body['raster1'].data[0][0:10]
 #
-lm.Load( 'test_lmgl_cons.yaml' )
-del lm.body['raster1'].data[0]
+#lm.Load( 'test_lmgl_cons.yaml' )
+#del lm.body['raster1'].data[0]
 #
-print 'Body 2: ', lm.body, '\n'
+#print 'Body 2: ', lm.body, '\n'
 #
-print 'Data is type:', type(lm.body['raster1'].data)
-print 'Inside Data, is type:', type(lm.body['raster1'].data[0])
-print 'Data is len:', len(lm.body['raster1'].data)
-print 'Data 0-10:', lm.body['raster1'].data[0][0:10]
+#print 'Data is type:', type(lm.body['raster1'].data)
+#print 'Inside Data, is type:', type(lm.body['raster1'].data[0])
+#print 'Data is len:', len(lm.body['raster1'].data)
+#print 'Data 0-10:', lm.body['raster1'].data[0][0:10]
 #
 print( "Please, use Lucida Console Bold, size 4 for viewing." )
 #
