@@ -15,7 +15,7 @@ from psyco import full ; full ()     # Performance boost.
 import sys ; sys.path.insert(0, getcwd() ) # Save current dir in path.
 from _classes import * # Need to add curr dir as path to import classes.
 
-print 'I am Python r16!'
+print 'I am Python r17!'
 
 #
 # Define YAML represent for numpy ndarray.
@@ -195,7 +195,7 @@ class LetterMonster:
         #
         ti = clock()
         vInput = open( lmgl, 'w' )
-        dump(self.body, stream=vInput, width=99, indent=4, canonical=False, default_flow_style=False,
+        dump(self.body, stream=vInput, width=99, indent=2, canonical=False, default_flow_style=False,
             explicit_start=True, explicit_end=True)
         vInput.close() ; del vInput
         tf = clock()
@@ -249,28 +249,26 @@ class LetterMonster:
             pass
         else: print( '"%s" is not a valid export type! Exiting function!' % out ) ; return
         #
-        TempA = [np.empty(0,'U')]
+        TempA = [[]]
         for elem in sorted(vLmgl.values(), key=sort_zorder):
             if str(elem)=='raster': # For each raster in body, sorted by Z-order.
                 tti = clock()
                 Data = elem.data    # This is a list of numpy ndarrays.
                 #
-                for nr_row in range( len(Data) ):  # For each row in Data.
+                for nr_row in range( len(Data) ): # For each numpy ndarray (row) in Data.
                     #
-                    NData = Data[nr_row]           # New data, to be written over old data.
-                    OData = TempA[nr_row:nr_row+1] # This is old data.
+                    NData = Data[nr_row]                   # New data, to be written over old data.
+                    OData = TempA[nr_row:nr_row+1] or [[]] # This is old data. Can be numpy ndarray, or empty list.
+                    OData = OData[0]
                     #
-                    if len(NData) >= len(OData):
-                        # TempB = New data.
-                        TempB = NData
-                    else: # If old data is longer than new data.
-                        # TempB = old data, resized to New length, or = with empty Unicode array of New length.
-                        TempB = np.resize( OData, len(NData) )
-                        TempB.put( (0,len(NData)-1), NData )
-                    #
-                    TempA[nr_row:nr_row+1] = [TempB] # Save replaced row as new, or overwrite existing.
-                    #
-                    del TempB
+                    if len(NData) >= len(OData): 
+                        # If new data is longer than old data, old data will be completely overwritten.
+                        TempA[nr_row:nr_row+1] = [NData]
+                    else: # Old data is longer than new data ; old data cannot be null.
+                        TempB = np.copy(OData)
+                        TempB.put( range(len(NData)), NData )
+                        TempA[nr_row:nr_row+1] = [TempB]
+                        del TempB
                     #
                 #
                 ttf = clock()
