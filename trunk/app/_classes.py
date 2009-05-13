@@ -25,12 +25,12 @@ class Vector:
     #
     def __init__(self):
         self.name = ''
-        self.instructions = ''
+        self.instructions = []
         self.data = []
         self.origin = (0,0)
         self.visible = False
         self.lock = False
-        self.z = -1
+        self.z = 0
     #
     def __str__(self):
         return 'vector'
@@ -42,7 +42,7 @@ class Event:
     #
     def __init__(self):
         self.name = ''
-        self.instructions = ''
+        self.affect = ''
         self.affect_macro = ''
         self.z = -1
     #
@@ -56,8 +56,8 @@ class Macro:
     #
     def __init__(self):
         self.name = ''
-        self.instructions = ''
-        self.z = 0
+        self.instructions = []
+        self.z = -1
     #
     def __str__(self):
         return 'macro'
