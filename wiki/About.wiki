@@ -1,11 +1,12 @@
 #labels Phase-Design
-
 =What is Letter Monster?=
 
-    * *Letter Monster* is a text rendering engine. It renders letters in a very similar way to a game engine that renders pixels.
-    * It can transform images into : ASCII Text, mono-color or multi-color Excel tables, mono-color or multi-color HTML tables.
-    * It can create text shapes and text interfaces.
-    * It can generate mono-color or multi-color ASCII animations. Animations are programable and can interact with the user. They can be used for ASCII movies, web design, or games. They can be embeded into websites, or can become standalone applications.
+    * *Letter Monster* is a text rendering engine. It renders letters in a very similar way to a 2D/3D engine that renders pixels.
+    * Can transform images (JPG, PNG, BMP) into : ASCII Text, mono-color or multi-color Excel tables, mono-color or multi-color HTML tables.
+    * Can create complex text shapes and text interfaces.
+    * Can make mono-color or multi-color ASCII animations.
+    * Can generate programs that respond to user input and react to events.
+    * Can be used for ASCII movies, web design, or games. Can be embeded into websites, or can become standalone applications.
     * There are two distinct versions of *Letter Monster* : colored and non-colored. In colored version, each letter has a color, in non-colored version, only plain letters are used to describe shapes.
     * *Letter Monster* Backpack can edit large TXT files : rotate, mirror, align, crop, resize, border, etc.
     * *Letter Monster* is 100% free. No hidden costs. You can use it anywhere, anyhow, anytime. *Letter Monster* will always be free, for home or commercial users. 
