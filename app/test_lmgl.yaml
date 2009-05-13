@@ -74,7 +74,15 @@ event1: !!python/object:_classes.Event
   visible: false
   z: -1
 vect1: !!python/object:_classes.Vector
-  data: some vector data
+  data: no data
+  instructions:
+  - f: FlipV
+    vInput: raster1
+  - f: Center
+    vInput: vect1
+  - f: Border
+    Char: '#'
+    vInput: vect1
   lock: false
   name: vect1
   origin: !!python/tuple

@@ -15,7 +15,7 @@ from psyco import full ; full ()     # Performance boost.
 import sys ; sys.path.insert(0, getcwd() ) # Save current dir in path.
 from _classes import * # Need to add curr dir as path to import classes.
 
-print 'I am Python r17!'
+print 'I am Python r19!'
 
 #
 # Define YAML represent for numpy ndarray.
@@ -32,9 +32,9 @@ def sort_zorder(x):
     return x.z
 
 class LetterMonster:
-    "This is the Letter Monster Class.\n\
+    '''This is the Letter Monster Class.\n\
     ^-^ You would have never guessed it.\n\
-    It uses no arguments for initialization."
+    It uses no arguments for initialization.'''
     #
     def __init__(self):
         #
@@ -44,7 +44,6 @@ class LetterMonster:
         self.bp = Backpack() # Helper functions instance.
         self.data_types = ('raster', 'vector', 'event', 'macro')
         self.body = {}
-        self.cache = []
         #
         self.visible_size = (100, 100)
         self.max_morph_rate = 1
@@ -55,6 +54,47 @@ class LetterMonster:
     def __str__(self):
         '''String representation of the engine.'''
         return 'I am Letter Monster. Baaah!'
+        #
+    #
+#---------------------------------------------------------------------------------------------------
+    #
+    def _execute(self, object):
+        '''Automatically execute object instructions. "Object" is the name of a data structure.'''
+        #
+        try:
+            vElem = self.body[object]
+            vInstructions = vElem.instructions
+        except: print( '"%s" object doesn\'t have instructions, or doesn\'t exist! Exiting execute!' % object ) ; return
+        #
+        if not vInstructions:
+            print( '"%s" has null instructions! Exiting execute!' % object ) ; return
+        #
+        if str(vElem)=='vector':
+            for vInstr in vInstructions: # For each dictionary in the instructions list.
+                vFunc = vInstr['f']      # Save the function to call, then delete this mapping.
+                del vInstr['f']
+                #
+                f = getattr(self.bp, vFunc, 'Error') # Save the function call.
+                #
+                if f!='Error': # If function is not Error, means it's valid.
+                    #
+                    # This is a BARBARIAN, TEMPORARY solution. In current implementation, vInput must be a string so i overwrite the list of ndarrays.
+                    try: vInstr['vInput'] = '\n'.join([ ''.join([j.encode('utf8') for j in i]) for i in self.body[vInstr['vInput']].data ])
+                    except: print( '"%s" doesn\'t have valid data! Call ignored!' % vInput ) ; continue
+                    #
+                    # Try to call the function with parameters and catch the errors.
+                    try: vData = f( **vInstr )
+                    except TypeError: print( 'Incorrect arguments for function "%s"! Call ignored!' % vFunc ) ; continue
+                    except: print( 'Unknown error occured in "%s" function call! Call ignored!' % vFunc ) ; continue
+                    #
+                    # Explode data back.
+                    self.body[object].data = [ np.array([i for i in j],'U') for j in vData.split('\n') ]
+                    #
+                else:
+                    print( 'Function "%s" doesn\'t exist! Call ignored!' % vFunc )
+                #
+        else:
+            print( 'Instructions for "%s" object not yet implemented!' % str(vElem) ) ; return
         #
     #
 #---------------------------------------------------------------------------------------------------
@@ -150,13 +190,13 @@ class LetterMonster:
         if self.DEBUG: print( 'Transformation took %.4f seconds.' % (ttf-tti) )
         for x in range(1, 999):
             if not 'raster'+str(x) in self.body: # If "raster+x" doesn't exist.
-                Elem = Raster()
-                Elem.name = 'raster'+str(x)
-                Elem.data = vResult
-                Elem.visible = False
-                Elem.lock = False
-                self.body['raster'+str(x)] = Elem # Save raster in body.
-                del Elem
+                vElem = Raster()
+                vElem.name = 'raster'+str(x)
+                vElem.data = vResult
+                vElem.visible = False
+                vElem.lock = False
+                self.body['raster'+str(x)] = vElem # Save raster in body.
+                del vElem
                 break
             #
         #
@@ -173,10 +213,10 @@ class LetterMonster:
         try: vInput = open( lmgl, 'r' )
         except: print( '"%s" is not a valid path! Exiting function!' % lmgl ) ; return
         #
+        ti = clock()
         try: vLmgl = load( vInput )
         except: print( '"%s" cannot be parsed! Invalid YAML file! Exiting function!' % lmgl ) ; return
         #
-        ti = clock()
         self.body = vLmgl
         vInput.close() ; del vInput
         tf = clock()
@@ -208,25 +248,25 @@ class LetterMonster:
     def Feed(self):
         '''Connect to a LMGL (Letter Monster Graphical Letters) file.\n\
     Everytime a Morph happens, the LMGL file is updated on hard disk.'''
-        print 'This is a TODO.'
+        print "I need faster YAML pickling / unpickling to finish this function."
     #
 #---------------------------------------------------------------------------------------------------
     #
-    def Mutate(self):
-        '''Changes internal engine layers, thus making Spit / Export return different values.'''
+    def Command(self):
+        '''Remotely command letter monster.'''
         pass
     #
 #---------------------------------------------------------------------------------------------------
     #
     def Spit(self):
         '''Render function. Returns the current reprezentation of the engine.'''
-        pass
+        print "This is a TODO for next versions."
     #
 #---------------------------------------------------------------------------------------------------
     #
     def Spawn(self, lmgl=None, out='txt', filename='Out'):
         '''Export function. Saves the current reprezentation of the engine.\n\
-    Can also transform one LMGL.'''
+    Can also export one LMGL into TXT, Excel, HTML, without changing the engine.'''
         if lmgl: # If a LMGL file is specified, export only the LMGL, don't change self.body.
             ti = clock() # Global counter.
             tti = clock() # Local counter.
