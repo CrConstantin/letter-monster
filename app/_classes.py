@@ -66,7 +66,8 @@ class Macro:
 
 class Backpack:
     "This is helper functions class.\n\
-    It uses no arguments for initialization."
+    It uses no arguments for initialization.\n\
+    All functions in Backpack take vInput as input. vInput MUST be a lis of Unicode ndarrays."
     #
     def __init__(self):
         self.vContent = None
@@ -74,6 +75,12 @@ class Backpack:
     def __str__(self):
         '''String representation of this abstract class.'''
         return 'I am the Evil Backpack. Baaah!'
+    #
+    def __test_input(self, INPUT):
+        '''Tests of vInput is a valid list of numpy ndarrays.'''
+        if str(type(INPUT))=="<type 'list'>" and str(type(INPUT[0]))=="<type 'numpy.ndarray'>":
+            return True
+        else: return False
     #
     def StrToYamlNdarray( self, vInput, Transform=True ):
         #
@@ -93,10 +100,12 @@ class Backpack:
     #
     def Rotate90Right( self, vInput, Compress=True ):
         #
-        self.vContent = vInput.split('\n')
-        self.vContent.reverse()
+        if not self.__test_input(vInput): print( 'vInput is not a list of numpy ndarrays! Exiting function.' ) ; return
         #
+        self.vContent = [ ''.join([j.encode('utf8') for j in i]) for i in vInput ]
+        self.vContent.reverse()
         vMaxLen = 0
+        #
         for vElem in self.vContent:
             if len(vElem) > vMaxLen: # Save lines max length.
                 vMaxLen = len(vElem)
@@ -111,16 +120,17 @@ class Backpack:
             for x in range( len(self.vContent) ): # Remove extra spaces from the end of the lines.
                 self.vContent[x] = self.vContent[x].rstrip()
         #
+        self.vContent = [ np.array([i for i in j],'U') for j in self.vContent ]
         print( "Done rotating 90 degrees right." )
-        self.vContent = '\n'.join( self.vContent )
         return self.vContent
         #
     #
     def Rotate90Left( self, vInput, Compress=True ):
         #
-        self.vContent = vInput.split('\n')
-        #
+        if not self.__test_input(vInput): print( 'vInput is not a list of numpy ndarrays! Exiting function.' ) ; return
+        self.vContent = [ ''.join([j.encode('utf8') for j in i]) for i in vInput ]
         vMaxLen = 0
+        #
         for vElem in self.vContent:
             if len(vElem) > vMaxLen: # Save lines max length.
                 vMaxLen = len(vElem)
@@ -136,167 +146,182 @@ class Backpack:
                 self.vContent[x] = self.vContent[x].rstrip()
         #
         self.vContent.reverse()
+        self.vContent = [ np.array([i for i in j],'U') for j in self.vContent ]
         print( "Done rotating 90 degrees left." )
-        self.vContent = '\n'.join( self.vContent )
         return self.vContent
         #
     #
     def FlipH( self, vInput ):
         #
-        self.vContent = vInput.split('\n')
+        if not self.__test_input(vInput): print( 'vInput is not a list of numpy ndarrays! Exiting function.' ) ; return
+        #
         vRevCont = []
+        for vLine in vInput:
+            vRevCont.append( vLine[::-1] ) # Reverse content for each line.
+        self.vContent = vRevCont
         #
-        for vLine in self.vContent:
-            vRevCont.append( vLine[::-1] ) # Reverse letters for each line.
-        #
-        print( "Done reversing letters for each line." )
-        self.vContent = '\n'.join( vRevCont )
+        print( "Done reversing content for each line." )
         return self.vContent
         #
     #
     def FlipV( self, vInput ):
         #
-        self.vContent = vInput.split('\n')
-        self.vContent.reverse() # First file line becomes last file line.
+        if not self.__test_input(vInput): print( 'vInput is not a list of numpy ndarrays! Exiting function.' ) ; return
         #
-        print( "Done reversing lines." )
-        self.vContent = '\n'.join( self.vContent )
+        vInput.reverse()
+        self.vContent = vInput # First line becomes last line.
+        #
+        print( "Done reversing order of lines." )
         return self.vContent
         #
     #
     def Reverse( self, vInput ):
         #
-        self.vContent = vInput
+        if not self.__test_input(vInput): print( 'vInput is not a list of numpy ndarrays! Exiting function.' ) ; return
         #
-        self.vContent = self.vContent[::-1] # Reverse all content.
+        vInput.reverse() # Reverse all lines.
+        vRevCont = []
+        for vLine in vInput:
+            vRevCont.append( vLine[::-1] ) # Reverse content for each line.
+        self.vContent = vRevCont
+        #
         print( "Done reversing content." )
         return self.vContent
         #
     #
     def StripRightSpace( self, vInput ):
         #
-        self.vContent = vInput.split('\n')
+        if not self.__test_input(vInput): print( 'vInput is not a list of numpy ndarrays! Exiting function.' ) ; return
         #
+        self.vContent = [ ''.join([j.encode('utf8') for j in i]) for i in vInput ]
         for x in range( len(self.vContent) ): # Remove extra spaces from the end of the lines.
             self.vContent[x] = self.vContent[x].rstrip()
+        self.vContent = [ np.array([i for i in j],'U') for j in self.vContent ]
         #
         print( "Done striping right spaces for each line." )
-        self.vContent = '\n'.join( self.vContent )
         return self.vContent
         #
     #
     def StripLeftSpace( self, vInput ):
         #
-        self.vContent = vInput.split('\n')
+        if not self.__test_input(vInput): print( 'vInput is not a list of numpy ndarrays! Exiting function.' ) ; return
         #
+        self.vContent = [ ''.join([j.encode('utf8') for j in i]) for i in vInput ]
         for x in range( len(self.vContent) ): # Remove extra spaces from the start of the lines.
             self.vContent[x] = self.vContent[x].lstrip()
+        self.vContent = [ np.array([i for i in j],'U') for j in self.vContent ]
         #
         print( "Done striping left spaces for each line." )
-        self.vContent = '\n'.join( self.vContent )
         return self.vContent
         #
     #
     def AlignRight( self, vInput, Char=' ' ):
         #
-        self.vContent = vInput.split('\n')
+        if not self.__test_input(vInput): print( 'vInput is not a list of numpy ndarrays! Exiting function.' ) ; return
         #
+        self.vContent = [ ''.join([j.encode('utf8') for j in i]) for i in vInput ]
         vMaxLen = 0
+        #
         for vElem in self.vContent:
             if len(vElem) > vMaxLen: # Save lines max length.
                 vMaxLen = len(vElem)
         for x in range( len(self.vContent) ):
             self.vContent[x] = self.vContent[x].ljust( vMaxLen, Char )
+        self.vContent = [ np.array([i for i in j],'U') for j in self.vContent ]
         #
         print( "Done aligning lines to right." )
-        self.vContent = '\n'.join(self.vContent)
         return self.vContent
         #
     #
     def AlignLeft( self, vInput, Char=' ' ):
         #
-        self.vContent = vInput.split('\n')
+        if not self.__test_input(vInput): print( 'vInput is not a list of numpy ndarrays! Exiting function.' ) ; return
         #
+        self.vContent = [ ''.join([j.encode('utf8') for j in i]) for i in vInput ]
         vMaxLen = 0
+        #
         for vElem in self.vContent:
             if len(vElem) > vMaxLen: # Save lines max length.
                 vMaxLen = len(vElem)
         for x in range( len(self.vContent) ):
             self.vContent[x] = self.vContent[x].rjust( vMaxLen, Char )
+        self.vContent = [ np.array([i for i in j],'U') for j in self.vContent ]
         #
         print( "Done aligning lines to left." )
-        self.vContent = '\n'.join(self.vContent)
         return self.vContent
         #
     #
     def Center( self, vInput, Char=' ' ):
         #
-        self.vContent = vInput.split('\n')
+        if not self.__test_input(vInput): print( 'vInput is not a list of numpy ndarrays! Exiting function.' ) ; return
         #
+        self.vContent = [ ''.join([j.encode('utf8') for j in i]) for i in vInput ]
         vMaxLen = 0
+        #
         for vElem in self.vContent:
             if len(vElem) > vMaxLen: # Save lines max length.
                 vMaxLen = len(vElem)
         for x in range( len(self.vContent) ):
             self.vContent[x] = self.vContent[x].center( vMaxLen, Char )
+        self.vContent = [ np.array([i for i in j],'U') for j in self.vContent ]
         #
         print( "Text centered." )
-        self.vContent = '\n'.join(self.vContent)
         return self.vContent
         #
     #
     def Crop( self, vInput, x1, y1, x2, y2 ):
         #
-        self.vContent = vInput.split('\n')
-        vRezCont = []
+        if not self.__test_input(vInput): print( 'vInput is not a list of numpy ndarrays! Exiting function.' ) ; return
         #
-        Y = len(self.vContent)        # This is Y coord. The X coord can be variable.
+        vRezCont = []
+        Y = len(vInput)               # Y coord is stable. Only X coord can be variable.
+        #
         for y in range(Y):            # For each line in file.
             if y >= y1 and y <= y2+1: # If y is between y1 and y2.
-                vRezCont.append( self.vContent[y][x1:x2+1] ) # Add sliced line.
+                vRezCont.append( vInput[y][x1:x2+1] ) # Add sliced line.
+        self.vContent = vRezCont
         #
         print( "Done cropping text." )
-        self.vContent = '\n'.join( vRezCont )
         return self.vContent
         #
     #
     def Border( self, vInput, Char=' ', Thick=1 ):
         #
-        self.vContent = vInput.split('\n')
+        if not self.__test_input(vInput): print( 'vInput is not a list of numpy ndarrays! Exiting function.' ) ; return
         #
-        for x in range( len(self.vContent) ):
-            self.vContent[x] = Thick*Char + self.vContent[x] + Thick*Char
+        self.vContent = vInput
+        for x in range( len(vInput) ):
+            self.vContent[x] = np.array( Thick*[Char] + vInput[x].tolist() + Thick*[Char], 'U' )
         #
         L1 = len( self.vContent[0] )  # Lenght of first line.
         L2 = len( self.vContent[-1] ) # Lenght of last line.
+        self.vContent = [np.array(L1*[Char],'U')] + self.vContent + [np.array(L2*[Char],'U')]
         #
-        ToReturn = Thick*(Char*L1 +'\n') + '\n'.join(self.vContent) +'\n'+ Thick*(Char*L2 +'\n')
         print( "Done adding full border." )
-        self.vContent = ToReturn[:-1] # Return all except for the last character, a newline.
         return self.vContent
         #
     #
     def RightBorder( self, vInput, Char=' ', Thick=1 ):
         #
-        self.vContent = vInput.split('\n')
+        if not self.__test_input(vInput): print( 'vInput is not a list of numpy ndarrays! Exiting function.' ) ; return
         #
-        for x in range( len(self.vContent) ):
-            self.vContent[x] = Thick*Char + self.vContent[x]
+        self.vContent = vInput
+        for x in range( len(vInput) ):
+            self.vContent[x] = np.array( Thick*[Char] + vInput[x].tolist(), 'U' )
         #
         print( "Done adding right border." )
-        self.vContent = '\n'.join(self.vContent)
         return self.vContent
         #
     #
     def LeftBorder( self, vInput, Char=' ', Thick=1 ):
         #
-        self.vContent = vInput.split('\n')
+        if not self.__test_input(vInput): print( 'vInput is not a list of numpy ndarrays! Exiting function.' ) ; return
         #
-        for x in range( len(self.vContent) ):
-            self.vContent[x] = self.vContent[x] + Thick*Char
+        self.vContent = vInput
+        for x in range( len(vInput) ):
+            self.vContent[x] = np.array(vInput[x].tolist() + Thick*[Char], 'U' )
         #
         print( "Done adding left border." )
-        self.vContent = '\n'.join(self.vContent)
         return self.vContent
         #
     #
