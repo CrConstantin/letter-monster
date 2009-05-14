@@ -15,7 +15,7 @@ from psyco import full ; full ()     # Performance boost.
 import sys ; sys.path.insert(0, getcwd() ) # Save current dir in path.
 from _classes import * # Need to add curr dir as path to import classes.
 
-print 'I am Python r19!'
+print 'I am Python r21!'
 
 #
 # Define YAML represent for numpy ndarray.
@@ -69,6 +69,7 @@ class LetterMonster:
         if not vInstructions:
             print( '"%s" has null instructions! Exiting execute!' % object ) ; return
         #
+        ti = clock()
         if str(vElem)=='vector':
             for vInstr in vInstructions: # For each dictionary in the instructions list.
                 vFunc = vInstr['f']      # Save the function to call, then delete this mapping.
@@ -78,8 +79,8 @@ class LetterMonster:
                 #
                 if f!='Error': # If function is not Error, means it's valid.
                     #
-                    # This is a BARBARIAN, TEMPORARY solution. In current implementation, vInput must be a string so i overwrite the list of ndarrays.
-                    try: vInstr['vInput'] = '\n'.join([ ''.join([j.encode('utf8') for j in i]) for i in self.body[vInstr['vInput']].data ])
+                    # Overwrite the name of the layer with the data of the layer.
+                    try: vInstr['vInput'] = self.body[vInstr['vInput']].data
                     except: print( '"%s" doesn\'t have valid data! Call ignored!' % vInput ) ; continue
                     #
                     # Try to call the function with parameters and catch the errors.
@@ -88,13 +89,17 @@ class LetterMonster:
                     except: print( 'Unknown error occured in "%s" function call! Call ignored!' % vFunc ) ; continue
                     #
                     # Explode data back.
-                    self.body[object].data = [ np.array([i for i in j],'U') for j in vData.split('\n') ]
+                    if vData: self.body[object].data = vData
+                    else: self.body[object].data = []
                     #
                 else:
                     print( 'Function "%s" doesn\'t exist! Call ignored!' % vFunc )
                 #
         else:
             print( 'Instructions for "%s" object not yet implemented!' % str(vElem) ) ; return
+        #
+        tf = clock()
+        if self.DEBUG: print( 'Execute took %.4f seconds.' % (tf-ti) )
         #
     #
 #---------------------------------------------------------------------------------------------------
@@ -317,7 +322,7 @@ class LetterMonster:
         #
         tti = clock()
         vOut = open( filename+'.txt', 'w' )
-        vOut.write( '\n'.join([ ''.join([j.encode('utf8') for j in i]) for i in TempA ]) )
+        vOut.write( ''.join(np.hstack( np.hstack((i,np.array([u'\n'],'U'))) for i in TempA )).encode('utf8') )
         vOut.close() ; del TempA ; del vOut
         ttf = clock()
         if self.DEBUG: print( 'Unite arrays and lists took %.4f seconds.' % (ttf-tti) )

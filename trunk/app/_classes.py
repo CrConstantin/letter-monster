@@ -102,7 +102,7 @@ class Backpack:
         #
         if not self.__test_input(vInput): print( 'vInput is not a list of numpy ndarrays! Exiting function.' ) ; return
         #
-        self.vContent = [ ''.join([j.encode('utf8') for j in i]) for i in vInput ]
+        self.vContent = [ ''.join(i) for i in vInput ]
         self.vContent.reverse()
         vMaxLen = 0
         #
@@ -115,7 +115,7 @@ class Backpack:
         vRevCont = map( lambda *row: [elem for elem in row], *self.vContent ) # Rotate the square.
         #
         del self.vContent
-        self.vContent = [ ''.join(vCont) for vCont in vRevCont ] # Join the sub-lists.
+        self.vContent = [ ''.join(i) for i in vRevCont ] # Join the sub-lists.
         if Compress:
             for x in range( len(self.vContent) ): # Remove extra spaces from the end of the lines.
                 self.vContent[x] = self.vContent[x].rstrip()
@@ -128,7 +128,7 @@ class Backpack:
     def Rotate90Left( self, vInput, Compress=True ):
         #
         if not self.__test_input(vInput): print( 'vInput is not a list of numpy ndarrays! Exiting function.' ) ; return
-        self.vContent = [ ''.join([j.encode('utf8') for j in i]) for i in vInput ]
+        self.vContent = [ ''.join(i) for i in vInput ]
         vMaxLen = 0
         #
         for vElem in self.vContent:
@@ -140,7 +140,7 @@ class Backpack:
         vRevCont = map( lambda *row: [elem for elem in row], *self.vContent ) # Rotate the square.
         #
         del self.vContent
-        self.vContent = [ ''.join(vCont) for vCont in vRevCont ] # Join the sub-lists.
+        self.vContent = [ ''.join(i) for i in vRevCont ] # Join the sub-lists.
         if Compress:
             for x in range( len(self.vContent) ): # Remove extra spaces from the end of the lines.
                 self.vContent[x] = self.vContent[x].rstrip()
@@ -193,7 +193,7 @@ class Backpack:
         #
         if not self.__test_input(vInput): print( 'vInput is not a list of numpy ndarrays! Exiting function.' ) ; return
         #
-        self.vContent = [ ''.join([j.encode('utf8') for j in i]) for i in vInput ]
+        self.vContent = [ ''.join(i) for i in vInput ]
         for x in range( len(self.vContent) ): # Remove extra spaces from the end of the lines.
             self.vContent[x] = self.vContent[x].rstrip()
         self.vContent = [ np.array([i for i in j],'U') for j in self.vContent ]
@@ -206,7 +206,7 @@ class Backpack:
         #
         if not self.__test_input(vInput): print( 'vInput is not a list of numpy ndarrays! Exiting function.' ) ; return
         #
-        self.vContent = [ ''.join([j.encode('utf8') for j in i]) for i in vInput ]
+        self.vContent = [ ''.join(i) for i in vInput ]
         for x in range( len(self.vContent) ): # Remove extra spaces from the start of the lines.
             self.vContent[x] = self.vContent[x].lstrip()
         self.vContent = [ np.array([i for i in j],'U') for j in self.vContent ]
@@ -219,7 +219,7 @@ class Backpack:
         #
         if not self.__test_input(vInput): print( 'vInput is not a list of numpy ndarrays! Exiting function.' ) ; return
         #
-        self.vContent = [ ''.join([j.encode('utf8') for j in i]) for i in vInput ]
+        self.vContent = [ ''.join(i) for i in vInput ]
         vMaxLen = 0
         #
         for vElem in self.vContent:
@@ -237,7 +237,7 @@ class Backpack:
         #
         if not self.__test_input(vInput): print( 'vInput is not a list of numpy ndarrays! Exiting function.' ) ; return
         #
-        self.vContent = [ ''.join([j.encode('utf8') for j in i]) for i in vInput ]
+        self.vContent = [ ''.join(i) for i in vInput ]
         vMaxLen = 0
         #
         for vElem in self.vContent:
@@ -255,7 +255,7 @@ class Backpack:
         #
         if not self.__test_input(vInput): print( 'vInput is not a list of numpy ndarrays! Exiting function.' ) ; return
         #
-        self.vContent = [ ''.join([j.encode('utf8') for j in i]) for i in vInput ]
+        self.vContent = [ ''.join(i) for i in vInput ]
         vMaxLen = 0
         #
         for vElem in self.vContent:
