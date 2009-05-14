@@ -8,7 +8,7 @@ from _letter_monster import LetterMonster
 lm = LetterMonster()
 lm.DEBUG = True
 
-lm.Consume( image='../Wallpaper3.jpg', x=0, y=0, pattern='default' )
+lm.Consume( image='../Wallpaper1.jpg', x=0, y=0, pattern='default' )
 
 try: os.remove( 'test_lmgl_cons.yaml' )
 except: pass
