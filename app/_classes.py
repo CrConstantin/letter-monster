@@ -65,9 +65,9 @@ class Macro:
 #
 
 class Backpack:
-    "This is helper functions class.\n\
-    It uses no arguments for initialization.\n\
-    All functions in Backpack take vInput as input. vInput MUST be a lis of Unicode ndarrays."
+    '''This is helper functions class.\n\
+It uses no arguments for initialization.\n\
+All functions in Backpack take vInput as input. vInput MUST be a lis of Unicode Ndarrays.'''
     #
     def __init__(self):
         self.vContent = None
@@ -82,18 +82,20 @@ class Backpack:
             return True
         else: return False
     #
-    def StrToYamlNdarray( self, vInput, Transform=True ):
+    def StrToYamlNdarray( self, vString, Transform=True ):
+        '''Transforms the input string into a YAML dump, or into a Ndarray.\n\
+This is the only function that doesn't take a list of Unicode Ndarrays as input.'''
         #
         from bz2 import compress
         from yaml import dump, add_representer
         from _letter_monster import ndarray_repr
         add_representer(np.ndarray, ndarray_repr)
         #
-        vCont = [ np.array([j for j in i],'U') for i in vInput.split('\n') ]
+        vCont = [ np.array([j for j in i],'U') for i in vString.split('\n') ]
         #
         print( "Done transforming String to YAML !ndarray." )
         if Transform:
-            return dump(data=vCont, width=99, indent=2, canonical=False, default_flow_style=False)
+            return dump(data=vCont, width=99, indent=4, canonical=False, default_flow_style=False)
         else:
             return vCont
         #
@@ -168,7 +170,7 @@ class Backpack:
         #
         if not self.__test_input(vInput): print( 'vInput is not a list of numpy ndarrays! Exiting function.' ) ; return
         #
-        vInput.reverse()
+        vInput.reverse() # Reverse all lines.
         self.vContent = vInput # First line becomes last line.
         #
         print( "Done reversing order of lines." )
@@ -194,8 +196,8 @@ class Backpack:
         if not self.__test_input(vInput): print( 'vInput is not a list of numpy ndarrays! Exiting function.' ) ; return
         #
         self.vContent = [ ''.join(i) for i in vInput ]
-        for x in range( len(self.vContent) ): # Remove extra spaces from the end of the lines.
-            self.vContent[x] = self.vContent[x].rstrip()
+        for x in range( len(self.vContent) ):
+            self.vContent[x] = self.vContent[x].rstrip() # Remove extra spaces from the end of the lines.
         self.vContent = [ np.array([i for i in j],'U') for j in self.vContent ]
         #
         print( "Done striping right spaces for each line." )
@@ -207,8 +209,8 @@ class Backpack:
         if not self.__test_input(vInput): print( 'vInput is not a list of numpy ndarrays! Exiting function.' ) ; return
         #
         self.vContent = [ ''.join(i) for i in vInput ]
-        for x in range( len(self.vContent) ): # Remove extra spaces from the start of the lines.
-            self.vContent[x] = self.vContent[x].lstrip()
+        for x in range( len(self.vContent) ):
+            self.vContent[x] = self.vContent[x].lstrip() # Remove extra spaces from the start of the lines.
         self.vContent = [ np.array([i for i in j],'U') for j in self.vContent ]
         #
         print( "Done striping left spaces for each line." )
@@ -226,7 +228,7 @@ class Backpack:
             if len(vElem) > vMaxLen: # Save lines max length.
                 vMaxLen = len(vElem)
         for x in range( len(self.vContent) ):
-            self.vContent[x] = self.vContent[x].ljust( vMaxLen, Char )
+            self.vContent[x] = self.vContent[x].ljust( vMaxLen, Char ) # Adds extra characters.
         self.vContent = [ np.array([i for i in j],'U') for j in self.vContent ]
         #
         print( "Done aligning lines to right." )
@@ -244,7 +246,7 @@ class Backpack:
             if len(vElem) > vMaxLen: # Save lines max length.
                 vMaxLen = len(vElem)
         for x in range( len(self.vContent) ):
-            self.vContent[x] = self.vContent[x].rjust( vMaxLen, Char )
+            self.vContent[x] = self.vContent[x].rjust( vMaxLen, Char ) # Adds extra characters.
         self.vContent = [ np.array([i for i in j],'U') for j in self.vContent ]
         #
         print( "Done aligning lines to left." )
@@ -262,7 +264,7 @@ class Backpack:
             if len(vElem) > vMaxLen: # Save lines max length.
                 vMaxLen = len(vElem)
         for x in range( len(self.vContent) ):
-            self.vContent[x] = self.vContent[x].center( vMaxLen, Char )
+            self.vContent[x] = self.vContent[x].center( vMaxLen, Char ) # Adds extra characters.
         self.vContent = [ np.array([i for i in j],'U') for j in self.vContent ]
         #
         print( "Text centered." )
