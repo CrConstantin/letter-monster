@@ -8,7 +8,7 @@ from _letter_monster import LetterMonster
 lm = LetterMonster()
 lm.DEBUG = True
 
-lm.Load( 'test_lmgl_cons.yaml' )
+lm.Load( 'test_lmgl.yaml' )
 print
 
 lm.Spit('WIN CMD')

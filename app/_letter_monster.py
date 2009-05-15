@@ -16,7 +16,7 @@ from psyco import full ; full ()     # Performance boost.
 import sys ; sys.path.insert(0, getcwd() ) # Save current dir in path.
 from _classes import * # Need to add curr dir as path to import classes.
 
-print 'I am Python r22!'
+print 'I am Python r23!'
 
 #
 # Define YAML represent for numpy ndarray.
@@ -308,13 +308,9 @@ Can also transform one LMGL into : TXT, Excel, HTML, without changing the engine
             if self.DEBUG: print( 'Loading LMGL (Spawn) took %.4f seconds.' % (ttf-tti) )
         else: vLmgl = self.body
         #
-        if out=='txt':
-            pass
-        elif out=='xls':
-            pass
-        elif out=='html':
-            pass
-        else: print( '"%s" is not a valid export type! Exiting function!' % out ) ; return
+        out = out.lower() # Lower letters.
+        if out not in ('txt', 'csv', 'html'):
+            print( '"%s" is not a valid export type! Exiting function!' % out ) ; return
         #
         tti = clock() # Local counter.
         TempA = [[]]
@@ -325,7 +321,7 @@ Can also transform one LMGL into : TXT, Excel, HTML, without changing the engine
                 #
                 for nr_row in range( len(Data) ): # For each numpy ndarray (row) in Data.
                     #
-                    NData = Data[nr_row]                     # New data, to be written over old data.
+                    NData = Data[nr_row]                   # New data, to be written over old data.
                     OData = TempA[nr_row:nr_row+1] or [[]] # This is old data. Can be numpy ndarray, or empty list.
                     OData = OData[0]
                     #
@@ -344,9 +340,23 @@ Can also transform one LMGL into : TXT, Excel, HTML, without changing the engine
         ttf = clock()
         print( 'Overwriting data took %.4f seconds.' % (ttf-tti) )
         #
-        tti = clock()
-        vOut = open( filename+'.txt', 'w' )
-        vOut.write( ''.join(np.hstack( np.hstack((i,np.array([u'\n'],'U'))) for i in TempA )).encode('utf8') )
+        tti = clock() # Local counter.
+        vOut = open( filename+'.'+out, 'w' ) # Filename + Extension.
+        if out=='txt':
+            vOut.write( ''.join ( np.hstack( np.hstack( (i,np.array([u'\n'],'U')) ) for i in TempA # Concatenate all arrays with an array containing '\n'.
+                                           )
+                                ).encode('utf8')
+                      )
+        #
+        elif out=='csv':
+            vOut.write( '"\n'.join('",'.join('"%s' % j for j in i) for i in TempA) )
+            vOut.write( '"\n' )
+        #
+        elif out=='html':
+            vOut.write('<html>\n<body>\n<table border="0" cellpadding="0" cellspacing="0" style="font-family: Lucida Console, Courier New; font-size: 3px; font-weight: bold; letter-spacing: 1px;">\n<tr>')
+            vOut.write( '</td></tr>\n<tr>'.join('</td>'.join('<td>%s' % j for j in i) for i in TempA) )
+            vOut.write('</td></tr>\n</table>\n</body>\n</html>')
+        #
         vOut.close() ; del TempA ; del vOut
         ttf = clock()
         if self.DEBUG: print( 'Unite arrays and lists took %.4f seconds.' % (ttf-tti) )
