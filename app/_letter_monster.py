@@ -4,6 +4,7 @@
 
 import Image, ImageFilter
 from os import getcwd                # Get currend directory.
+from os import system as cmd         # Command line.
 import numpy as np                   # Numpy arrays.
 from yaml import load, dump          # Used for reading XML data.
 from yaml import CLoader as Loader
@@ -15,21 +16,22 @@ from psyco import full ; full ()     # Performance boost.
 import sys ; sys.path.insert(0, getcwd() ) # Save current dir in path.
 from _classes import * # Need to add curr dir as path to import classes.
 
-print 'I am Python r21!'
+print 'I am Python r22!'
 
 #
 # Define YAML represent for numpy ndarray.
-def ndarray_repr(dumper, data):
-    return dumper.represent_scalar(u'!ndarray', compress(data.dumps()).decode('latin_1'))
+def ndarray_repr(dumper, data): # NDARRAY.dumps can save any array, Unicode or Integer.
+    return dumper.represent_scalar( u'!ndarray', compress(data.dumps()).decode('latin_1') )
 add_representer(np.ndarray, ndarray_repr)
 #
 # Define YAML construct data for numpy ndarray.
 def ndarray_construct(loader, node):
-    return np.loads(decompress(loader.construct_scalar(node).encode('latin_1')))
+    return np.loads( decompress(loader.construct_scalar(node).encode('latin_1')) )
 add_constructor(u'!ndarray', ndarray_construct)
 #
 def sort_zorder(x):
     return x.z
+#
 
 class LetterMonster:
     '''This is the Letter Monster Class.\n\
@@ -40,13 +42,23 @@ class LetterMonster:
         #
         self.DEBUG = True
         #
-        self.log = []        # All functions throw their messages in here.
-        self.bp = Backpack() # Helper functions instance.
-        self.data_types = ('raster', 'vector', 'event', 'macro')
         self.body = {}
-        #
-        self.visible_size = (100, 100)
         self.max_morph_rate = 1
+        self.visible_size = (100, 100)
+        self.bp = Backpack() # Helper functions instance.
+        #
+        self.data_types = ('raster', 'vector', 'event', 'macro')
+        self.Patterns = {
+        'default'    : u'&80$21|;:\' ',                        # Original Patrick T. Cossette pattern
+        'cro'        : u'MWBHASI+;,. ',                        # Cristi Constantin pattern
+        'dos'        : u'\u2588\u2593\u2592\u2665\u2666\u263b\u256c\u263a\u25ca\u25cb\u2591 ', # Cristi Constantin DOS pattern.
+        'sharp'      : u'#w4Axv^*\"\'` ',                      # Cristi Constantin Sharp
+        'smooth'     : u'a@\u00a9\u0398O90c\u00a4\u2022. ',    # Cristi Constantin Smooth
+        'vertical'   : u'\u00b6\u0132I|}\u00ce!VAi; ',         # Cristi Constantin Vertical
+        'horizontal' : u'\u25ac\u039e\u00ac\u2261=\u2248~-. ', # Cristi Constantin Horizontal
+        'numbers'    : u'0684912357',
+        'letters'    : u'NADXEIQOVJL ',
+        }
         #
     #
 #---------------------------------------------------------------------------------------------------
@@ -54,6 +66,14 @@ class LetterMonster:
     def __str__(self):
         '''String representation of the engine.'''
         return 'I am Letter Monster. Baaah!'
+        #
+    #
+#---------------------------------------------------------------------------------------------------
+    #
+    def Hatch(self, visible_size=(100,100), max_morph_rate=1):
+        '''Setup the engine.'''
+        self.visible_size = visible_size
+        self.max_morph_rate = max_morph_rate
         #
     #
 #---------------------------------------------------------------------------------------------------
@@ -104,16 +124,8 @@ class LetterMonster:
     #
 #---------------------------------------------------------------------------------------------------
     #
-    def Hatch(self, visible_size=(100,100), max_morph_rate=1):
-        '''Setup the engine.'''
-        self.visible_size = visible_size
-        self.max_morph_rate = max_morph_rate
-        #
-    #
-#---------------------------------------------------------------------------------------------------
-    #
     def Consume(self, image='image.jpg', x=0, y=0, pattern='default', filter=''):
-        '''Takes an image, transforms it into ASCII and saves it internally, in body.'''
+        '''Takes an image, transforms it into ASCII and stores it internally.'''
         #
         try: vInput = Image.open( image )
         except: print( '"%s" is not a valid image path! Exiting function!' % image ) ; return
@@ -144,22 +156,11 @@ class LetterMonster:
                     print( '"%s" is not a valid fliter! Filter ignored.' % filt )
             #
         #
-        Patterns = {
-        'default'    : u'&80$21|;:\' ',                        # Original Patrick T. Cossette pattern
-        'cro'        : u'MWBHASI+;,. ',                        # Cristi Constantin pattern
-        'dos'        : u'\u2588\u2593\u2592\u2665\u2666\u263b\u256c\u263a\u25ca\u25cb\u2591 ', # Cristi Constantin DOS pattern.
-        'sharp'      : u'#w4Axv^*\"\'` ',                      # Cristi Constantin Sharp
-        'smooth'     : u'a@\u00a9\u0398O90c\u00a4\u2022. ',    # Cristi Constantin Smooth
-        'vertical'   : u'\u00b6\u0132I|}\u00ce!VAi; ',         # Cristi Constantin Vertical
-        'horizontal' : u'\u25ac\u039e\u00ac\u2261=\u2248~-. ', # Cristi Constantin Horizontal
-        'numbers'    : u'0684912357',
-        'letters'    : u'NADXEIQOVJL ',
-        }
-        if pattern.lower() in Patterns.keys():
-            vPattern = Patterns[pattern.lower()]
+        if pattern.lower() in self.Patterns:
+            vPattern = self.Patterns[pattern.lower()]
         else:
             print( '"%s" is not a valid pattern! Using default pattern.' % pattern )
-            vPattern = Patterns['default']
+            vPattern = self.Patterns['default']
         #
         ti = clock() # Global counter.
         tti = clock() # Local counter.
@@ -198,7 +199,7 @@ class LetterMonster:
                 vElem = Raster()
                 vElem.name = 'raster'+str(x)
                 vElem.data = vResult
-                vElem.visible = False
+                vElem.visible = True
                 vElem.lock = False
                 self.body['raster'+str(x)] = vElem # Save raster in body.
                 del vElem
@@ -250,28 +251,49 @@ class LetterMonster:
     #
 #---------------------------------------------------------------------------------------------------
     #
-    def Feed(self):
-        '''Connect to a LMGL (Letter Monster Graphical Letters) file.\n\
-    Everytime a Morph happens, the LMGL file is updated on hard disk.'''
-        print "I need faster YAML pickling / unpickling to finish this function."
-    #
-#---------------------------------------------------------------------------------------------------
-    #
-    def Command(self):
-        '''Remotely command letter monster.'''
-        pass
-    #
-#---------------------------------------------------------------------------------------------------
-    #
-    def Spit(self):
-        '''Render function. Returns the current reprezentation of the engine.'''
-        print "This is a TODO for next versions."
+    def Spit(self, format='WIN CMD'):
+        '''
+Render function. Returns the current reprezentation of the engine.
+All visible Raster and Vector layers are represented.'''
+        #
+        vOutput = [[]]
+        #
+        for vElem in sorted(self.body.values(), key=sort_zorder): # For each visible Raster and Vector in body, sorted in Z-order.
+            if (str(vElem)=='raster' and vElem.visible) or (str(vElem)=='vector' and vElem.visible):
+                Data = vElem.data                 # This is a list of numpy ndarrays.
+                #
+                for nr_row in range( len(Data) ): # For each numpy ndarray (row) in Data.
+                    #
+                    NData = Data[nr_row]                     # New data, to be written over old data.
+                    OData = vOutput[nr_row:nr_row+1] or [[]] # This is old data. Can be numpy ndarray, or empty list.
+                    OData = OData[0]
+                    #
+                    if len(NData) >= len(OData): 
+                        # If new data is longer than old data, old data will be completely overwritten.
+                        vOutput[nr_row:nr_row+1] = [NData]
+                    else: # Old data is longer than new data ; old data cannot be null.
+                        TempB = np.copy(OData)
+                        TempB.put( range(len(NData)), NData )
+                        vOutput[nr_row:nr_row+1] = [TempB]
+                        del TempB
+                    #
+                #
+            # If not Raster or Vector, pass.
+        #
+        if format=='WIN CMD':
+            for vLine in vOutput:
+                vEcho = u''.join(u'^'+i for i in vLine)
+                if vEcho: cmd( '@ECHO %s' % vEcho.encode('utf') )
+                else: cmd( '@ECHO.' )
+            #
+        # More formats will be implemented soon.
     #
 #---------------------------------------------------------------------------------------------------
     #
     def Spawn(self, lmgl=None, out='txt', filename='Out'):
-        '''Export function. Saves the current reprezentation of the engine.\n\
-    Can also export one LMGL into TXT, Excel, HTML, without changing the engine.'''
+        '''
+Export function. Saves the current reprezentation of the engine.
+Can also transform one LMGL into : TXT, Excel, HTML, without changing the engine.'''
         if lmgl: # If a LMGL file is specified, export only the LMGL, don't change self.body.
             ti = clock() # Global counter.
             tti = clock() # Local counter.
@@ -294,15 +316,16 @@ class LetterMonster:
             pass
         else: print( '"%s" is not a valid export type! Exiting function!' % out ) ; return
         #
+        tti = clock() # Local counter.
         TempA = [[]]
-        for elem in sorted(vLmgl.values(), key=sort_zorder):
-            if str(elem)=='raster': # For each raster in body, sorted by Z-order.
-                tti = clock()
-                Data = elem.data    # This is a list of numpy ndarrays.
+        #
+        for vElem in sorted(vLmgl.values(), key=sort_zorder): # For each visible Raster and Vector in body, sorted in Z-order.
+            if (str(vElem)=='raster' and vElem.visible) or (str(vElem)=='vector' and vElem.visible):
+                Data = vElem.data                 # This is a list of numpy ndarrays.
                 #
                 for nr_row in range( len(Data) ): # For each numpy ndarray (row) in Data.
                     #
-                    NData = Data[nr_row]                   # New data, to be written over old data.
+                    NData = Data[nr_row]                     # New data, to be written over old data.
                     OData = TempA[nr_row:nr_row+1] or [[]] # This is old data. Can be numpy ndarray, or empty list.
                     OData = OData[0]
                     #
@@ -316,9 +339,10 @@ class LetterMonster:
                         del TempB
                     #
                 #
-                ttf = clock()
-                if self.DEBUG: print( 'Overwriting data took %.4f seconds.' % (ttf-tti) )
-            # If not raster, pass.
+            # If not Raster or Vector, pass.
+        #
+        ttf = clock()
+        print( 'Overwriting data took %.4f seconds.' % (ttf-tti) )
         #
         tti = clock()
         vOut = open( filename+'.txt', 'w' )
