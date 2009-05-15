@@ -16,7 +16,7 @@ from psyco import full ; full ()     # Performance boost.
 import sys ; sys.path.insert(0, getcwd() ) # Save current dir in path.
 from _classes import * # Need to add curr dir as path to import classes.
 
-print 'I am Python r23!'
+print 'I am Python r27!'
 
 #
 # Define YAML represent for numpy ndarray.
@@ -34,9 +34,9 @@ def sort_zorder(x):
 #
 
 class LetterMonster:
-    '''This is the Letter Monster Class.\n\
-    ^-^ You would have never guessed it.\n\
-    It uses no arguments for initialization.'''
+    '''
+This is the Letter Monster Class. ^-^ You would have never guessed it.\n\
+It uses no arguments for initialization. You can later on setup the engine via Hatch function.'''
     #
     def __init__(self):
         #
@@ -79,7 +79,7 @@ class LetterMonster:
 #---------------------------------------------------------------------------------------------------
     #
     def _execute(self, object):
-        '''Automatically execute object instructions. "Object" is the name of a data structure.'''
+        '''Automatically execute object instructions. "Object" must be the name of a data structure.'''
         #
         try:
             vElem = self.body[object]
@@ -125,7 +125,7 @@ class LetterMonster:
 #---------------------------------------------------------------------------------------------------
     #
     def Consume(self, image='image.jpg', x=0, y=0, pattern='default', filter=''):
-        '''Takes an image, transforms it into ASCII and stores it internally.'''
+        '''Takes an image as input, transforms it into Unicode Ndarrays and stores it internally.'''
         #
         try: vInput = Image.open( image )
         except: print( '"%s" is not a valid image path! Exiting function!' % image ) ; return
@@ -251,10 +251,10 @@ class LetterMonster:
     #
 #---------------------------------------------------------------------------------------------------
     #
-    def Spit(self, format='WIN CMD'):
+    def Spit(self, format='WIN CMD', transparent=' '):
         '''
-Render function. Returns the current reprezentation of the engine.
-All visible Raster and Vector layers are represented.'''
+Render function. Returns current representation of the engine.
+All visible Raster and Vector layers are rendered.'''
         #
         vOutput = [[]]
         #
@@ -290,10 +290,10 @@ All visible Raster and Vector layers are represented.'''
     #
 #---------------------------------------------------------------------------------------------------
     #
-    def Spawn(self, lmgl=None, out='txt', filename='Out'):
+    def Spawn(self, lmgl=None, out='txt', filename='Out', transparent=' '):
         '''
-Export function. Saves the current reprezentation of the engine.
-Can also transform one LMGL into : TXT, Excel, HTML, without changing the engine.'''
+Export function. Saves current reprezentation of the engine on Hard Disk.
+Can also transform one LMGL into : TXT, Excel, or HTML, without changing engine body.'''
         if lmgl: # If a LMGL file is specified, export only the LMGL, don't change self.body.
             ti = clock() # Global counter.
             tti = clock() # Local counter.
@@ -343,18 +343,18 @@ Can also transform one LMGL into : TXT, Excel, HTML, without changing the engine
         tti = clock() # Local counter.
         vOut = open( filename+'.'+out, 'w' ) # Filename + Extension.
         if out=='txt':
-            vOut.write( ''.join ( np.hstack( np.hstack( (i,np.array([u'\n'],'U')) ) for i in TempA # Concatenate all arrays with an array containing '\n'.
+            vOut.write( ''.join ( np.hstack( np.hstack( (i,np.array([u'\n'],'U')) ) for i in TempA # Concatenate all arrays with an array containing ['\n'].
                                            )
                                 ).encode('utf8')
                       )
         #
         elif out=='csv':
-            vOut.write( '"\n'.join('",'.join('"%s' % j for j in i) for i in TempA) )
+            vOut.write( '"\n'.join('",'.join('"%s' % j for j in i) for i in TempA) ) # Put each value into " ", pairs.
             vOut.write( '"\n' )
         #
         elif out=='html':
             vOut.write('<html>\n<body>\n<table border="0" cellpadding="0" cellspacing="0" style="font-family: Lucida Console, Courier New; font-size: 3px; font-weight: bold; letter-spacing: 1px;">\n<tr>')
-            vOut.write( '</td></tr>\n<tr>'.join('</td>'.join('<td>%s' % j for j in i) for i in TempA) )
+            vOut.write( '</td></tr>\n<tr>'.join('</td>'.join('<td>%s' % j for j in i) for i in TempA) ) # Put each value into <td> </td> pairs.
             vOut.write('</td></tr>\n</table>\n</body>\n</html>')
         #
         vOut.close() ; del TempA ; del vOut

@@ -13,6 +13,7 @@ vOutput = open( 'Example_Strip+Center+Border.txt', 'w' )
 _bp = Backpack()
 print( 'Starting to read example file...\n' )
 vResult = [ np.array([i for i in j],'U') for j in vInput.read().split('\n') ]
+vInput.close()
 
 vResult = _bp.Rotate90Right( vResult ) # Rotate, then undo.
 vResult = _bp.Rotate90Left( vResult )
@@ -35,6 +36,7 @@ vResult = _bp.LeftBorder( vResult, Char='~' )
 vResult = _bp.Border( vResult, Char='#', Thick=2 )
 
 vOutput.write( '\n'.join([ ''.join([j.encode('utf8') for j in i]) for i in vResult ]) )
+vOutput.close()
 
 #
 
