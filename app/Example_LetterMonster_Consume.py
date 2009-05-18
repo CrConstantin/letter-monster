@@ -10,9 +10,9 @@ lm.DEBUG = True
 
 lm.Consume( image='../Wallpaper1.jpg', x=0, y=0, pattern='default' )
 
-try: os.remove( 'test_lmgl_cons.yaml' )
+try: os.remove( 'test_cons.lmgl' )
 except: pass
-lm.Save( 'test_lmgl_cons.yaml' )
+lm.Save( 'test_cons.lmgl' )
 
 print 'Body 1: ', lm.body, '\n'
 print 'Data is type:', type(lm.body['raster1'].data)

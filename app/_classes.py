@@ -65,7 +65,8 @@ class Macro:
 #
 
 class Backpack:
-    '''This is helper functions class.\n\
+    '''
+This is helper functions class.\n\
 It uses no arguments for initialization.\n\
 All functions in Backpack take vInput as input. vInput MUST be a lis of Unicode Ndarrays.'''
     #
@@ -82,22 +83,15 @@ All functions in Backpack take vInput as input. vInput MUST be a lis of Unicode 
             return True
         else: return False
     #
-    def StrToYamlNdarray( self, vString, Transform=True ):
-        '''Transforms the input string into a YAML dump, or into a Ndarray.\n\
+    def StrToArray( self, vString ):
+        '''
+Transforms the input string into a Ndarray.\n\
 This is the only function that doesn't take a list of Unicode Ndarrays as input.'''
-        #
-        from bz2 import compress
-        from yaml import dump, add_representer
-        from _letter_monster import ndarray_repr
-        add_representer(np.ndarray, ndarray_repr)
         #
         vCont = [ np.array([j for j in i],'U') for i in vString.split('\n') ]
         #
-        print( "Done transforming String to YAML !ndarray." )
-        if Transform:
-            return dump(data=vCont, width=99, indent=4, canonical=False, default_flow_style=False)
-        else:
-            return vCont
+        print( "Done transforming String to Array." )
+        return vCont
         #
     #
     def Rotate90Right( self, vInput, Compress=True ):

@@ -9,7 +9,8 @@ lm = LetterMonster()
 lm.DEBUG = True
 
 print( 'Spawning...\n' )
-lm.Spawn( 'test_lmgl.yaml', 'txt' )
+
+lm.Spawn( lmgl='test.lmgl', out='txt' )
 
 #
 
