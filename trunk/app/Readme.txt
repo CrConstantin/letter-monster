@@ -26,7 +26,7 @@
     In colored version, each letter has a color, in non-colored version, only plain letters are used to describe shapes.
  * Letter-Monster Backpack can edit large TXT files : rotate, mirror, align, crop, resize, border, etc.
  * Letter-Monster is 100% free. No hidden costs. You can use it anywhere, anyhow, anytime.
-    Letter-Monster will always be free, for home or commercial users.
+    Letter-Monster will always be free, for home or commercial users. Please check Licence.
 
 -----------------
   Requirements:
@@ -34,7 +34,7 @@
  * Python 2.5. Letter-Monster is written entirely in Python 2.5. (www.python.org)
  * Numpy. All data is represented as Numpy tables; they are fast and use little memory. (numpy.scipy.org)
  * Psyco. Makes Letter-Monster 2 times faster. It uses a lot of memory. (psyco.sourceforge.net)
- * Python Image Library. Manipulates images. Used to transform images into ASCII. (www.pythonware.com/products/pil)
+ * Python Image Library (PIL). Manipulates images. Used to transform images into ASCII. (www.pythonware.com/products/pil)
 
 ---------------
   How to use:

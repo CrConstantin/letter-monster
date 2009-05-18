@@ -2,32 +2,19 @@
 #        v1        #
 #    Main Class    #
 
-import Image, ImageFilter
-from os import getcwd                # Get currend directory.
-from os import system as cmd         # Command line.
+import Image, ImageFilter            # PIL Image.
+from os import getcwd                # OS get currend directory.
+from os import system as cmd         # OS command line access.
 import numpy as np                   # Numpy arrays.
-from yaml import load, dump          # Used for reading XML data.
-from yaml import CLoader as Loader
-from yaml import CDumper as Dumper
-from yaml import add_representer, add_constructor
-from bz2 import compress, decompress # Compress data in raster.
-from time import clock               # Used for timing operations.
+from cPickle import dump, load       # Represent letter-monster body.
+from bz2 import BZ2File              # Compress and write data.
+from time import clock               # Timing operations.
 from psyco import full ; full ()     # Performance boost.
 import sys ; sys.path.insert(0, getcwd() ) # Save current dir in path.
 from _classes import * # Need to add curr dir as path to import classes.
 
-print 'I am Python r27!'
+print 'I am Python r28!'
 
-#
-# Define YAML represent for numpy ndarray.
-def ndarray_repr(dumper, data): # NDARRAY.dumps can save any array, Unicode or Integer.
-    return dumper.represent_scalar( u'!ndarray', compress(data.dumps()).decode('latin_1') )
-add_representer(np.ndarray, ndarray_repr)
-#
-# Define YAML construct data for numpy ndarray.
-def ndarray_construct(loader, node):
-    return np.loads( decompress(loader.construct_scalar(node).encode('latin_1')) )
-add_constructor(u'!ndarray', ndarray_construct)
 #
 def sort_zorder(x):
     return x.z
@@ -74,6 +61,41 @@ It uses no arguments for initialization. You can later on setup the engine via H
         '''Setup the engine.'''
         self.visible_size = visible_size
         self.max_morph_rate = max_morph_rate
+        #
+    #
+#---------------------------------------------------------------------------------------------------
+    #
+    def Load(self, lmgl):
+        '''Load a LMGL (Letter Monster Graphical Letters) file, using cPickle.'''
+        try: vInput = BZ2File( lmgl, 'r', 0, 1 ) # Load for reading, no buffer, compress level 1.
+        except: print( '"%s" is not a valid path! Exiting function!' % lmgl ) ; return
+        #
+        ti = clock()
+        try: vLmgl = load( vInput )
+        except: print( '"%s" cannot be parsed! Invalid cPickle file! Exiting function!' % lmgl ) ; return
+        self.body = vLmgl
+        vInput.close() ; del vInput
+        tf = clock()
+        #
+        if self.DEBUG: print( 'Loading LMGL took %.4f seconds total.' % (tf-ti) )
+        #
+    #
+#---------------------------------------------------------------------------------------------------
+    #
+    def Save(self, lmgl):
+        '''Save body into a LMGL (Letter Monster Graphical Letters) file, using cPickle.'''
+        try:
+            vInput = open( lmgl )
+            print( '"%s" is a LMGL file! Will not overwrite. Exiting function!' % lmgl ) ; return
+        except: pass # If file exists, pass.
+        #
+        ti = clock()
+        vInput = BZ2File( lmgl, 'w', 0, 1 ) # Load for writing, no buffer, compress level 1.
+        dump( self.body, vInput, 2 ) # Represent as cPickle method 2.
+        vInput.close() ; del vInput
+        tf = clock()
+        #
+        if self.DEBUG: print( 'Saving LMGL took %.4f seconds total.' % (tf-ti) )
         #
     #
 #---------------------------------------------------------------------------------------------------
@@ -214,46 +236,9 @@ It uses no arguments for initialization. You can later on setup the engine via H
     #
 #---------------------------------------------------------------------------------------------------
     #
-    def Load(self, lmgl):
-        '''Load a LMGL (Letter Monster Graphical Letters) file, using YAML.'''
-        try: vInput = open( lmgl, 'r' )
-        except: print( '"%s" is not a valid path! Exiting function!' % lmgl ) ; return
-        #
-        ti = clock()
-        try: vLmgl = load( vInput )
-        except: print( '"%s" cannot be parsed! Invalid YAML file! Exiting function!' % lmgl ) ; return
-        #
-        self.body = vLmgl
-        vInput.close() ; del vInput
-        tf = clock()
-        #
-        if self.DEBUG: print( 'Loading LMGL took %.4f seconds total.' % (tf-ti) )
-        #
-    #
-#---------------------------------------------------------------------------------------------------
-    #
-    def Save(self, lmgl):
-        '''Save body into a LMGL (Letter Monster Graphical Letters) file, using YAML.'''
-        try:
-            vInput = open( lmgl )
-            print( '"%s" is a valid LMGL file! Will not overwrite. Exiting function!' % lmgl ) ; return
-        except: pass # If file exists, pass.
-        #
-        ti = clock()
-        vInput = open( lmgl, 'w' )
-        dump(self.body, stream=vInput, width=99, indent=2, canonical=False, default_flow_style=False,
-            explicit_start=True, explicit_end=True)
-        vInput.close() ; del vInput
-        tf = clock()
-        #
-        if self.DEBUG: print( 'Saving LMGL took %.4f seconds total.' % (tf-ti) )
-        #
-    #
-#---------------------------------------------------------------------------------------------------
-    #
     def Spit(self, format='WIN CMD', transparent=' '):
         '''
-Render function. Returns current representation of the engine.
+Render function. Represents engine body.\n\
 All visible Raster and Vector layers are rendered.'''
         #
         vOutput = [[]]
@@ -292,16 +277,16 @@ All visible Raster and Vector layers are rendered.'''
     #
     def Spawn(self, lmgl=None, out='txt', filename='Out', transparent=' '):
         '''
-Export function. Saves current reprezentation of the engine on Hard Disk.
+Export function. Saves engine body on Hard Disk in specific format.\n\
 Can also transform one LMGL into : TXT, Excel, or HTML, without changing engine body.'''
+        ti = clock() # Global counter.
         if lmgl: # If a LMGL file is specified, export only the LMGL, don't change self.body.
-            ti = clock() # Global counter.
             tti = clock() # Local counter.
-            try: vInput = open( lmgl, 'r' )
+            try: vInput = BZ2File( lmgl, 'r', 0, 1 ) # Load for reading, no buffer, compress level 1.
             except: print( '"%s" is not a valid path! Exiting function!' % lmgl ) ; return
             #
             try: vLmgl = load( vInput )
-            except: print( '"%s" cannot be parsed! Invalid YAML file! Exiting function!' % lmgl ) ; return
+            except: print( '"%s" cannot be parsed! Invalid cPickle file! Exiting function!' % lmgl ) ; return
             #
             vInput.close() ; del vInput
             ttf = clock()
@@ -325,12 +310,15 @@ Can also transform one LMGL into : TXT, Excel, or HTML, without changing engine 
                     OData = TempA[nr_row:nr_row+1] or [[]] # This is old data. Can be numpy ndarray, or empty list.
                     OData = OData[0]
                     #
+                    # NData must completely eliminate transparent pixels... here comes the algorithm.
+                    #
                     if len(NData) >= len(OData): 
                         # If new data is longer than old data, old data will be completely overwritten.
                         TempA[nr_row:nr_row+1] = [NData]
                     else: # Old data is longer than new data ; old data cannot be null.
                         TempB = np.copy(OData)
                         TempB.put( range(len(NData)), NData )
+                        #TempB[0:len(NData)-1] = NData
                         TempA[nr_row:nr_row+1] = [TempB]
                         del TempB
                     #
