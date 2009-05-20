@@ -16,8 +16,9 @@ lm.Save( 'test_cons.lmgl' )
 
 print 'Body 1: ', lm.body, '\n'
 print 'Data is type:', type(lm.body['raster1'].data)
-print 'Inside Data, is type:', type(lm.body['raster1'].data[0])
+print 'Inside Data, is type:', type(lm.body['raster1'].data[0]),'\n'
 print 'Data is len:', len(lm.body['raster1'].data)
+print 'Data[0] is len:', len(lm.body['raster1'].data[0]),'\n'
 print 'Data 0-10:', lm.body['raster1'].data[0][0:10]
 
 print( "Please, use Lucida Console Bold, size 4 for viewing." )

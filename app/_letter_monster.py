@@ -13,7 +13,7 @@ from psyco import full ; full ()     # Performance boost.
 import sys ; sys.path.insert(0, getcwd() ) # Save current dir in path.
 from _classes import * # Need to add curr dir as path to import classes.
 
-print 'I am Python r28!'
+print 'I am Python r29!'
 
 #
 def sort_zorder(x):
@@ -67,7 +67,7 @@ It uses no arguments for initialization. You can later on setup the engine via H
     #
     def Load(self, lmgl):
         '''Load a LMGL (Letter Monster Graphical Letters) file, using cPickle.'''
-        try: vInput = BZ2File( lmgl, 'r', 0, 1 ) # Load for reading, no buffer, compress level 1.
+        try: vInput = BZ2File( lmgl, 'r', 0, 6 ) # Load for reading, no buffer, compress level 6.
         except: print( '"%s" is not a valid path! Exiting function!' % lmgl ) ; return
         #
         ti = clock()
@@ -90,7 +90,7 @@ It uses no arguments for initialization. You can later on setup the engine via H
         except: pass # If file exists, pass.
         #
         ti = clock()
-        vInput = BZ2File( lmgl, 'w', 0, 1 ) # Load for writing, no buffer, compress level 1.
+        vInput = BZ2File( lmgl, 'w', 0, 6 ) # Load for writing, no buffer, compress level 6.
         dump( self.body, vInput, 2 ) # Represent as cPickle method 2.
         vInput.close() ; del vInput
         tf = clock()
@@ -186,7 +186,8 @@ It uses no arguments for initialization. You can later on setup the engine via H
         #
         ti = clock() # Global counter.
         tti = clock() # Local counter.
-        vResult = []
+        #
+        vResult = np.empty( (vInput.size[1],vInput.size[0]), 'U' )
         if self.DEBUG: print( "Starting consume..." )
         #
         vLen = len( vPattern )
@@ -194,24 +195,19 @@ It uses no arguments for initialization. You can later on setup the engine via H
         #
         for py in range(vInput.size[1]): # Cycle through the image's pixels, one by one
             #
-            vTempRez = np.empty(vInput.size[0],'U')
-            #
             for px in range(vInput.size[0]):
+                #
                 RGB = getpx((px, py))             # Retrieve pixel RGB values
                 vColor = RGB[0] + RGB[1] + RGB[2] # Find the general darkness of the pixel
                 #
                 for vp in range( vLen ):                      # For each element in the string pattern...
                     if vColor <= ( 255 * 3 / vLen * (vp+1) ): # Return matching character from pattern.
-                        vTempRez[px] = vPattern[vp]
+                        vResult[py,px] = vPattern[vp]
                         break
                     elif vColor > ( 255 * 3 / vLen * vLen ) and vColor <= ( 255 * 3 ): # If not in range, return last character from pattern.
-                        vTempRez[px] = vPattern[-1]
+                        vResult[py,px] = vPattern[-1]
                         break
-                    #
                 #
-            #
-            vResult.append( vTempRez )
-            del vTempRez ; del RGB ; del vColor
             #
         #
         ttf = clock()
@@ -253,6 +249,10 @@ All visible Raster and Vector layers are rendered.'''
                     OData = vOutput[nr_row:nr_row+1] or [[]] # This is old data. Can be numpy ndarray, or empty list.
                     OData = OData[0]
                     #
+                    # Replace all NData transparent pixels with OData, at respective indices.
+                    try: NData[ (NData==transparent)[:len(OData)] ] = OData[ (NData==transparent)[:len(OData)] ]
+                    except: pass
+                    #
                     if len(NData) >= len(OData): 
                         # If new data is longer than old data, old data will be completely overwritten.
                         vOutput[nr_row:nr_row+1] = [NData]
@@ -275,14 +275,14 @@ All visible Raster and Vector layers are rendered.'''
     #
 #---------------------------------------------------------------------------------------------------
     #
-    def Spawn(self, lmgl=None, out='txt', filename='Out', transparent=' '):
+    def Spawn(self, lmgl=None, out='txt', filename='Out', transparent=u' '):
         '''
 Export function. Saves engine body on Hard Disk in specific format.\n\
 Can also transform one LMGL into : TXT, Excel, or HTML, without changing engine body.'''
         ti = clock() # Global counter.
         if lmgl: # If a LMGL file is specified, export only the LMGL, don't change self.body.
             tti = clock() # Local counter.
-            try: vInput = BZ2File( lmgl, 'r', 0, 1 ) # Load for reading, no buffer, compress level 1.
+            try: vInput = BZ2File( lmgl, 'r', 0, 6 ) # Load for reading, no buffer, compress level 6.
             except: print( '"%s" is not a valid path! Exiting function!' % lmgl ) ; return
             #
             try: vLmgl = load( vInput )
@@ -310,15 +310,16 @@ Can also transform one LMGL into : TXT, Excel, or HTML, without changing engine 
                     OData = TempA[nr_row:nr_row+1] or [[]] # This is old data. Can be numpy ndarray, or empty list.
                     OData = OData[0]
                     #
-                    # NData must completely eliminate transparent pixels... here comes the algorithm.
+                    # Replace all NData transparent pixels with OData, at respective indices.
+                    try: NData[ (NData==transparent)[:len(OData)] ] = OData[ (NData==transparent)[:len(OData)] ]
+                    except: pass
                     #
                     if len(NData) >= len(OData): 
                         # If new data is longer than old data, old data will be completely overwritten.
                         TempA[nr_row:nr_row+1] = [NData]
                     else: # Old data is longer than new data ; old data cannot be null.
                         TempB = np.copy(OData)
-                        TempB.put( range(len(NData)), NData )
-                        #TempB[0:len(NData)-1] = NData
+                        TempB[0:len(NData)] = NData
                         TempA[nr_row:nr_row+1] = [TempB]
                         del TempB
                     #

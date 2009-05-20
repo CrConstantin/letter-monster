@@ -12,7 +12,7 @@ vOutput = open( 'Example_Strip+Center+Border.txt', 'w' )
 
 _bp = Backpack()
 print( 'Starting to read example file...\n' )
-vResult = [ np.array([i for i in j],'U') for j in vInput.read().split('\n') ]
+vResult = _bp.StrToArray( vInput.read() )
 vInput.close()
 
 vResult = _bp.Rotate90Right( vResult ) # Rotate, then undo.
