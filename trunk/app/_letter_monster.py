@@ -13,7 +13,7 @@ from psyco import full ; full ()     # Performance boost.
 import sys ; sys.path.insert(0, getcwd() ) # Save current dir in path.
 from _classes import * # Need to add curr dir as path to import classes.
 
-print 'I am Python r29!'
+print 'I am Python r30!'
 
 #
 def sort_zorder(x):
@@ -73,7 +73,7 @@ It uses no arguments for initialization. You can later on setup the engine via H
         ti = clock()
         try: vLmgl = load( vInput )
         except: print( '"%s" cannot be parsed! Invalid cPickle file! Exiting function!' % lmgl ) ; return
-        self.body = vLmgl
+        self.body = vLmgl # On load, old body is COMPLETELY overwritten.
         vInput.close() ; del vInput
         tf = clock()
         #
@@ -245,17 +245,24 @@ All visible Raster and Vector layers are rendered.'''
                 #
                 for nr_row in range( len(Data) ): # For each numpy ndarray (row) in Data.
                     #
-                    NData = Data[nr_row]                     # New data, to be written over old data.
+                    NData = Data[nr_row]     # New data, to be written over old data.
+                    NData = NData[NData!=''] # Strip empty strings from the end.
                     OData = vOutput[nr_row:nr_row+1] or [[]] # This is old data. Can be numpy ndarray, or empty list.
-                    OData = OData[0]
+                    OData = OData[0] # It doesn't work other way.
+                    #
+                    vLN = len(NData)
+                    vLO = len(OData)
                     #
                     # Replace all NData transparent pixels with OData, at respective indices.
-                    try: NData[ (NData==transparent)[:len(OData)] ] = OData[ (NData==transparent)[:len(OData)] ]
+                    vMask = (NData==transparent)[:vLO]
+                    try: NData[ vMask ] = OData[ vMask ]
                     except: pass
                     #
                     if len(NData) >= len(OData): 
                         # If new data is longer than old data, old data will be completely overwritten.
-                        vOutput[nr_row:nr_row+1] = [NData]
+                        TempB = np.copy(NData)
+                        vOutput[nr_row:nr_row+1] = [TempB]
+                        del TempB
                     else: # Old data is longer than new data ; old data cannot be null.
                         TempB = np.copy(OData)
                         TempB.put( range(len(NData)), NData )
@@ -302,24 +309,31 @@ Can also transform one LMGL into : TXT, Excel, or HTML, without changing engine 
         #
         for vElem in sorted(vLmgl.values(), key=sort_zorder): # For each visible Raster and Vector in body, sorted in Z-order.
             if (str(vElem)=='raster' and vElem.visible) or (str(vElem)=='vector' and vElem.visible):
-                Data = vElem.data                 # This is a list of numpy ndarrays.
+                Data = vElem.data                 # This is a 2D numpy array.
                 #
-                for nr_row in range( len(Data) ): # For each numpy ndarray (row) in Data.
+                for nr_row in range( len(Data) ): # For each row in Data.
                     #
-                    NData = Data[nr_row]                   # New data, to be written over old data.
-                    OData = TempA[nr_row:nr_row+1] or [[]] # This is old data. Can be numpy ndarray, or empty list.
-                    OData = OData[0]
+                    NData = Data[nr_row]     # New data, to be written over old data. It's a 1D unicode numpy array.
+                    NData = NData[NData!=''] # Strip empty strings from the end.
+                    OData = TempA[nr_row:nr_row+1] or [[]] # Old data. First loops is empty list, then is 1D unicode numpy array.
+                    OData = OData[0] # It doesn't work other way.
+                    #
+                    vLN = len(NData)
+                    vLO = len(OData)
                     #
                     # Replace all NData transparent pixels with OData, at respective indices.
-                    try: NData[ (NData==transparent)[:len(OData)] ] = OData[ (NData==transparent)[:len(OData)] ]
+                    vMask = (NData==transparent)[:vLO]
+                    try: NData[ vMask ] = OData[ vMask ]
                     except: pass
                     #
-                    if len(NData) >= len(OData): 
+                    if vLN >= vLO:
                         # If new data is longer than old data, old data will be completely overwritten.
-                        TempA[nr_row:nr_row+1] = [NData]
+                        TempB = np.copy(NData)
+                        TempA[nr_row:nr_row+1] = [TempB]
+                        del TempB
                     else: # Old data is longer than new data ; old data cannot be null.
                         TempB = np.copy(OData)
-                        TempB[0:len(NData)] = NData
+                        TempB[:vLN] = NData
                         TempA[nr_row:nr_row+1] = [TempB]
                         del TempB
                     #

@@ -11,7 +11,7 @@ r = Raster()
 lm.body['raster1'] = r
 lm.body['raster1'].name = 'raster1'
 lm.body['raster1'].visible = True
-lm.body['raster1'].data = lm.bp.StrToArray('R a s t e r 1\nsome data')
+lm.body['raster1'].data = lm.bp._Transform('s2a', 'R a s t e r 1\nsome data')
 lm.body['raster1'].z=2
 del r
 
@@ -19,7 +19,7 @@ r = Raster()
 lm.body['raster2'] = r
 lm.body['raster2'].name = 'raster2'
 lm.body['raster2'].visible = True
-lm.body['raster2'].data = lm.bp.StrToArray('00000\n11111\n22222\n33333\n44444')
+lm.body['raster2'].data = lm.bp._Transform('s2a', '00000\n11111\n22222\n33333\n44444')
 lm.body['raster2'].z=1
 del r
 
@@ -27,7 +27,7 @@ r = Raster()
 lm.body['raster3'] = r
 lm.body['raster3'].name = 'raster3'
 lm.body['raster3'].visible = True
-lm.body['raster3'].data = lm.bp.StrToArray('\n .\n .\nRas ter3\nlast line of raster3')
+lm.body['raster3'].data = lm.bp._Transform('s2a', '    .\n    .\nlast line of raster3')
 lm.body['raster3'].z=3
 del r
 
