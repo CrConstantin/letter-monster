@@ -1,3 +1,9 @@
+# -*- coding: utf-8 -*-
+'''
+Letter-Monster Engine.
+Copyright © 2009, Cristi Constantin. All rights reserved.
+This module generates a LMGL file to play with. You can use it for Spawn or Spit.
+'''
 
 import os, sys
 sys.path.insert( 0, os.getcwd() )

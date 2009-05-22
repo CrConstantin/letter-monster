@@ -1,18 +1,35 @@
+# -*- coding: utf-8 -*-
+'''
+Letter-Monster Engine.
+Copyright © 2009, Cristi Constantin. All rights reserved.
+This module demonstrates all Backpack functions.
+'''
 
 import os, sys
 import numpy as np
 sys.path.insert( 0, os.getcwd() )
 from _classes import Backpack
 
-#
-
-vInput = open( 'To_Test.txt', 'r' )
-vOutput = open( 'Example_Backpack.txt', 'w' )
+vInput = '''\
+    .\n\
+      xx   \n\
+-012345     \n\
+ this is 3\n\
+-12345  E\n\
+ this is 5\n\
+ 1234 6789 4321\n\
+           xx\n\
+/  \        \n\
+  x   3 \n\
+               |   |\n\
+\n\
+\n\
+E O F ()     \n\
+'''
 
 _bp = Backpack()
-print( 'Starting to read example file...\n' )
-vResult = _bp._Transform( 's2a', vInput.read() )
-vInput.close()
+
+vResult = _bp._Transform( 's2a', vInput ) # Transform string into Numpy Array.
 
 vResult = _bp.Rotate90Right( vResult ) # Rotate, then undo.
 vResult = _bp.Rotate90Left( vResult )
@@ -36,12 +53,10 @@ vResult = _bp.RightBorder( vResult, Char='~', Thick=1 )
 vResult = _bp.LeftBorder( vResult, Char='~', Thick=1 )
 vResult = _bp.Border( vResult, Char='#', Thick=2 )
 
-vOutput.write( ''.join (np.hstack( np.hstack( (i,np.array([u'\n'],'U')) ) for i in vResult )).encode('utf8') )
-vOutput.close()
-
-#
-
+print
+print ''.join (np.hstack( np.hstack( (i,np.array([u'\n'],'U')) ) for i in vResult ))
 print( 'Finished.\n' )
+
 os.system( 'pause' )
 
 #

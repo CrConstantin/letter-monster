@@ -1,6 +1,9 @@
-#  Letter Monster  #
-#        v1        #
-#    Main Class    #
+# -*- coding: utf-8 -*-
+'''
+    Letter-Monster Engine v0.1
+    Copyright © 2009, Cristi Constantin. All rights reserved.
+    MAIN CLASSES
+'''
 
 import Image, ImageFilter            # PIL Image.
 from os import getcwd                # OS get currend directory.
@@ -13,7 +16,7 @@ from psyco import full ; full ()     # Performance boost.
 import sys ; sys.path.insert(0, getcwd() ) # Save current dir in path.
 from _classes import * # Need to add curr dir as path to import classes.
 
-print 'I am Python r31!'
+print 'I am Python r32!'
 
 #
 def sort_zorder(x):
@@ -35,6 +38,8 @@ It uses no arguments for initialization. You can later on setup the engine via H
         self.bp = Backpack() # Helper functions instance.
         #
         self.data_types = ('raster', 'vector', 'event', 'macro')
+        self.Filters = ( 'BLUR', 'SMOOTH', 'SMOOTH_MORE', 'DETAIL', 'SHARPEN', # All valid filters.
+                         'CONTOUR', 'EDGE_ENHANCE', 'EDGE_ENHANCE_MORE' )
         self.Patterns = {
         'default'    : u'&80$21|;:\' ',                        # Original Patrick T. Cossette pattern
         'cro'        : u'MWBHASI+;,. ',                        # Cristi Constantin pattern
@@ -204,11 +209,10 @@ It uses no arguments for initialization. You can later on setup the engine via H
             vInput = vInput.resize((x, y), Image.BICUBIC) # Do the resize.
         del x ; del y
         #
-        if filter:          # If filter was called.
+        if filter: # If filter was called.
             for filt in filter.split('|'):
                 filt = filt.upper()
-                if filt in ( 'BLUR', 'SMOOTH', 'SMOOTH_MORE', 'DETAIL', 'SHARPEN',
-                            'CONTOUR', 'EDGE_ENHANCE', 'EDGE_ENHANCE_MORE' ):
+                if filt in self.Filters:
                     vInput = vInput.filter( getattr(ImageFilter, filt) )
                     print( "Applied %s filter." % filt )
                 else:

@@ -1,3 +1,15 @@
+# -*- coding: utf-8 -*-
+'''
+Letter-Monster Engine.
+Copyright © 2009, Cristi Constantin. All rights reserved.
+#
+This module calls all examples, to test them and show the order in which they can be tested.
+If you want to see more, you must edit some of the files.
+For example, to see how "lmgl_bord.lmgl" looks like,
+    you must first run "Example_LetterMonster_LMGL_Border.py", to generate the file "lmgl_bord.lmgl",
+    then edit "Example_LetterMonster_Spit.py" and change the string in Load function
+    from 'test.lmgl' to 'lmgl_bord.lmgl'. Now run the Spit Example.
+'''
 
 import os, sys, glob
 sys.path.insert( 0, os.getcwd() )
