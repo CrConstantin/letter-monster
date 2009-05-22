@@ -7,13 +7,13 @@ import numpy as np
 class Raster:
     "Raster objects class"
     #
-    def __init__(self):
-        self.name = ''
-        self.data = []
-        self.origin = (0,0)
-        self.visible = False
-        self.lock = False
-        self.z = 0
+    def __init__(self, name='', data=np.zeros((1,1),'U'), origin=(0,0), visible=True, lock=False, z=1):
+        self.name = name
+        self.data = data
+        self.origin = origin
+        self.visible = visible
+        self.lock = lock
+        self.z = z
     #
     def __str__(self):
         return 'raster'
@@ -23,14 +23,14 @@ class Raster:
 class Vector:
     "Vector objects class"
     #
-    def __init__(self):
-        self.name = ''
-        self.instructions = []
-        self.data = []
-        self.origin = (0,0)
-        self.visible = False
-        self.lock = False
-        self.z = 0
+    def __init__(self, name='', data=np.zeros((1,1),'U'), instructions=[{}], origin=(0,0), visible=True, lock=False, z=1):
+        self.name = name
+        self.data = data
+        self.instructions = instructions
+        self.origin = origin
+        self.visible = visible
+        self.lock = lock
+        self.z = z
     #
     def __str__(self):
         return 'vector'
@@ -40,11 +40,11 @@ class Vector:
 class Event:
     "Event objects class"
     #
-    def __init__(self):
-        self.name = ''
-        self.affect = ''
-        self.affect_macro = ''
-        self.z = -1
+    def __init__(self, name='', affects='', affect_macro=''):
+        self.name = name
+        self.affects = affects
+        self.affect_macro = affect_macro
+        self.z = -99 # This should be read-only.
     #
     def __str__(self):
         return 'event'
@@ -54,10 +54,10 @@ class Event:
 class Macro:
     "Macro objects class"
     #
-    def __init__(self):
-        self.name = ''
-        self.instructions = []
-        self.z = -1
+    def __init__(self, name='', instructions=[{}]):
+        self.name = name
+        self.instructions = instructions
+        self.z = -99 # This should be read-only.
     #
     def __str__(self):
         return 'macro'
@@ -68,7 +68,7 @@ class Backpack:
     '''
 This is helper functions class.\n\
 It uses no arguments for initialization.\n\
-All functions in Backpack take Input as input. Input MUST be a rectangular Unicode Array.'''
+All functions in Backpack take a rectangular Unicode Array as input.'''
     #
     def __init__(self):
         self.vContent = None
@@ -83,17 +83,17 @@ All functions in Backpack take Input as input. Input MUST be a rectangular Unico
             return True
         else: return False
     #
-    def _Transform( self, Direction, Input ):
+    def _Transform( self, Type, Input ):
         '''
-Transforms the input string into a rectangular Unicode Array.\n\
+Transforms the input into a rectangular Unicode Array.\n\
 This is the only function that doesn't take a rectangular Unicode Array as input.'''
         #
-        if Direction=='s2a': # String to array.
-            vLines = Input.split('\n')              # Split by '\n'.
-        elif Direction=='ls2a': # List of strings to array.
+        if Type=='s2a':    # Input is a string containing newline.
+            vLines = Input.split('\n')
+        elif Type=='ls2a': # Input is a list containing strings split by newline.
             vLines = Input
         else:
-            print( "Invalid direction! Exiting function." ) ; return
+            print( "Invalid type! Exiting function." ) ; return
         #
         vMax = max(len(line) for line in vLines) # Get max lines length.
         vCont = np.zeros((len(vLines),vMax),dtype='U') # Define empty array.

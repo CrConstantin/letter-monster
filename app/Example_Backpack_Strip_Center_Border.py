@@ -1,14 +1,13 @@
 
 import os, sys
 import numpy as np
-from pprint import pprint
 sys.path.insert( 0, os.getcwd() )
 from _classes import Backpack
 
 #
 
 vInput = open( 'To_Test.txt', 'r' )
-vOutput = open( 'Example_Strip+Center+Border.txt', 'w' )
+vOutput = open( 'Example_Backpack.txt', 'w' )
 
 _bp = Backpack()
 print( 'Starting to read example file...\n' )

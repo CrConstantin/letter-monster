@@ -7,34 +7,34 @@ from _letter_monster import LetterMonster
 lm = LetterMonster()
 lm.DEBUG = True
 
-r = Raster()
-lm.body['raster1'] = r
-lm.body['raster1'].name = 'raster1'
-lm.body['raster1'].visible = True
-lm.body['raster1'].data = lm.bp._Transform('s2a', '#'*30+'\n' + 10*('#'+' '*28+'#\n') + '#'*30 )
-lm.body['raster1'].z=1
+r = Raster(
+    name = 'raster1',
+    visible = True,
+    data = lm.bp._Transform('s2a', '#'*40+'\n' + 10*('#'+' '*38+'#\n') + '#'*40 ),
+    z=1, )
+lm.body[ r.name ] = r
 del r
 
-r = Raster()
-lm.body['raster2'] = r
-lm.body['raster2'].name = 'raster2'
-lm.body['raster2'].visible = True
-lm.body['raster2'].data = lm.bp._Transform('s2a', '\n\n  I am Johny.')
-lm.body['raster2'].z=2
+r = Raster(
+    name = 'raster2',
+    visible = True,
+    data = lm.bp._Transform('s2a', '\n\n  I am Johny.'),
+    z=2, )
+lm.body[ r.name ] = r
 del r
 
-r = Raster()
-lm.body['raster3'] = r
-lm.body['raster3'].name = 'raster3'
-lm.body['raster3'].visible = True
-lm.body['raster3'].data = lm.bp._Transform('s2a', '\n\n\n  Johny Mnemonic.')
-lm.body['raster3'].z=3
+r = Raster(
+    name = 'raster3',
+    visible = True,
+    data = lm.bp._Transform('s2a', '\n\n\n  Johny Bravo.\n\n\n\n\n\n  Am i cool or what ;>'),
+    z=3, )
+lm.body[ r.name ] = r
 del r
 
 print( 'Added data...' )
-try: os.remove( 'test_b.lmgl' )
+try: os.remove( 'test_bord.lmgl' )
 except: pass
-lm.Save( 'test_b.lmgl' )
+lm.Save( 'test_bord.lmgl' )
 
 print( 'Finished.\n' )
 os.system( 'pause' )
