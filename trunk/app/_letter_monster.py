@@ -13,7 +13,7 @@ from psyco import full ; full ()     # Performance boost.
 import sys ; sys.path.insert(0, getcwd() ) # Save current dir in path.
 from _classes import * # Need to add curr dir as path to import classes.
 
-print 'I am Python r30!'
+print 'I am Python r31!'
 
 #
 def sort_zorder(x):
@@ -75,6 +75,7 @@ It uses no arguments for initialization. You can later on setup the engine via H
         except: print( '"%s" cannot be parsed! Invalid cPickle file! Exiting function!' % lmgl ) ; return
         self.body = vLmgl # On load, old body is COMPLETELY overwritten.
         vInput.close() ; del vInput
+        self._validate()
         tf = clock()
         #
         if self.DEBUG: print( 'Loading LMGL took %.4f seconds total.' % (tf-ti) )
@@ -93,9 +94,44 @@ It uses no arguments for initialization. You can later on setup the engine via H
         vInput = BZ2File( lmgl, 'w', 0, 6 ) # Load for writing, no buffer, compress level 6.
         dump( self.body, vInput, 2 ) # Represent as cPickle method 2.
         vInput.close() ; del vInput
+        self._validate()
         tf = clock()
         #
         if self.DEBUG: print( 'Saving LMGL took %.4f seconds total.' % (tf-ti) )
+        #
+    #
+#---------------------------------------------------------------------------------------------------
+    #
+    def _validate(self):
+        '''After loading or saving one LMGL file, it must be validated.'''
+        body = self.body
+        #
+        if not body:
+            print( 'Letter-Monster body is empty!' ) ; return
+        #
+        for vKey, vElem in body.items():
+            if vKey==vElem.name: # If body name is the same as internal object name, pass.
+                pass
+            else: # This kind of error can lead to nasty bugs.
+                print( 'Warning! %s object label is ambiguous! Body name is "" and object name is ""!'
+                    % (str(vElem),vKey,vElem.name) )
+            #
+            try: # Try to get information about object data.
+                if str(type(vElem.data))=="<type 'numpy.ndarray'>" and str(type(vElem.data[0]))=="<type 'numpy.ndarray'>":
+                    pass
+                else:
+                    print( 'Warning! %s object "%s" data is not a valid rectangular Numpy Array!'
+                        % (str(vElem),vKey) )
+            except: pass # If object doesn't have "data", pass.
+            #
+            try: # Try to get information about object instructions.
+                if str(type(vElem.instructions))=="<type 'list'>" and str(type(vElem.instructions[0]))=="<type 'dict'>":
+                    pass
+                else:
+                    print( 'Warning! %s object "%s" instructions is not a valid list of dictionaries!'
+                        % (str(vElem),vKey) )
+            except: pass # If object doesn't have "instructions", pass.
+            #
         #
     #
 #---------------------------------------------------------------------------------------------------
@@ -122,21 +158,22 @@ It uses no arguments for initialization. You can later on setup the engine via H
                 if f!='Error': # If function is not Error, means it's valid.
                     #
                     # Overwrite the name of the layer with the data of the layer.
-                    try: vInstr['vInput'] = self.body[vInstr['vInput']].data
-                    except: print( '"%s" doesn\'t have valid data! Call ignored!' % vInput ) ; continue
+                    try: vInstr['Input'] = self.body[vInstr['Input']].data
+                    except: print( '"%s" doesn\'t have valid data! Call ignored!' % Input ) ; continue
                     #
                     # Try to call the function with parameters and catch the errors.
                     try: vData = f( **vInstr )
                     except TypeError: print( 'Incorrect arguments for function "%s"! Call ignored!' % vFunc ) ; continue
                     except: print( 'Unknown error occured in "%s" function call! Call ignored!' % vFunc ) ; continue
                     #
-                    # Explode data back.
-                    if vData: self.body[object].data = vData
-                    else: self.body[object].data = []
+                    # Save data in body -> object.
+                    if vData is not None: self.body[object].data = vData
+                    else: self.body[object].data = np.zeros((1,1),'U')
                     #
                 else:
                     print( 'Function "%s" doesn\'t exist! Call ignored!' % vFunc )
                 #
+            #
         else:
             print( 'Instructions for "%s" object not yet implemented!' % str(vElem) ) ; return
         #
@@ -191,14 +228,14 @@ It uses no arguments for initialization. You can later on setup the engine via H
         if self.DEBUG: print( "Starting consume..." )
         #
         vLen = len( vPattern )
-        getpx = vInput.getpixel
+        pxaccess = vInput.load()
         #
         for py in range(vInput.size[1]): # Cycle through the image's pixels, one by one
             #
             for px in range(vInput.size[0]):
                 #
-                RGB = getpx((px, py))             # Retrieve pixel RGB values
-                vColor = RGB[0] + RGB[1] + RGB[2] # Find the general darkness of the pixel
+                RGB = pxaccess[px, py]            # Retrieve pixel RGB values.
+                vColor = RGB[0] + RGB[1] + RGB[2] # Calculate general darkness of the pixel.
                 #
                 for vp in range( vLen ):                      # For each element in the string pattern...
                     if vColor <= ( 255 * 3 / vLen * (vp+1) ): # Return matching character from pattern.
@@ -232,7 +269,7 @@ It uses no arguments for initialization. You can later on setup the engine via H
     #
 #---------------------------------------------------------------------------------------------------
     #
-    def Spit(self, format='WIN CMD', transparent=' '):
+    def Spit(self, format='WIN CMD', transparent=' ', autoclear=False):
         '''
 Render function. Represents engine body.\n\
 All visible Raster and Vector layers are rendered.'''
@@ -273,10 +310,14 @@ All visible Raster and Vector layers are rendered.'''
             # If not Raster or Vector, pass.
         #
         if format=='WIN CMD':
+            if autoclear: vCmd = ['cls'] # If autoclear, clear the screen.
+            else: vCmd = []
+            #
             for vLine in vOutput:
                 vEcho = u''.join(u'^'+i for i in vLine)
-                if vEcho: cmd( '@ECHO %s' % vEcho.encode('utf') )
-                else: cmd( '@ECHO.' )
+                if vEcho: vCmd.append( '@ECHO %s' % vEcho.encode('utf8') )
+                else: vCmd.append( '@ECHO.' )
+            cmd( '&'.join(vCmd) )
             #
         # More formats will be implemented soon.
     #
@@ -299,6 +340,8 @@ Can also transform one LMGL into : TXT, Excel, or HTML, without changing engine 
             ttf = clock()
             if self.DEBUG: print( 'Loading LMGL (Spawn) took %.4f seconds.' % (ttf-tti) )
         else: vLmgl = self.body
+        #
+        self._validate() # Check everithing before rendering.
         #
         out = out.lower() # Lower letters.
         if out not in ('txt', 'csv', 'html'):

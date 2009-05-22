@@ -11,7 +11,7 @@ lm.DEBUG = True
 lm.Load( 'test.lmgl' )
 print
 
-lm.Spit('WIN CMD')
+lm.Spit('WIN CMD', autoclear=True)
 print
 
 #
