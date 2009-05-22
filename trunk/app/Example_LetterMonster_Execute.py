@@ -1,9 +1,13 @@
+# -*- coding: utf-8 -*-
+'''
+Letter-Monster Engine.
+Copyright © 2009, Cristi Constantin. All rights reserved.
+This module demonstrates executing instructions stored inside a vector.
+'''
 
 import os, sys
 sys.path.insert( 0, os.getcwd() )
 from _letter_monster import LetterMonster
-
-#
 
 lm = LetterMonster()
 lm.DEBUG = True
@@ -17,8 +21,6 @@ print 'Inside instructions, there is type:', type(lm.body['vect1'].instructions[
 
 lm._execute( 'vect1' )
 print
-
-#
 
 print( 'Finished.\n' )
 os.system( 'pause' )

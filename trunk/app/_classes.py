@@ -1,6 +1,9 @@
-#  Letter Monster  #
-#        v1        #
-#  Helper Classes  #
+# -*- coding: utf-8 -*-
+'''
+    Letter-Monster Engine v0.1
+    Copyright © 2009, Cristi Constantin. All rights reserved.
+    HELPER CLASSES
+'''
 
 import numpy as np
 
