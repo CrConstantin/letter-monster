@@ -9,4 +9,6 @@
     * Can be used for ASCII movies, web design, or games. Can be embeded into websites, or can become standalone applications.
     * There are two distinct versions of *Letter-Monster* : colored and non-colored. In colored version, each letter has a color, in non-colored version, only plain letters are used to describe shapes.
     * *Letter-Monster* Backpack can edit large TXT files : rotate, mirror, align, crop, resize, border, etc.
-    * *Letter-Monster* is 100% free. No hidden costs. You can use it anywhere, anyhow, anytime. *Letter-Monster* will always be free, for home or commercial users. 
+    * *Letter-Monster* is 100% free. No hidden costs. You can use it anywhere, anyhow, anytime. *Letter-Monster* will always be free, for home or commercial users.
+
+`***`Note that some of these features are not yet available. Letter-Monster is a *work in progress*.
