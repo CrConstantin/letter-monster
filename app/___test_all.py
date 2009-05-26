@@ -52,4 +52,6 @@ lmgl = glob.glob( '*.lmgl' )
 for l in lmgl:
     try: os.remove( l )
     except: pass
-os.system('pause')
+try: os.remove( 'out.txt' )
+except: pass
+os.system('echo Finished. Sleeping 10...&sleep 10')

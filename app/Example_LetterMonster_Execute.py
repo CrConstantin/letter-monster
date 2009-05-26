@@ -20,9 +20,7 @@ print 'Instructions are type:', type(lm.body['vect1'].instructions)
 print 'Inside instructions, there is type:', type(lm.body['vect1'].instructions[0]), '\n'
 
 lm._execute( 'vect1' )
-print
 
-print( 'Finished.\n' )
-os.system( 'pause' )
+os.system( 'echo Done. Sleeping 5...&sleep 5' )
 
 #

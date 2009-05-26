@@ -55,8 +55,7 @@ vResult = _bp.Border( vResult, Char='#', Thick=2 )
 
 print
 print ''.join (np.hstack( np.hstack( (i,np.array([u'\n'],'U')) ) for i in vResult ))
-print( 'Finished.\n' )
 
-os.system( 'pause' )
+os.system( 'echo Done. Sleeping 5...&sleep 5' )
 
 #

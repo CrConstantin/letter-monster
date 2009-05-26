@@ -16,7 +16,7 @@ from psyco import full ; full ()     # Performance boost.
 import sys ; sys.path.insert(0, getcwd() ) # Save current dir in path.
 from _classes import * # Need to add curr dir as path to import classes.
 
-print 'I am Python r32!'
+print 'I am Python r35!'
 
 #
 def sort_zorder(x):
@@ -319,8 +319,8 @@ All visible Raster and Vector layers are rendered.'''
             #
             for vLine in vOutput:
                 vEcho = u''.join(u'^'+i for i in vLine)
-                if vEcho: vCmd.append( '@ECHO %s' % vEcho.encode('utf8') )
-                else: vCmd.append( '@ECHO.' )
+                if vEcho: vCmd.append( 'echo %s' % vEcho.encode('utf8') )
+                else: vCmd.append( 'echo.' )
             cmd( '&'.join(vCmd) )
             #
         # More formats will be implemented soon.
@@ -344,8 +344,6 @@ Can also transform one LMGL into : TXT, Excel, or HTML, without changing engine 
             ttf = clock()
             if self.DEBUG: print( 'Loading LMGL (Spawn) took %.4f seconds.' % (ttf-tti) )
         else: vLmgl = self.body
-        #
-        self._validate() # Check everithing before rendering.
         #
         out = out.lower() # Lower letters.
         if out not in ('txt', 'csv', 'html'):
