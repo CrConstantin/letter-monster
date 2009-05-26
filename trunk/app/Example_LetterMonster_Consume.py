@@ -17,7 +17,7 @@ from _letter_monster import LetterMonster
 lm = LetterMonster()
 lm.DEBUG = True
 
-lm.Consume( image='../Wind_by_pincel3d.jpg', x=0, y=0, pattern='default', filter='' )
+lm.Consume( image='Logo.jpg', x=0, y=0, pattern='default', filter='' )
 
 try: os.remove( 'test_cons.lmgl' )
 except: pass
@@ -32,7 +32,6 @@ print 'Data 0-10:', lm.body['raster1'].data[0][0:10]
 
 print( "Please, use Lucida Console Bold, size 4 for viewing." )
 
-print( 'Finished.\n' )
-os.system( 'pause' )
+os.system( 'echo Done. Sleeping 5...&sleep 5' )
 
 #

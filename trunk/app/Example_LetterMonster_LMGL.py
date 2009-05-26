@@ -60,7 +60,6 @@ try: os.remove( 'test.lmgl' )
 except: pass
 lm.Save( 'test.lmgl' )
 
-print( 'Finished.\n' )
-os.system( 'pause' )
+os.system( 'echo Done. Sleeping 5...&sleep 5' )
 
 #

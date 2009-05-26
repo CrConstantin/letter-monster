@@ -12,12 +12,11 @@ from _letter_monster import LetterMonster
 lm = LetterMonster()
 lm.DEBUG = True
 
-lm.Load( 'test.lmgl' )
+lm.Load( 'test_bord.lmgl' )
 print
 
 lm.Spit('WIN CMD', autoclear=True)
-print
 
-os.system( 'pause' )
+os.system( 'echo Done. Sleeping 5...&sleep 5' )
 
 #

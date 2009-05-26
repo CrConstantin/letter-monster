@@ -42,7 +42,6 @@ try: os.remove( 'test_bord.lmgl' )
 except: pass
 lm.Save( 'test_bord.lmgl' )
 
-print( 'Finished.\n' )
-os.system( 'pause' )
+os.system( 'echo Done. Sleeping 5...&sleep 5' )
 
 #

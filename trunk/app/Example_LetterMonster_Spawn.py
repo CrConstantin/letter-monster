@@ -13,10 +13,8 @@ lm = LetterMonster()
 lm.DEBUG = True
 
 print( 'Spawning...\n' )
-
 lm.Spawn( lmgl='test.lmgl', out='txt' )
 
-print( 'Finished.\n' )
-os.system( 'pause' )
+os.system( 'echo Done. Sleeping 5...&sleep 5' )
 
 #
