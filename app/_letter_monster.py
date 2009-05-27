@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 '''
-    Letter-Monster Engine v0.1
+    Letter-Monster Engine v0.2
     Copyright © 2009, Cristi Constantin. All rights reserved.
     MAIN CLASSES
 '''
 
-import Image, ImageFilter            # PIL Image.
+import Image, ImageFilter            # Python-Imaging.
+import ImageFont, ImageDraw          # Python-Imaging.
 from os import getcwd                # OS get currend directory.
-from os import system as cmd         # OS command line access.
 import numpy as np                   # Numpy arrays.
 from cPickle import dump, load       # Represent letter-monster body.
 from bz2 import BZ2File              # Compress and write data.
@@ -16,7 +16,7 @@ from psyco import full ; full ()     # Performance boost.
 import sys ; sys.path.insert(0, getcwd() ) # Save current dir in path.
 from _classes import * # Need to add curr dir as path to import classes.
 
-print 'I am Python r35!'
+print 'I am Python r36!'
 
 #
 def sort_zorder(x):
@@ -153,10 +153,10 @@ It uses no arguments for initialization. You can later on setup the engine via H
             print( '"%s" has null instructions! Exiting execute!' % object ) ; return
         #
         ti = clock()
-        if str(vElem)=='vector':
-            for vInstr in vInstructions: # For each dictionary in the instructions list.
-                vFunc = vInstr['f']      # Save the function to call, then delete this mapping.
-                del vInstr['f']
+        if str(vElem)=='vector': # Execute vector instructions.
+            for vInstr in vInstructions: # For each dictionary in vector instructions list.
+                vFunc = vInstr['f']      # Save function name, then delete this mapping.
+                del vInstr['f']          # All vector function calls are backpack functions.
                 #
                 f = getattr(self.bp, vFunc, 'Error') # Save the function call.
                 #
@@ -179,6 +179,8 @@ It uses no arguments for initialization. You can later on setup the engine via H
                     print( 'Function "%s" doesn\'t exist! Call ignored!' % vFunc )
                 #
             #
+        if str(vElem)=='macro':
+            pass
         else:
             print( 'Instructions for "%s" object not yet implemented!' % str(vElem) ) ; return
         #
@@ -233,19 +235,20 @@ It uses no arguments for initialization. You can later on setup the engine via H
         #
         vLen = len( vPattern )
         pxaccess = vInput.load()
+        ch = len(vInput.getbands())
         #
         for py in range(vInput.size[1]): # Cycle through the image's pixels, one by one
             #
             for px in range(vInput.size[0]):
                 #
-                RGB = pxaccess[px, py]            # Retrieve pixel RGB values.
-                vColor = RGB[0] + RGB[1] + RGB[2] # Calculate general darkness of the pixel.
+                RGB = pxaccess[px, py] # Retrieve pixel RGB values.
+                vColor = sum(RGB)      # Calculate general darkness of the pixel.
                 #
-                for vp in range( vLen ):                      # For each element in the string pattern...
-                    if vColor <= ( 255 * 3 / vLen * (vp+1) ): # Return matching character from pattern.
+                for vp in range( vLen ):                       # For each element in the string pattern...
+                    if vColor <= ( 255 * ch / vLen * (vp+1) ): # Return matching character from pattern.
                         vResult[py,px] = vPattern[vp]
                         break
-                    elif vColor > ( 255 * 3 / vLen * vLen ) and vColor <= ( 255 * 3 ): # If not in range, return last character from pattern.
+                    elif vColor > ( 255 * ch / vLen * vLen ) and vColor <= ( 255 * ch ): # If not in range, return last character from pattern.
                         vResult[py,px] = vPattern[-1]
                         break
                 #
@@ -273,7 +276,7 @@ It uses no arguments for initialization. You can later on setup the engine via H
     #
 #---------------------------------------------------------------------------------------------------
     #
-    def Spit(self, format='WIN CMD', transparent=' ', autoclear=False):
+    def Spit(self, format='CMD', transparent=' ', autoclear=False):
         '''
 Render function. Represents engine body.\n\
 All visible Raster and Vector layers are rendered.'''
@@ -313,7 +316,8 @@ All visible Raster and Vector layers are rendered.'''
                 #
             # If not Raster or Vector, pass.
         #
-        if format=='WIN CMD':
+        if format=='CMD':
+            from os import system as cmd # OS command line access.
             if autoclear: vCmd = ['cls'] # If autoclear, clear the screen.
             else: vCmd = []
             #
@@ -323,6 +327,8 @@ All visible Raster and Vector layers are rendered.'''
                 else: vCmd.append( 'echo.' )
             cmd( '&'.join(vCmd) )
             #
+        elif format=='SH':
+            pass
         # More formats will be implemented soon.
     #
 #---------------------------------------------------------------------------------------------------
@@ -346,7 +352,7 @@ Can also transform one LMGL into : TXT, Excel, or HTML, without changing engine 
         else: vLmgl = self.body
         #
         out = out.lower() # Lower letters.
-        if out not in ('txt', 'csv', 'html'):
+        if out not in ('txt', 'csv', 'html', 'bmp', 'gif', 'jpg', 'png'):
             print( '"%s" is not a valid export type! Exiting function!' % out ) ; return
         #
         tti = clock() # Local counter.
@@ -387,28 +393,49 @@ Can also transform one LMGL into : TXT, Excel, or HTML, without changing engine 
         #
         ttf = clock()
         print( 'Overwriting data took %.4f seconds.' % (ttf-tti) )
-        #
         tti = clock() # Local counter.
-        vOut = open( filename+'.'+out, 'w' ) # Filename + Extension.
+        #
         if out=='txt':
+            vOut = open( filename+'.'+out, 'w' ) # Filename + Extension.
             vOut.write( ''.join ( np.hstack( np.hstack( (i,np.array([u'\n'],'U')) ) for i in TempA # Concatenate all arrays with an array containing ['\n'].
                                            )
                                 ).encode('utf8')
                       )
+            vOut.close()
         #
         elif out=='csv':
+            vOut = open( filename+'.'+out, 'w' ) # Filename + Extension.
             vOut.write( '"\n'.join('",'.join('"%s' % j for j in i) for i in TempA) ) # Put each value into " ", pairs.
             vOut.write( '"\n' )
+            vOut.close()
         #
         elif out=='html':
+            vOut = open( filename+'.'+out, 'w' ) # Filename + Extension.
             vOut.write('<html>\n<body>\n<table border="0" cellpadding="0" cellspacing="0" style="font-family: Lucida Console, Courier New; font-size: 3px; font-weight: bold; letter-spacing: 1px;">\n<tr>')
             vOut.write( '</td></tr>\n<tr>'.join('</td>'.join('<td>%s' % j for j in i) for i in TempA) ) # Put each value into <td> </td> pairs.
             vOut.write('</td></tr>\n</table>\n</body>\n</html>')
+            vOut.close()
         #
-        vOut.close() ; del TempA ; del vOut
+        elif out in ('bmp', 'gif', 'jpg', 'png'):
+            lenW = len(TempA[0]) # Get TempA width and height.
+            lenH = len(TempA)
+            vFont = ImageFont.truetype('c:/windows/fonts/lucon.ttf', 8) # Load font.
+            vLtrSize = (vFont.getsize('x')[0], int(2*vFont.getsize('x')[1]/3))          # Get true size of a letter drawn with this font.
+            vOut = Image.new('RGB', ((lenW+1)*vLtrSize[0],lenH*vLtrSize[1]), "#ffffee") # New image: Type, Width, Height, Background.
+            vDraw = ImageDraw.Draw(vOut)
+            i = 1
+            for line in TempA: # For each line...
+                vDraw.text((1,i), ''.join ( line ).encode('utf8'), fill="#000066", font=vFont) # Draw line.
+                i += vLtrSize[0]-1
+            del i
+            vOut.save( filename+'.'+out )
+        #
+        # More export formats will be implemented.
+        #
+        del TempA ; del vOut
+        #
         ttf = clock()
-        if self.DEBUG: print( 'Unite arrays and lists took %.4f seconds.' % (ttf-tti) )
-        #
+        if self.DEBUG: print( 'Saving took %.4f seconds.' % (ttf-tti) )
         tf = clock()
         if self.DEBUG: print( 'Spawn took %.4f seconds total.' % (tf-ti) )
         #

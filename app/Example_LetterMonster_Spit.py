@@ -15,7 +15,7 @@ lm.DEBUG = True
 lm.Load( 'test_bord.lmgl' )
 print
 
-lm.Spit('WIN CMD', autoclear=True)
+lm.Spit('CMD', autoclear=True)
 
 os.system( 'echo Done. Sleeping 5...&sleep 5' )
 

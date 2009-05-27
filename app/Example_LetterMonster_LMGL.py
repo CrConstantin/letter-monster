@@ -43,7 +43,7 @@ instruct = [
     {'f':'StripRightSpace','Input':'vect1'},
     {'f':'StripLeftSpace','Input':'vect1'},
     {'f':'Border','Input':'vect1'} ]
-v = Vector(name = 'vect1', instructions=instruct, origin = (99,10))
+v = Vector(name = 'vect1', instructions=instruct, position = (99,10))
 lm.body[ v.name ] = v
 del v
 
