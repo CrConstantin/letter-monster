@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 '''
-    Letter-Monster Engine v0.1
+    Letter-Monster Engine v0.2
     Copyright © 2009, Cristi Constantin. All rights reserved.
     HELPER CLASSES
 '''
@@ -10,10 +10,10 @@ import numpy as np
 class Raster:
     "Raster objects class"
     #
-    def __init__(self, name='', data=np.zeros((1,1),'U'), origin=(0,0), visible=True, lock=False, z=1):
+    def __init__(self, name='', data=np.zeros((1,1),'U'), position=(0,0), visible=True, lock=False, z=1):
         self.name = name
         self.data = data
-        self.origin = origin
+        self.position = position
         self.visible = visible
         self.lock = lock
         self.z = z
@@ -26,11 +26,11 @@ class Raster:
 class Vector:
     "Vector objects class"
     #
-    def __init__(self, name='', data=np.zeros((1,1),'U'), instructions=[{}], origin=(0,0), visible=True, lock=False, z=1):
+    def __init__(self, name='', data=np.zeros((1,1),'U'), instructions=[{}], position=(0,0), visible=True, lock=False, z=1):
         self.name = name
         self.data = data
         self.instructions = instructions
-        self.origin = origin
+        self.position = position
         self.visible = visible
         self.lock = lock
         self.z = z
