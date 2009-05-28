@@ -5,18 +5,18 @@
     MAIN CLASSES
 '''
 
-import Image, ImageFilter            # Python-Imaging.
-import ImageFont, ImageDraw          # Python-Imaging.
-from os import getcwd                # OS get currend directory.
-import numpy as np                   # Numpy arrays.
-from cPickle import dump, load       # Represent letter-monster body.
-from bz2 import BZ2File              # Compress and write data.
-from time import clock               # Timing operations.
-from psyco import full ; full ()     # Performance boost.
-import sys ; sys.path.insert(0, getcwd() ) # Save current dir in path.
+import os, sys                   # Very important System functions.
+import Image, ImageFilter        # Python-Imaging.
+import ImageFont, ImageDraw      # Python-Imaging.
+import numpy as np               # Numpy arrays.
+from cPickle import dump, load   # Represent letter-monster body.
+from bz2 import BZ2File          # Compress and write data.
+from time import clock           # Timing operations.
+from psyco import profile ; profile() # Performance boost.
+sys.path.insert(0, os.getcwd() ) # Save current dir in path.
 from _classes import * # Need to add curr dir as path to import classes.
 
-print 'I am Python r36!'
+print 'I am Python r37!'
 
 #
 def sort_zorder(x):
@@ -241,8 +241,7 @@ It uses no arguments for initialization. You can later on setup the engine via H
             #
             for px in range(vInput.size[0]):
                 #
-                RGB = pxaccess[px, py] # Retrieve pixel RGB values.
-                vColor = sum(RGB)      # Calculate general darkness of the pixel.
+                vColor = sum( pxaccess[px,py] ) # Calculate general darkness of the pixel.
                 #
                 for vp in range( vLen ):                       # For each element in the string pattern...
                     if vColor <= ( 255 * ch / vLen * (vp+1) ): # Return matching character from pattern.
@@ -315,9 +314,9 @@ All visible Raster and Vector layers are rendered.'''
                     #
                 #
             # If not Raster or Vector, pass.
+            del NData ; del OData
         #
         if format=='CMD':
-            from os import system as cmd # OS command line access.
             if autoclear: vCmd = ['cls'] # If autoclear, clear the screen.
             else: vCmd = []
             #
@@ -325,10 +324,62 @@ All visible Raster and Vector layers are rendered.'''
                 vEcho = u''.join(u'^'+i for i in vLine)
                 if vEcho: vCmd.append( 'echo %s' % vEcho.encode('utf8') )
                 else: vCmd.append( 'echo.' )
-            cmd( '&'.join(vCmd) )
+            os.system( '&'.join(vCmd) ) # Execute Windows command!
             #
         elif format=='SH':
-            pass
+            if autoclear: vCmd = ['clear'] # If autoclear, clear the screen.
+            else: vCmd = []
+            #
+            for vLine in vOutput:
+                vEcho = u''.join(u'\\'+i for i in vLine)
+                if vEcho: vCmd.append( 'echo %s' % vEcho.encode('utf8') )
+                else: vCmd.append( 'echo.' )
+            os.system( '&&'.join(vCmd) ) # Execute Linux command!
+            #
+        elif format=='pygame': # Pygame render.
+            try: import pygame
+            except: print( 'Could not import Pygame! Make sure you downloaded and installed it. Check http://www.pygame.org. Exiting!' )
+            pygame.init()
+            #
+            vSize = width, height = 320, 240
+            vScreen = pygame.display.set_mode(vSize)
+            vFont = pygame.font.SysFont('Lucida Console', 12)
+            vHeight = vFont.get_height()
+            #
+            while 1:
+                for event in pygame.event.get():
+                    if event.type in (pygame.QUIT, pygame.KEYDOWN):
+                        print 'Key pressed, exiting...'
+                        pygame.quit() ; return
+                    #
+                    i = 1
+                    for vLine in vOutput:
+                        vFR = vFont.render(''.join(vLine), True, (0,255,255))
+                        vScreen.blit(vFR, (1,i))
+                        i += vHeight
+                    pygame.display.flip()
+                #
+            #
+        elif format=='pyglet': # Pyglet render.
+            try: import pyglet
+            except: print( 'Could not import Pyglet! Make sure you downloaded and installed it. Check http://www.pyglet.org. Exiting!' )
+            #
+            window = pyglet.window.Window(width=800, height=600, caption='Pyglet render', resizable=False, style=None, fullscreen=False, visible=True, vsync=True)
+            label = pyglet.text.Label( text=''.join ( np.hstack( np.hstack( (i,np.array([u'\n'],'U')) ) for i in vOutput ) ).encode('utf8'),
+                font_name='Lucida Console', font_size=8, x=1, y=window.height-1, width=len(vOutput[0]), anchor_x='left', anchor_y='top', multiline=True)
+            #
+            @window.event
+            def on_key_press(symbol, modifiers):
+                print 'Key pressed, exiting...'
+                window.close()
+            @window.event
+            def on_draw():
+                window.clear()
+                label.draw()
+            #
+            pyglet.app.run()
+            #
+        #
         # More formats will be implemented soon.
     #
 #---------------------------------------------------------------------------------------------------
