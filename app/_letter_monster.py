@@ -12,12 +12,16 @@ import numpy as np               # Numpy arrays.
 from cPickle import dump, load   # Represent Letter-Monster body.
 from bz2 import BZ2File          # Compress and write data.
 from time import clock           # Timing operations.
-from psyco import profile ; profile() # Performance boost.
 sys.path.insert(0, os.getcwd() ) # Save current dir in path.
-from _classes import * # Need to add curr dir as path to import classes.
+
+try: from psyco import profile ; profile() # Performance boost.
+except: pass                               # If Psyco is not available, pass.
+from _classes import *
 from _FlattenLayers import FlattenLayers
 
-print 'I am LM r38!'
+print 'I am LM r39!'
+
+#
 
 class LetterMonster:
     '''
@@ -116,8 +120,9 @@ Private function. After load or save, each LMGL file MUST be validated.\n\
 Errors are printed in console, but cannot be fixed. It is your responsability to do the fixing.\n\
 Valid LMGL file should respect this:\n\
  - internal name of all layers must be the same as the key used to acces them, in LetterMonster body.\n\
- - data of all layers must be valid rectangular Numpy Arrays.\n\
- - instructions of all layers must be valid lists of dictionaries.
+ - data of Raster and Vector layers must be Rectangular Numpy Arrays.\n\
+ - instructions of Vector and Macro layers must be lists of dictionaries.\n\
+ - position of Raster and Vector layers must be tuples of 2 integers.
 '''
         #
         body = self.body
@@ -147,6 +152,14 @@ Valid LMGL file should respect this:\n\
                     print( 'Letter-Monster growls: "Be warned! %s object `%s` instructions is not a valid list of dictionaries!"'
                         % (str(vElem),vKey) )
             except: pass # If object doesn't have "instructions", pass.
+            #
+            try: # Try to get information about object position.
+                if str(type(vElem.position))=="<type 'tuple'>" and str(type(vElem.position[0]))=="<type 'int'>":
+                    pass
+                else:
+                    print( 'Letter-Monster growls: "Be warned! %s object `%s` position is not a tuple containing two integers!"'
+                        % (str(vElem),vKey) )
+            except: pass # If object doesn't have "position", pass.
             #
         #
     #
@@ -205,7 +218,7 @@ Valid LMGL file should respect this:\n\
     def Consume(self, image='image.jpg', x=0, y=0, pattern='default', filter=''):
         '''
 Takes a supported image as input, transforms it into a Rectangular Unicode Array and stores it in LetterMonster body.\n\
-You can later on export this "consumed" image into TXT, CSV, HTM, or whatever suits your needs.
+You can later on export this "consumed" image into TXT, CSV, HTM, or whatever suits your needs, with Spawn.
 '''
         #
         try: vInput = Image.open( image )
@@ -410,9 +423,8 @@ Can also transform one LMGL into : TXT, Excel, or HTML, without changing engine 
         if out not in ('txt', 'csv', 'html', 'bmp', 'gif', 'jpg', 'png'):
             print( 'Letter-Monster growls: "I cannot export in `%s` type! Exiting spawn!' % out ) ; return
         #
-        #try:
-        vOutput = FlattenLayers( vLmgl )
-        #except: print( 'Letter-Monster snarls: "Flatten body layers returned an error! Cannot spawn!"' )
+        try: vOutput = FlattenLayers( vLmgl )
+        except: print( 'Letter-Monster snarls: "Flatten body layers returned an error! Cannot spawn!"' )
         #
         tti = clock() # Local counter.
         #

@@ -1,5 +1,5 @@
 
-  * Letter-Monster Engine Documentation *
+ * Letter-Monster Engine Documentation *
 
 -------------
   Contents:
@@ -15,25 +15,25 @@
 ----------
   About:
 ----------
- * Letter-Monster is a text rendering engine.
+ * Letter-Monster is a multi-layer text rendering engine.
     It renders letters in a very similar way to a 2D/3D engine that renders pixels.
- * Can transform images (JPG, PNG, BMP) into : ASCII Text, mono-color Excel tables, mono-color HTML tables.
+ * Can transform images (BMP, JPG, PNG, PSD, TGA) into : ASCII Text, CSV, mono-color HTML tables, ASCII images.
  * Can create complex text shapes and text interfaces.
- * Can make mono-color ASCII animations.
- * Can generate programs that respond to user input and react to events.
+ * Can generate ASCII animations.
+ * Can make programs that respond to user input and react to events.
  * Can be used for ASCII movies, web design, games.
-    Can be embeded into command line applications, web-sites, or can become standalone applications.
- * There will two distinct versions of Letter-Monster : colored and non-colored.
-    In colored version, each letter has a color, in non-colored version, only plain letters are used to describe shapes.
+    Can be embeded into command line applications, game engines like Pygame and Pyglet, web-sites,
+    or can become standalone applications.
  * Letter-Monster Backpack can edit large TXT files : rotate, mirror, align, crop, resize, border, etc.
+ * There will be two distinct versions of Letter-Monster : colored and non-colored.
+    In colored version, each letter has a color, in non-colored version, only plain letters are used to describe shapes.
  * Letter-Monster is 100% free. No hidden costs. You can use it anywhere, anyhow, anytime.
     Letter-Monster will always be free, for home or commercial users. Please check the Licence.
 
 ------------
   Licence:
 ------------
-  Letter-Monster engine and Letter-Monster Logo are copyright © 2009, Cristi Constantin.
-  All rights reserved.
+  Letter-Monster engine and Letter-Monster Logo are copyright © 2009, Cristi Constantin. All rights reserved.
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -58,8 +58,11 @@
 -----------------
  * Python 2.5. Letter-Monster is written entirely in Python 2.5. (www.python.org)
  * Python-Numpy. All data is represented as Numpy tables; they are fast and use little memory. (numpy.scipy.org)
- * Python-Psyco. Makes Letter-Monster 2-3 times faster. It uses quite a lot of memory. (psyco.sourceforge.net)
  * Python Image Library (PIL). Manipulates and creates images. (www.pythonware.com/products/pil)
+
+ * (Optional) Python-Psyco. Makes Letter-Monster 2-3 times faster. It uses quite a lot of memory. (psyco.sourceforge.net)
+ * (Optional) Pygame. Used to render in Pygame. (www.pygame.org)
+ * (Optional) Pyglet. Used to render in Pyglet. (www.pyglet.org)
 
 ---------------
   How to use:
@@ -68,7 +71,7 @@
     Just make sure that Python can find the path to "_letter_monster.py" file. Check the examples.
     Alternatively, you can copy "_letter_monster.py" and "_classes.py" into "C:\Python25\Lib".
     This way, you will be able to import them anytime, without specifying a path.
- * A lot of time was spent to document all modules, classes and functions in Letter-Monster, so enjoy.
+ * A LOT of time was spent to document all modules, classes and functions in Letter-Monster, so enjoy.
  * All examples delivered with Letter-Monster work out-of-the-box. Just open them with Python:
     > c:\Python25\python.exe "... path to example file ..."
     in Windows, or
