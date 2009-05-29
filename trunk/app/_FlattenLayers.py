@@ -6,53 +6,46 @@ from time import clock
 def sort_zorder(x):
     return x.z
 #
-
+# TODO !!!!! Multiple transparent values !
+# TODO !!!!! Move insert layers into given position !
 #
 def FlattenLayers( vInput ):
     '''
 This function takes as input a dictionary containing layers, like LetterMonster.body.\n\
-All layers data is merged and the function returns the result as 2D unicode numpy array.
+Only layers that have a "data" attribute (Raster and Vector) can be rendered.
+Function returns the flatened result, as Rectangular Unicode Numpy Array.
 '''
     #
-    tti = clock()
-    vOutput = [[]]
+    ti = clock()
+    vOutput = np.zeros((1,1), 'U') # Define one empty Rectangular Unicode Numpy Array.
     #
-    for vElem in sorted(vInput.values(), key=sort_zorder): # For each visible Raster and Vector in body, sorted in Z-order.
-        if (str(vElem)=='raster' and vElem.visible) or (str(vElem)=='vector' and vElem.visible):
-            Data = vElem.data                 # This is a 2D numpy array.
+    for vElem in sorted(vInput.values(), key=sort_zorder): # For all elements in LetterMonster body, sorted by Z-order...
+        if (str(vElem)=='raster' and vElem.visible) or (str(vElem)=='vector' and vElem.visible): # If element is a visible Raster or Vector...
+            vData = vElem.data          # This should be a Rectangular Unicode Numpy Array.
+            vCoords = vElem.position    # This should be a tuple with 2 integers.
+            vTransp = vElem.transparent # This should be a unicode character.
             #
-            for nr_row in range( len(Data) ): # For each row in Data.
-                #
-                NData = Data[nr_row]     # New data, to be written over old data. It's a 1D unicode numpy array.
-                NData = NData[NData!=''] # Strip empty strings from the end.
-                OData = vOutput[nr_row:nr_row+1] or [[]] # Old data. First loops is empty list, then is 1D unicode numpy array.
-                OData = OData[0] # It doesn't work other way.
-                #
-                vLN = len(NData)
-                vLO = len(OData)
-                #
-                # Replace all NData transparent pixels with OData, at respective indices.
-                vMask = (NData==vElem.transparent)[:vLO]
-                try: NData[ vMask ] = OData[ vMask ]
-                except: pass
-                #
-                if vLN >= vLO:
-                    # If new data is longer than old data, old data will be completely overwritten.
-                    TempB = np.copy(NData)
-                    vOutput[nr_row:nr_row+1] = [TempB]
-                    del TempB
-                else: # Old data is longer than new data ; old data cannot be null.
-                    TempB = np.copy(OData)
-                    TempB[:vLN] = NData
-                    vOutput[nr_row:nr_row+1] = [TempB]
-                    del TempB
-                #
+            # Get maximum length between current Element array shape and current Output array shape.
+            vCoord0 = max(vData.shape[0]+vCoords[0], vOutput.shape[0])
+            vCoord1 = max(vData.shape[1]+vCoords[1], vOutput.shape[1])
+            #
+            # Resize Output Array to current layer array shape + current layer position.
+            vOutput.resize( (vCoord0, vCoord1) )
+            #
+            # MASK 1 : all null values become transparent values.
+            vMask = vData==u''
+            vData[ vMask ] = vTransp
+            #
+            # MASK 2 : insert all NON-transparent values into Final Numpy Array, considering the position...
+            vMask = vData!=vTransp
+            vOutput[ vMask ] = vData[ vMask ]
+            #
+            del vMask # Just to make sure. :p
             #
         # If not Raster or Vector, pass.
     #
-    ttf = clock()
-    print( 'Flatten layers took %.4f seconds.' % (ttf-tti) )
+    tf = clock()
+    print( 'Flatten Layers took %.4f seconds.' % (tf-ti) )
     return vOutput
     #
-
 #

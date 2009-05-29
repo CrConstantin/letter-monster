@@ -16,7 +16,8 @@ lm.DEBUG = True
 r = Raster(
     name = 'raster1',
     visible = True,
-    data = lm.bp._Transform('s2a', '#'*40+'\n' + 10*('#'+' '*38+'#\n') + '#'*40 ),
+    transparent = u'',
+    data = lm.bp._Transform('s2a', '#'*30+'\n' + 10*('#'+' '*28+'#\n') + '#'*30 ),
     z=1, )
 lm.body[ r.name ] = r
 del r
@@ -24,7 +25,9 @@ del r
 r = Raster(
     name = 'raster2',
     visible = True,
-    data = lm.bp._Transform('s2a', '\n\n  I am Johny.'),
+    transparent = u' ',
+    position = (1,3),
+    data = lm.bp._Transform('s2a', 'I am Johny.'),
     z=2, )
 lm.body[ r.name ] = r
 del r
@@ -32,6 +35,7 @@ del r
 r = Raster(
     name = 'raster3',
     visible = True,
+    transparent = u' ',
     data = lm.bp._Transform('s2a', '\n\n\n  Johny Bravo.\n\n\n\n\n\n  Am i cool or what ;>'),
     z=3, )
 lm.body[ r.name ] = r
