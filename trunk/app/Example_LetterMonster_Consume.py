@@ -1,6 +1,6 @@
-# -*- coding: utf-8 -*-
+# -*- coding: latin-1 -*-
 '''
-Letter-Monster Engine.
+Letter-Monster Engine v0.2.
 Copyright © 2009, Cristi Constantin. All rights reserved.
 This module demonstrates transforming an Image into a LMGL file.
 This file can be later rendered (check Spit Example) or exported (check Spawn example).

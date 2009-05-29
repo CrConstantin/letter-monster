@@ -6,6 +6,7 @@
 -------------
 
  - About
+ - Licence
  - Requirements
  - How to use
 
@@ -28,22 +29,48 @@
  * Letter-Monster is 100% free. No hidden costs. You can use it anywhere, anyhow, anytime.
     Letter-Monster will always be free, for home or commercial users. Please check the Licence.
 
+------------
+  Licence:
+------------
+  Letter-Monster engine and Letter-Monster Logo are copyright © 2009, Cristi Constantin.
+  All rights reserved.
+
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  If you redistribute this software, neither the name of "Letter Monster"
+  nor the names of its contributors may be used to endorse or promote
+  products derived from this software without specific prior written
+  permission.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  GNU General Public License (GPL) for more details.
+
+  You have received a copy of the GNU General Public License along
+  with this program.
+
 -----------------
   Requirements:
 -----------------
  * Python 2.5. Letter-Monster is written entirely in Python 2.5. (www.python.org)
- * Numpy. All data is represented as Numpy tables; they are fast and use little memory. (numpy.scipy.org)
- * Psyco. Makes Letter-Monster 2 times faster. It uses quite a lot of memory. (psyco.sourceforge.net)
- * Python Image Library (PIL). Manipulates images. Used to transform images into ASCII. (www.pythonware.com/products/pil)
+ * Python-Numpy. All data is represented as Numpy tables; they are fast and use little memory. (numpy.scipy.org)
+ * Python-Psyco. Makes Letter-Monster 2-3 times faster. It uses quite a lot of memory. (psyco.sourceforge.net)
+ * Python Image Library (PIL). Manipulates and creates images. (www.pythonware.com/products/pil)
 
 ---------------
   How to use:
 ---------------
- * In order to use Letter-Monster, all you have to do is "import _letter_monster".
-    Just make sure that Python can find the path to "_letter_monster.py" file.
+ * In order to access Letter-Monster classes, all you have to do is "import _letter_monster".
+    Just make sure that Python can find the path to "_letter_monster.py" file. Check the examples.
     Alternatively, you can copy "_letter_monster.py" and "_classes.py" into "C:\Python25\Lib".
     This way, you will be able to import them anytime, without specifying a path.
- * All functions from LetterMonster and Backpack classes are well documented.
+ * A lot of time was spent to document all modules, classes and functions in Letter-Monster, so enjoy.
  * All examples delivered with Letter-Monster work out-of-the-box. Just open them with Python:
-    c:\Python25\python.exe "... path to example file ..."
-    You can double click any example, if you installed Python 2.5 as default program for opening ".py" files.
+    > c:\Python25\python.exe "... path to example file ..."
+    in Windows, or
+    $ python ... path to example file ...
+    in Linux.
