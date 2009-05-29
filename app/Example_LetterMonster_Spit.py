@@ -1,8 +1,8 @@
-# -*- coding: utf-8 -*-
+# -*- coding: latin-1 -*-
 '''
-Letter-Monster Engine.
+Letter-Monster Engine v0.2.
 Copyright © 2009, Cristi Constantin. All rights reserved.
-This is a simple example for rendering a LMGL file on the screen, via WIN CMD.
+This is a simple example for rendering a LMGL file on the screen, via Windows Command.
 '''
 
 import os, sys

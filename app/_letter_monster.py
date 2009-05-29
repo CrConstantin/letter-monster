@@ -1,32 +1,29 @@
-# -*- coding: utf-8 -*-
+# -*- coding: latin-1 -*-
 '''
     Letter-Monster Engine v0.2
     Copyright © 2009, Cristi Constantin. All rights reserved.
-    MAIN CLASSES
+    This module contains Letter-Monster class with all its functions.
 '''
 
 import os, sys                   # Very important System functions.
 import Image, ImageFilter        # Python-Imaging.
 import ImageFont, ImageDraw      # Python-Imaging.
 import numpy as np               # Numpy arrays.
-from cPickle import dump, load   # Represent letter-monster body.
+from cPickle import dump, load   # Represent Letter-Monster body.
 from bz2 import BZ2File          # Compress and write data.
 from time import clock           # Timing operations.
 from psyco import profile ; profile() # Performance boost.
 sys.path.insert(0, os.getcwd() ) # Save current dir in path.
 from _classes import * # Need to add curr dir as path to import classes.
+from _FlattenLayers import FlattenLayers
 
-print 'I am Python r37!'
-
-#
-def sort_zorder(x):
-    return x.z
-#
+print 'I am LM r38!'
 
 class LetterMonster:
     '''
-This is the Letter Monster Class. ^-^ You would have never guessed it.\n\
-It uses no arguments for initialization. You can later on setup the engine via Hatch function.'''
+This is Letter-Monster Class. You would have never guessed it, right? ^-^\n\
+It uses no arguments for initialization. You can later on setup the engine via Hatch function.
+'''
     #
     def __init__(self):
         #
@@ -56,8 +53,8 @@ It uses no arguments for initialization. You can later on setup the engine via H
 #---------------------------------------------------------------------------------------------------
     #
     def __str__(self):
-        '''String representation of the engine.'''
-        return 'I am Letter Monster. Baaah!'
+        '''String representation of the engine... It has no use for now.'''
+        return 'I am Letter-Monster! Be afraid! Baaah!'
         #
     #
 #---------------------------------------------------------------------------------------------------
@@ -71,61 +68,75 @@ It uses no arguments for initialization. You can later on setup the engine via H
 #---------------------------------------------------------------------------------------------------
     #
     def Load(self, lmgl):
-        '''Load a LMGL (Letter Monster Graphical Letters) file, using cPickle.'''
+        '''
+Load a LMGL (Letter-Monster Graphical Letters) file.\n\
+LMGL file format is nothing more but a cPickle dump of LetterMonster body, compressed with BZ2.
+'''
         try: vInput = BZ2File( lmgl, 'r', 0, 6 ) # Load for reading, no buffer, compress level 6.
-        except: print( '"%s" is not a valid path! Exiting function!' % lmgl ) ; return
+        except: print( 'Letter-Monster snarls: "`%s` is not a valid path, or BZ2 cannot decompress that file! I cannot load!"' % lmgl ) ; return
         #
         ti = clock()
         try: vLmgl = load( vInput )
-        except: print( '"%s" cannot be parsed! Invalid cPickle file! Exiting function!' % lmgl ) ; return
+        except: print( 'Letter-Monster snarls: "cPickle cannot parse `%s` file! I cannot load!"' % lmgl ) ; return
         self.body = vLmgl # On load, old body is COMPLETELY overwritten.
         vInput.close() ; del vInput
-        self._validate()
+        self.__validate()
         tf = clock()
         #
-        if self.DEBUG: print( 'Loading LMGL took %.4f seconds total.' % (tf-ti) )
+        if self.DEBUG: print( 'Letter-Monster says: "Loading LMGL took %.4f seconds total."' % (tf-ti) )
         #
     #
 #---------------------------------------------------------------------------------------------------
     #
     def Save(self, lmgl):
-        '''Save body into a LMGL (Letter Monster Graphical Letters) file, using cPickle.'''
+        '''
+Save body into a LMGL (Letter-Monster Graphical Letters) file.\n\
+LMGL file format is nothing more but a cPickle dump of LetterMonster body, compressed with BZ2.
+'''
         try:
             vInput = open( lmgl )
-            print( '"%s" is a LMGL file! Will not overwrite. Exiting function!' % lmgl ) ; return
+            print( 'Letter-Monster snarls: "`%s` is a LMGL file! I refuse to overwrite!"' % lmgl ) ; return
         except: pass # If file exists, pass.
         #
         ti = clock()
         vInput = BZ2File( lmgl, 'w', 0, 6 ) # Load for writing, no buffer, compress level 6.
-        dump( self.body, vInput, 2 ) # Represent as cPickle method 2.
+        dump( self.body, vInput, 2 ) # Represent LetterMonster body as cPickle, method 2.
         vInput.close() ; del vInput
-        self._validate()
+        self.__validate()
         tf = clock()
         #
-        if self.DEBUG: print( 'Saving LMGL took %.4f seconds total.' % (tf-ti) )
+        if self.DEBUG: print( 'Letter-Monster says: "Saving LMGL took %.4f seconds total."' % (tf-ti) )
         #
     #
 #---------------------------------------------------------------------------------------------------
     #
-    def _validate(self):
-        '''After loading or saving one LMGL file, it must be validated.'''
+    def __validate(self):
+        '''
+Private function. After load or save, each LMGL file MUST be validated.\n\
+Errors are printed in console, but cannot be fixed. It is your responsability to do the fixing.\n\
+Valid LMGL file should respect this:\n\
+ - internal name of all layers must be the same as the key used to acces them, in LetterMonster body.\n\
+ - data of all layers must be valid rectangular Numpy Arrays.\n\
+ - instructions of all layers must be valid lists of dictionaries.
+'''
+        #
         body = self.body
         #
         if not body:
-            print( 'Letter-Monster body is empty!' ) ; return
+            print( 'Letter-Monster snarls: "My body is empty! I have nothing to validate."' ) ; return
         #
         for vKey, vElem in body.items():
             if vKey==vElem.name: # If body name is the same as internal object name, pass.
                 pass
             else: # This kind of error can lead to nasty bugs.
-                print( 'Warning! %s object label is ambiguous! Body name is "" and object name is ""!'
+                print( 'Letter-Monster growls: "Be warned! Inside my body, %s object label is ambiguous! Body name is `%s` and object name is `%s`!"'
                     % (str(vElem),vKey,vElem.name) )
             #
             try: # Try to get information about object data.
                 if str(type(vElem.data))=="<type 'numpy.ndarray'>" and str(type(vElem.data[0]))=="<type 'numpy.ndarray'>":
                     pass
                 else:
-                    print( 'Warning! %s object "%s" data is not a valid rectangular Numpy Array!'
+                    print( 'Letter-Monster growls: "Be warned! %s object `%s` data is not a valid rectangular Numpy Array!"'
                         % (str(vElem),vKey) )
             except: pass # If object doesn't have "data", pass.
             #
@@ -133,7 +144,7 @@ It uses no arguments for initialization. You can later on setup the engine via H
                 if str(type(vElem.instructions))=="<type 'list'>" and str(type(vElem.instructions[0]))=="<type 'dict'>":
                     pass
                 else:
-                    print( 'Warning! %s object "%s" instructions is not a valid list of dictionaries!'
+                    print( 'Letter-Monster growls: "Be warned! %s object `%s` instructions is not a valid list of dictionaries!"'
                         % (str(vElem),vKey) )
             except: pass # If object doesn't have "instructions", pass.
             #
@@ -142,15 +153,15 @@ It uses no arguments for initialization. You can later on setup the engine via H
 #---------------------------------------------------------------------------------------------------
     #
     def _execute(self, object):
-        '''Automatically execute object instructions. "Object" must be the name of a data structure.'''
+        '''Automatically execute object instructions. "Object" must be the name of a LatterMonster layer.'''
         #
         try:
             vElem = self.body[object]
             vInstructions = vElem.instructions
-        except: print( '"%s" object doesn\'t have instructions, or doesn\'t exist! Exiting execute!' % object ) ; return
+        except: print( 'Letter-Monster snarls: "`%s` is not an object from my body, or it doesn\'t have valid instructions! I refuse to execute!"' % object ) ; return
         #
         if not vInstructions:
-            print( '"%s" has null instructions! Exiting execute!' % object ) ; return
+            print( 'Letter-Monster growls: "`%s` has NULL instructions! I refuse to execute!"' % object ) ; return
         #
         ti = clock()
         if str(vElem)=='vector': # Execute vector instructions.
@@ -162,51 +173,57 @@ It uses no arguments for initialization. You can later on setup the engine via H
                 #
                 if f!='Error': # If function is not Error, means it's valid.
                     #
-                    # Overwrite the name of the layer with the data of the layer.
+                    # Overwrite the Name of the vector with the Data of the vector.
                     try: vInstr['Input'] = self.body[vInstr['Input']].data
-                    except: print( '"%s" doesn\'t have valid data! Call ignored!' % Input ) ; continue
+                    except: print( 'Letter-Monster growls: "Vector `%s` doesn\'t have valid data! Call ignored!"' % object ) ; continue
                     #
                     # Try to call the function with parameters and catch the errors.
                     try: vData = f( **vInstr )
-                    except TypeError: print( 'Incorrect arguments for function "%s"! Call ignored!' % vFunc ) ; continue
-                    except: print( 'Unknown error occured in "%s" function call! Call ignored!' % vFunc ) ; continue
+                    except TypeError: print( 'Letter-Monster growls: "Incorrect arguments for function `%s`! Call ignored!"' % vFunc ) ; continue
+                    except: print( 'Letter-Monster growls: "Unknown error occured in `%s` function call! Call ignored!"' % vFunc ) ; continue
                     #
-                    # Save data in body -> object.
+                    # Save data in LetterMonster body -> object.
                     if vData is not None: self.body[object].data = vData
                     else: self.body[object].data = np.zeros((1,1),'U')
                     #
                 else:
-                    print( 'Function "%s" doesn\'t exist! Call ignored!' % vFunc )
+                    print( 'Letter-Monster growls: "I refuse to execute that! Vector `%s` tries to call function `%s` which doesn\'t exist!"'
+                        % (object,vFunc) ) ; return
                 #
             #
         if str(vElem)=='macro':
             pass
         else:
-            print( 'Instructions for "%s" object not yet implemented!' % str(vElem) ) ; return
+            print( 'Letter-Monster sighs: "Instructions for macros not yet implemented! Scheduled for version 0.3."' ) ; return
         #
         tf = clock()
-        if self.DEBUG: print( 'Execute took %.4f seconds.' % (tf-ti) )
+        if self.DEBUG: print( 'Letter-Monster says: "Execute took %.4f seconds."' % (tf-ti) )
         #
     #
 #---------------------------------------------------------------------------------------------------
     #
     def Consume(self, image='image.jpg', x=0, y=0, pattern='default', filter=''):
-        '''Takes an image as input, transforms it into Unicode Ndarrays and stores it internally.'''
+        '''
+Takes a supported image as input, transforms it into a Rectangular Unicode Array and stores it in LetterMonster body.\n\
+You can later on export this "consumed" image into TXT, CSV, HTM, or whatever suits your needs.
+'''
         #
         try: vInput = Image.open( image )
-        except: print( '"%s" is not a valid image path! Exiting function!' % image ) ; return
+        except:
+            print( 'Letter-Monster snarls: "`%s` is not a valid image path, or Python-Imaging cannot open that type of file! Cannot consume!"'
+                % image ) ; return
         #
         if x and not y:     # If x has a value.
-            if self.DEBUG: print( "Resizing to X = %i." % x )
+            if self.DEBUG: print( 'Letter-Monster says: "I\'m resizing to X = %i."' % x )
             y = (x * vInput.size[1]) / vInput.size[0]
-            print( "Y becomes %i." % y )
+            if self.DEBUG: print( 'Letter-Monster says: "Y becomes %i."' % y )
         elif y and not x:   # Or if y has a value.
-            if self.DEBUG: print( "Resizing to Y = %i." % y )
+            if self.DEBUG: print( 'Letter-Monster says: "I\'m resizing to Y = %i."' % y )
             x = (y * vInput.size[0]) / vInput.size[1]
-            print( "X becomes %i." % x )
+            if self.DEBUG: print( 'Letter-Monster says: "X becomes %i."' % x )
         #
         elif x and y:       # If both x and y have a value.
-            if self.DEBUG: print( "Disproportionate resize X = %i, Y = %i." % ( x, y ) )
+            if self.DEBUG: print( 'Letter-Monster says: "Disproportionate resize X = %i, Y = %i."' % (x,y) )
         if x or y:          # If resize was called.
             vInput = vInput.resize((x, y), Image.BICUBIC) # Do the resize.
         del x ; del y
@@ -216,22 +233,22 @@ It uses no arguments for initialization. You can later on setup the engine via H
                 filt = filt.upper()
                 if filt in self.Filters:
                     vInput = vInput.filter( getattr(ImageFilter, filt) )
-                    print( "Applied %s filter." % filt )
+                    if self.DEBUG: print( 'Letter-Monster says: "Applied %s filter."' % filt )
                 else:
-                    print( '"%s" is not a valid fliter! Filter ignored.' % filt )
+                    print( 'Letter-Monster growls: "I don\'t know any filter called `%s`! I will ignore it."' % filt )
             #
         #
         if pattern.lower() in self.Patterns:
             vPattern = self.Patterns[pattern.lower()]
         else:
-            print( '"%s" is not a valid pattern! Using default pattern.' % pattern )
+            print( 'Letter-Monster growls: "I don\' know any pattern called `%s`! I will use default pattern."' % pattern )
             vPattern = self.Patterns['default']
         #
         ti = clock() # Global counter.
         tti = clock() # Local counter.
         #
         vResult = np.empty( (vInput.size[1],vInput.size[0]), 'U' )
-        if self.DEBUG: print( "Starting consume..." )
+        if self.DEBUG: print( 'Letter-Monster says: "Starting consume..."' )
         #
         vLen = len( vPattern )
         pxaccess = vInput.load()
@@ -254,7 +271,7 @@ It uses no arguments for initialization. You can later on setup the engine via H
             #
         #
         ttf = clock()
-        if self.DEBUG: print( 'Transformation took %.4f seconds.' % (ttf-tti) )
+        if self.DEBUG: print( 'Letter-Monster says: "Transformation took %.4f seconds."' % (ttf-tti) )
         for x in range(1, 999):
             if not 'raster'+str(x) in self.body: # If "raster+x" doesn't exist.
                 vElem = Raster()
@@ -270,51 +287,22 @@ It uses no arguments for initialization. You can later on setup the engine via H
         del vResult ; del vInput
         tf = clock()
         #
-        if self.DEBUG: print( 'Consume took %.4f seconds total.' % (tf-ti) )
+        if self.DEBUG: print( 'Letter-Monster says: "Consume took %.4f seconds total."' % (tf-ti) )
         #
     #
 #---------------------------------------------------------------------------------------------------
     #
-    def Spit(self, format='CMD', transparent=' ', autoclear=False):
+    def Spit(self, format='CMD', autoclear=False):
         '''
-Render function. Represents engine body.\n\
-All visible Raster and Vector layers are rendered.'''
+Frame-by-frame render function. Represents LetterMonster body.\n\
+All visible Raster and Vector layers are flattened and the result is sent to the specified output.
+'''
         #
-        vOutput = [[]]
+        if not format in ('CMD', 'SH'):
+            print( 'Letter-Monster snarls: "Cannot spit in `%s` format! Exiting!"' % format )
         #
-        for vElem in sorted(self.body.values(), key=sort_zorder): # For each visible Raster and Vector in body, sorted in Z-order.
-            if (str(vElem)=='raster' and vElem.visible) or (str(vElem)=='vector' and vElem.visible):
-                Data = vElem.data                 # This is a list of numpy ndarrays.
-                #
-                for nr_row in range( len(Data) ): # For each numpy ndarray (row) in Data.
-                    #
-                    NData = Data[nr_row]     # New data, to be written over old data.
-                    NData = NData[NData!=''] # Strip empty strings from the end.
-                    OData = vOutput[nr_row:nr_row+1] or [[]] # This is old data. Can be numpy ndarray, or empty list.
-                    OData = OData[0] # It doesn't work other way.
-                    #
-                    vLN = len(NData)
-                    vLO = len(OData)
-                    #
-                    # Replace all NData transparent pixels with OData, at respective indices.
-                    vMask = (NData==transparent)[:vLO]
-                    try: NData[ vMask ] = OData[ vMask ]
-                    except: pass
-                    #
-                    if len(NData) >= len(OData): 
-                        # If new data is longer than old data, old data will be completely overwritten.
-                        TempB = np.copy(NData)
-                        vOutput[nr_row:nr_row+1] = [TempB]
-                        del TempB
-                    else: # Old data is longer than new data ; old data cannot be null.
-                        TempB = np.copy(OData)
-                        TempB.put( range(len(NData)), NData )
-                        vOutput[nr_row:nr_row+1] = [TempB]
-                        del TempB
-                    #
-                #
-            # If not Raster or Vector, pass.
-            del NData ; del OData
+        try: vOutput = FlattenLayers( self.body )
+        except: print( 'Letter-Monster snarls: "Flatten body layers returned an error! Cannot spit!"' )
         #
         if format=='CMD':
             if autoclear: vCmd = ['cls'] # If autoclear, clear the screen.
@@ -336,9 +324,24 @@ All visible Raster and Vector layers are rendered.'''
                 else: vCmd.append( 'echo.' )
             os.system( '&&'.join(vCmd) ) # Execute Linux command!
             #
-        elif format=='pygame': # Pygame render.
+    #
+#---------------------------------------------------------------------------------------------------
+    #
+    def Render(self, format='pygame'):
+        '''
+Render in loop function. Represents LetterMonster body.\n\
+All visible Raster and Vector layers are flattened and the result is sent to the specified output.
+'''
+        #
+        if not format in ('pygame', 'pyglet'):
+            print( 'Letter-Monster snarls: "Cannot render in `%s` format! Exiting!"' % format )
+        #
+        try: vOutput = FlattenLayers( self.body )
+        except: print( 'Letter-Monster snarls: "Flatten body layers returned an error! Cannot render!"' )
+        #
+        if format=='pygame': # Pygame render.
             try: import pygame
-            except: print( 'Could not import Pygame! Make sure you downloaded and installed it. Check http://www.pygame.org. Exiting!' )
+            except: print( 'Letter-Monster snarls: "Could not import Pygame! Make sure you downloaded and installed it. Check http://www.pygame.org. Exiting!"' )
             pygame.init()
             #
             vSize = width, height = 320, 240
@@ -349,7 +352,7 @@ All visible Raster and Vector layers are rendered.'''
             while 1:
                 for event in pygame.event.get():
                     if event.type in (pygame.QUIT, pygame.KEYDOWN):
-                        print 'Key pressed, exiting...'
+                        print( 'Letter-Monster says: "Key pressed, exiting..."' )
                         pygame.quit() ; return
                     #
                     i = 1
@@ -362,7 +365,7 @@ All visible Raster and Vector layers are rendered.'''
             #
         elif format=='pyglet': # Pyglet render.
             try: import pyglet
-            except: print( 'Could not import Pyglet! Make sure you downloaded and installed it. Check http://www.pyglet.org. Exiting!' )
+            except: print( 'Letter-Monster snarls: "Could not import Pyglet! Make sure you downloaded and installed it. Check http://www.pyglet.org. Exiting!"' )
             #
             window = pyglet.window.Window(width=800, height=600, caption='Pyglet render', resizable=False, style=None, fullscreen=False, visible=True, vsync=True)
             label = pyglet.text.Label( text=''.join ( np.hstack( np.hstack( (i,np.array([u'\n'],'U')) ) for i in vOutput ) ).encode('utf8'),
@@ -370,7 +373,7 @@ All visible Raster and Vector layers are rendered.'''
             #
             @window.event
             def on_key_press(symbol, modifiers):
-                print 'Key pressed, exiting...'
+                print( 'Letter-Monster says: "Key pressed, exiting..."' )
                 window.close()
             @window.event
             def on_draw():
@@ -384,71 +387,38 @@ All visible Raster and Vector layers are rendered.'''
     #
 #---------------------------------------------------------------------------------------------------
     #
-    def Spawn(self, lmgl=None, out='txt', filename='Out', transparent=u' '):
+    def Spawn(self, lmgl=None, out='txt', filename='Out'):
         '''
 Export function. Saves engine body on Hard Disk in specific format.\n\
 Can also transform one LMGL into : TXT, Excel, or HTML, without changing engine body.'''
-        ti = clock() # Global counter.
-        if lmgl: # If a LMGL file is specified, export only the LMGL, don't change self.body.
+        #
+        ti = clock() # Global counter for function.
+        if lmgl: # If a LMGL file is specified, export only the LMGL, but don't change self.body.
             tti = clock() # Local counter.
             try: vInput = BZ2File( lmgl, 'r', 0, 6 ) # Load for reading, no buffer, compress level 6.
-            except: print( '"%s" is not a valid path! Exiting function!' % lmgl ) ; return
+            except: print( 'Letter-Monster snarls: "`%s` is not a valid path, or BZ2 cannot decompress that file! Exiting spawn!"' % lmgl ) ; return
             #
             try: vLmgl = load( vInput )
-            except: print( '"%s" cannot be parsed! Invalid cPickle file! Exiting function!' % lmgl ) ; return
+            except: print( 'Letter-Monster snarls: "cPickle cannot parse `%s` file! Exiting spawn!"' % lmgl ) ; return
             #
             vInput.close() ; del vInput
             ttf = clock()
-            if self.DEBUG: print( 'Loading LMGL (Spawn) took %.4f seconds.' % (ttf-tti) )
+            if self.DEBUG: print( 'Letter-Monster says: "Loading LMGL (Spawn) took %.4f seconds."' % (ttf-tti) )
         else: vLmgl = self.body
         #
         out = out.lower() # Lower letters.
         if out not in ('txt', 'csv', 'html', 'bmp', 'gif', 'jpg', 'png'):
-            print( '"%s" is not a valid export type! Exiting function!' % out ) ; return
+            print( 'Letter-Monster growls: "I cannot export in `%s` type! Exiting spawn!' % out ) ; return
         #
-        tti = clock() # Local counter.
-        TempA = [[]]
+        #try:
+        vOutput = FlattenLayers( vLmgl )
+        #except: print( 'Letter-Monster snarls: "Flatten body layers returned an error! Cannot spawn!"' )
         #
-        for vElem in sorted(vLmgl.values(), key=sort_zorder): # For each visible Raster and Vector in body, sorted in Z-order.
-            if (str(vElem)=='raster' and vElem.visible) or (str(vElem)=='vector' and vElem.visible):
-                Data = vElem.data                 # This is a 2D numpy array.
-                #
-                for nr_row in range( len(Data) ): # For each row in Data.
-                    #
-                    NData = Data[nr_row]     # New data, to be written over old data. It's a 1D unicode numpy array.
-                    NData = NData[NData!=''] # Strip empty strings from the end.
-                    OData = TempA[nr_row:nr_row+1] or [[]] # Old data. First loops is empty list, then is 1D unicode numpy array.
-                    OData = OData[0] # It doesn't work other way.
-                    #
-                    vLN = len(NData)
-                    vLO = len(OData)
-                    #
-                    # Replace all NData transparent pixels with OData, at respective indices.
-                    vMask = (NData==transparent)[:vLO]
-                    try: NData[ vMask ] = OData[ vMask ]
-                    except: pass
-                    #
-                    if vLN >= vLO:
-                        # If new data is longer than old data, old data will be completely overwritten.
-                        TempB = np.copy(NData)
-                        TempA[nr_row:nr_row+1] = [TempB]
-                        del TempB
-                    else: # Old data is longer than new data ; old data cannot be null.
-                        TempB = np.copy(OData)
-                        TempB[:vLN] = NData
-                        TempA[nr_row:nr_row+1] = [TempB]
-                        del TempB
-                    #
-                #
-            # If not Raster or Vector, pass.
-        #
-        ttf = clock()
-        print( 'Overwriting data took %.4f seconds.' % (ttf-tti) )
         tti = clock() # Local counter.
         #
         if out=='txt':
             vOut = open( filename+'.'+out, 'w' ) # Filename + Extension.
-            vOut.write( ''.join ( np.hstack( np.hstack( (i,np.array([u'\n'],'U')) ) for i in TempA # Concatenate all arrays with an array containing ['\n'].
+            vOut.write( ''.join ( np.hstack( np.hstack( (i,np.array([u'\n'],'U')) ) for i in vOutput # Concatenate all arrays with an array containing ['\n'].
                                            )
                                 ).encode('utf8')
                       )
@@ -456,39 +426,39 @@ Can also transform one LMGL into : TXT, Excel, or HTML, without changing engine 
         #
         elif out=='csv':
             vOut = open( filename+'.'+out, 'w' ) # Filename + Extension.
-            vOut.write( '"\n'.join('",'.join('"%s' % j for j in i) for i in TempA) ) # Put each value into " ", pairs.
+            vOut.write( '"\n'.join('",'.join('"%s' % j for j in i) for i in vOutput) ) # Put each value into " ", pairs.
             vOut.write( '"\n' )
             vOut.close()
         #
         elif out=='html':
             vOut = open( filename+'.'+out, 'w' ) # Filename + Extension.
             vOut.write('<html>\n<body>\n<table border="0" cellpadding="0" cellspacing="0" style="font-family: Lucida Console, Courier New; font-size: 3px; font-weight: bold; letter-spacing: 1px;">\n<tr>')
-            vOut.write( '</td></tr>\n<tr>'.join('</td>'.join('<td>%s' % j for j in i) for i in TempA) ) # Put each value into <td> </td> pairs.
+            vOut.write( '</td></tr>\n<tr>'.join('</td>'.join('<td>%s' % j for j in i) for i in vOutput) ) # Put each value into <td> </td> pairs.
             vOut.write('</td></tr>\n</table>\n</body>\n</html>')
             vOut.close()
         #
         elif out in ('bmp', 'gif', 'jpg', 'png'):
-            lenW = len(TempA[0]) # Get TempA width and height.
-            lenH = len(TempA)
+            lenW = len(vOutput[0]) # Get vOutput width and height.
+            lenH = len(vOutput)
             vFont = ImageFont.truetype('c:/windows/fonts/lucon.ttf', 8) # Load font.
             vLtrSize = (vFont.getsize('x')[0], int(2*vFont.getsize('x')[1]/3))          # Get true size of a letter drawn with this font.
             vOut = Image.new('RGB', ((lenW+1)*vLtrSize[0],lenH*vLtrSize[1]), "#ffffee") # New image: Type, Width, Height, Background.
             vDraw = ImageDraw.Draw(vOut)
             i = 1
-            for line in TempA: # For each line...
+            for line in vOutput: # For each line...
                 vDraw.text((1,i), ''.join ( line ).encode('utf8'), fill="#000066", font=vFont) # Draw line.
                 i += vLtrSize[0]-1
             del i
             vOut.save( filename+'.'+out )
         #
-        # More export formats will be implemented.
+        # More export formats will be implemented ...
         #
-        del TempA ; del vOut
+        del vOutput ; del vOut
         #
         ttf = clock()
-        if self.DEBUG: print( 'Saving took %.4f seconds.' % (ttf-tti) )
+        if self.DEBUG: print( 'Letter-Monster says: "Exporting data took %.4f seconds."' % (ttf-tti) )
         tf = clock()
-        if self.DEBUG: print( 'Spawn took %.4f seconds total.' % (tf-ti) )
+        if self.DEBUG: print( 'Letter-Monster says: "Spawn took %.4f seconds total."' % (tf-ti) )
         #
     #
 

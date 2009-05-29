@@ -2,7 +2,7 @@
 '''
 Letter-Monster Engine v0.2.
 Copyright © 2009, Cristi Constantin. All rights reserved.
-Spawn is the export function.
+This is a simple example for rendering a LMGL file on the screen, via Pygame.
 '''
 
 import os, sys
@@ -12,8 +12,10 @@ from _letter_monster import LetterMonster
 lm = LetterMonster()
 lm.DEBUG = True
 
-print( 'Spawning...\n' )
-lm.Spawn( lmgl='test_cons.lmgl', out='txt' )
+lm.Load( 'test_bord.lmgl' )
+print
+
+lm.Render('pygame')
 
 os.system( 'echo Done. Sleeping 5...&sleep 5' )
 
