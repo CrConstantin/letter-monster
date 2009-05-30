@@ -19,7 +19,7 @@ except: pass                               # If Psyco is not available, pass.
 from _classes import *
 from _FlattenLayers import FlattenLayers
 
-print 'I am LM r39!'
+print 'I am LM r40!'
 
 #
 
@@ -122,7 +122,8 @@ Valid LMGL file should respect this:\n\
  - internal name of all layers must be the same as the key used to acces them, in LetterMonster body.\n\
  - data of Raster and Vector layers must be Rectangular Numpy Arrays.\n\
  - instructions of Vector and Macro layers must be lists of dictionaries.\n\
- - position of Raster and Vector layers must be tuples of 2 integers.
+ - position of Raster and Vector layers must be tuples of 2 integers.\n\
+ - transparent of Raster and Vector layers must be a unicode string.
 '''
         #
         body = self.body
@@ -131,35 +132,35 @@ Valid LMGL file should respect this:\n\
             print( 'Letter-Monster snarls: "My body is empty! I have nothing to validate."' ) ; return
         #
         for vKey, vElem in body.items():
-            if vKey==vElem.name: # If body name is the same as internal object name, pass.
-                pass
-            else: # This kind of error can lead to nasty bugs.
+            if vKey!=vElem.name: # If body name is not the same as internal object name...
                 print( 'Letter-Monster growls: "Be warned! Inside my body, %s object label is ambiguous! Body name is `%s` and object name is `%s`!"'
                     % (str(vElem),vKey,vElem.name) )
             #
             try: # Try to get information about object data.
-                if str(type(vElem.data))=="<type 'numpy.ndarray'>" and str(type(vElem.data[0]))=="<type 'numpy.ndarray'>":
-                    pass
-                else:
+                if not ( str(type(vElem.data))=="<type 'numpy.ndarray'>" and str(type(vElem.data[0]))=="<type 'numpy.ndarray'>" ):
                     print( 'Letter-Monster growls: "Be warned! %s object `%s` data is not a valid rectangular Numpy Array!"'
                         % (str(vElem),vKey) )
             except: pass # If object doesn't have "data", pass.
             #
             try: # Try to get information about object instructions.
-                if str(type(vElem.instructions))=="<type 'list'>" and str(type(vElem.instructions[0]))=="<type 'dict'>":
-                    pass
-                else:
+                if not ( (str(type(vElem.instructions))=="<type 'list'>" or str(type(vElem.instructions))=="<type 'tuple'>")
+                and str(type(vElem.instructions[0]))=="<type 'dict'>" ):
                     print( 'Letter-Monster growls: "Be warned! %s object `%s` instructions is not a valid list of dictionaries!"'
                         % (str(vElem),vKey) )
             except: pass # If object doesn't have "instructions", pass.
             #
             try: # Try to get information about object position.
-                if str(type(vElem.position))=="<type 'tuple'>" and str(type(vElem.position[0]))=="<type 'int'>":
-                    pass
-                else:
-                    print( 'Letter-Monster growls: "Be warned! %s object `%s` position is not a tuple containing two integers!"'
+                if not ( (str(type(vElem.position))=="<type 'list'>" or str(type(vElem.position))=="<type 'tuple'>")
+                and str(type(vElem.position[0]))=="<type 'int'>" and len(vElem.position)==2 ):
+                    print( 'Letter-Monster growls: "Be warned! %s object `%s` position is not a list with two integers!"'
                         % (str(vElem),vKey) )
             except: pass # If object doesn't have "position", pass.
+            #
+            try: # Try to get information about object transparent.
+                if not str(type(vElem.transparent))=="<type 'unicode'>":
+                    print( 'Letter-Monster growls: "Be warned! %s object `%s` transparent is not a unicode string!"'
+                        % (str(vElem),vKey) )
+            except: pass # If object doesn't have "transparent", pass.
             #
         #
     #
