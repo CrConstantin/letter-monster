@@ -10,7 +10,7 @@ import numpy as np
 class Raster:
     '''Raster layer class.'''
     #
-    def __init__(self, name='', data=np.zeros((1,1),'U'), transparent=u' ', position=(0,0), visible=True, lock=False, z=1):
+    def __init__(self, name='', data=np.zeros((1,1),'U'), transparent=u'', position=(0,0), visible=True, lock=False, z=1):
         self.name = name
         self.data = data
         self.transparent = transparent
@@ -28,7 +28,7 @@ class Raster:
 class Vector:
     '''Vector layer class.'''
     #
-    def __init__(self, name='', data=np.zeros((1,1),'U'), transparent=u' ', instructions=[{}], position=(0,0), visible=True, lock=False, z=1):
+    def __init__(self, name='', data=np.zeros((1,1),'U'), transparent=u'', instructions=[{}], position=(0,0), visible=True, lock=False, z=1):
         self.name = name
         self.data = data
         self.transparent = transparent
