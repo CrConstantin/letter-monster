@@ -1,14 +1,14 @@
 # -*- coding: latin-1 -*-
 '''
-    Letter-Monster Engine v0.2
-    Copyright © 2009, Cristi Constantin. All rights reserved.
-    This module contains Backpack class, with all the helper functions and all layer types : Raster, Vector, Event and Macro.
+    Letter-Monster Engine v0.2 \n\
+    Copyright © 2009, Cristi Constantin. All rights reserved.\n\
+    This module contains Backpack class, with all helper functions and all layer types : Raster, Vector, Event and Macro.\n\
 '''
 
 import numpy as np
 
 class Raster:
-    '''Raster layer class.'''
+    '''Raster layer class.\n'''
     #
     def __init__(self, name='', data=np.zeros((1,1),'U'), transparent=u'', position=(0,0), visible=True, lock=False, z=1):
         self.name = name
@@ -20,13 +20,13 @@ class Raster:
         self.z = z
     #
     def __str__(self):
-        '''This func is used to identify the type of layer when more layers are stored inside LetterMonster body dictionary.'''
+        '''This func is used to identify the type of layer when more layers are stored inside LetterMonster body dictionary.\n'''
         return 'raster'
     #
 #
 
 class Vector:
-    '''Vector layer class.'''
+    '''Vector layer class.\n'''
     #
     def __init__(self, name='', data=np.zeros((1,1),'U'), transparent=u'', instructions=[{}], position=(0,0), visible=True, lock=False, z=1):
         self.name = name
@@ -39,13 +39,13 @@ class Vector:
         self.z = z
     #
     def __str__(self):
-        '''This func is used to identify the type of layer when more layers are stored inside LetterMonster body dictionary.'''
+        '''This func is used to identify the type of layer when more layers are stored inside LetterMonster body dictionary.\n'''
         return 'vector'
     #
 #
 
 class Event:
-    '''Event layer class.'''
+    '''Event layer class.\n'''
     #
     def __init__(self, name='', affects='', affect_macro=''):
         self.name = name
@@ -54,13 +54,13 @@ class Event:
         self.z = -99 # This should be read-only.
     #
     def __str__(self):
-        '''This func is used to identify the type of layer when more layers are stored inside LetterMonster body dictionary.'''
+        '''This func is used to identify the type of layer when more layers are stored inside LetterMonster body dictionary.\n'''
         return 'event'
     #
 #
 
 class Macro:
-    '''Macro layer class.'''
+    '''Macro layer class.\n'''
     #
     def __init__(self, name='', instructions=[{}]):
         self.name = name
@@ -68,38 +68,42 @@ class Macro:
         self.z = -99 # This should be read-only.
     #
     def __str__(self):
-        '''This func is used to identify the type of layer when more layers are stored inside LetterMonster body dictionary.'''
+        '''This func is used to identify the type of layer when more layers are stored inside LetterMonster body dictionary.\n'''
         return 'macro'
     #
 #
 
 class Backpack:
     '''
-This class contains helper functions. It uses no arguments for initialization.\n\
-All functions in Backpack take a rectangular Unicode Array as input.
+This is Backpack class. It contains helper functions. It uses no arguments for initialization.\n\
+All functions in Backpack take a Rectangular Unicode Array as input.\n\
 '''
     #
     def __init__(self):
-        '''Initializes the engine. vContent will always contain last-transformed-data.'''
+        '''Initializes the engine. vContent will always contain last-transformed-data.\n'''
         self.vContent = None
     #
     def __str__(self):
-        '''String representation of this abstract class... It has no use for now.'''
+        '''String representation of this abstract class. It's just a fun function to have.\n'''
         return 'I am the Evil Backpack. Baaah!'
     #
     def __test_input(self, INPUT):
         '''
-Private function. Tests if Input is a valid 2D Numpy Array.\n\
-All helper functions call this before transforming data. If Input is not valid, helper function must exit.
+Private validation function. Tests if Input is a 2D Numpy Array.\n\
+All helper functions call this before transforming data. If Input is not valid, respective helper function must exit.\n\
 '''
-        if str(type(INPUT))=="<type 'numpy.ndarray'>" and str(type(INPUT[0]))=="<type 'numpy.ndarray'>":
-            return True
-        else: return False
+        try:
+            if str(type(INPUT))=="<type 'numpy.ndarray'>" and str(type(INPUT[0]))=="<type 'numpy.ndarray'>" and len(INPUT.shape)==2:
+                return True
+            else:
+                return False
+        except:
+            return False
     #
     def _Transform( self, Type, Input ):
         '''
-Transforms the input into a rectangular Unicode Array.\n\
-This is the only function that doesn't take a rectangular Unicode Array as input.
+Transforms the input into a Rectangular Unicode Array.\n\
+This is the only function that doesn't take a Rectangular Unicode Array as input.\n\
 '''
         #
         if Type=='s2a':    # Input is a string containing newline.
@@ -248,7 +252,7 @@ This is the only function that doesn't take a rectangular Unicode Array as input
         #
     #
     def Crop( self, Input, x1, y1, x2, y2 ):
-        "x1, x2, y1, y2 are zero based indexes."
+        '''Crop a Rectangular Numpy Array. x1, x2, y1, y2 are zero based indexes.'''
         #
         if not self.__test_input(Input): print( 'Backpack yells: "Input is not a rectangular numpy array! Exiting function."' ) ; return
         #

@@ -9,6 +9,7 @@
  - Licence
  - Requirements
  - How to use
+ - TODO
 
 ###############
 
@@ -77,3 +78,12 @@
     in Windows, or
     $ python ... path to example file ...
     in Linux.
+
+--------
+  TODO:
+--------
+ * Instructions for Macro Layers. This will allow creating/ deleting/ renaming/ changing attributes of other layers from within LMGL.
+ * Fast export LMGL as PDF, PS, EPS, GIF animation, Excel animation, SWF app, etc. Exporting as image is currently very slow.
+ * Draw ASCII shapes: circle, rectangle, polygon, etc, with a lot of options.
+ * ASCII blur, sharpen, darken, lighten.
+ * Make a GUI to visualize and edit LMGL files.
