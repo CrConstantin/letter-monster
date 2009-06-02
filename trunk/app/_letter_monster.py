@@ -1,8 +1,8 @@
 # -*- coding: latin-1 -*-
 '''
-    Letter-Monster Engine v0.2
-    Copyright © 2009, Cristi Constantin. All rights reserved.
-    This module contains Letter-Monster class with all its functions.
+    Letter-Monster Engine v0.2 \n\
+    Copyright © 2009, Cristi Constantin. All rights reserved. \n\
+    This module contains Letter-Monster class with all its functions. \n\
 '''
 
 import os, sys                   # Very important System functions.
@@ -25,11 +25,22 @@ print 'I am LM r40!'
 
 class LetterMonster:
     '''
-This is Letter-Monster Class. You would have never guessed it, right? ^-^\n\
-It uses no arguments for initialization. You can later on setup the engine via Hatch function.
+This is Letter-Monster Class. You would have never guessed it, right? ^_^\n\
+It uses no arguments for initialization.\n\
 '''
     #
     def __init__(self):
+        '''
+Initializes the engine.\n\
+LetterMonster -> DEBUG. If False, debug messages will not be printed.\n\
+LetterMonster -> body. This dictionary contains all layers loaded from LMGL and saved into LMGL.\n\
+LetterMonster -> max_morph_rate. TODO.\n\
+LetterMonster -> visible_size. TODO\n\
+LetterMonster -> bp. It's a Backpack instance. All helper functions can be accessed through it.\n\
+LetterMonster -> data_types. List with all valid layer names.\n\
+LetterMonster -> Filters. List with all valid filter names, used in Consume function.\n\
+LetterMonster -> Patterns. List with all valid pattern names, used in Consume function.\n\
+'''
         #
         self.DEBUG = True
         #
@@ -57,7 +68,7 @@ It uses no arguments for initialization. You can later on setup the engine via H
 #---------------------------------------------------------------------------------------------------
     #
     def __str__(self):
-        '''String representation of the engine... It has no use for now.'''
+        '''String representation of the engine. It's just a fun function to have.\n'''
         return 'I am Letter-Monster! Be afraid! Baaah!'
         #
     #
@@ -74,7 +85,7 @@ It uses no arguments for initialization. You can later on setup the engine via H
     def Load(self, lmgl):
         '''
 Load a LMGL (Letter-Monster Graphical Letters) file.\n\
-LMGL file format is nothing more but a cPickle dump of LetterMonster body, compressed with BZ2.
+LMGL file format is nothing more than a cPickle dump of LetterMonster body, compressed with BZ2.\n\
 '''
         try: vInput = BZ2File( lmgl, 'r', 0, 6 ) # Load for reading, no buffer, compress level 6.
         except: print( 'Letter-Monster snarls: "`%s` is not a valid path, or BZ2 cannot decompress that file! I cannot load!"' % lmgl ) ; return
@@ -95,7 +106,7 @@ LMGL file format is nothing more but a cPickle dump of LetterMonster body, compr
     def Save(self, lmgl):
         '''
 Save body into a LMGL (Letter-Monster Graphical Letters) file.\n\
-LMGL file format is nothing more but a cPickle dump of LetterMonster body, compressed with BZ2.
+You should also check Load function.\n\
 '''
         try:
             vInput = open( lmgl )
@@ -116,14 +127,14 @@ LMGL file format is nothing more but a cPickle dump of LetterMonster body, compr
     #
     def __validate(self):
         '''
-Private function. After load or save, each LMGL file MUST be validated.\n\
+Private validation function. After load or save, each LMGL file MUST be validated.\n\
 Errors are printed in console, but cannot be fixed. It is your responsability to do the fixing.\n\
 Valid LMGL file should respect this:\n\
  - internal name of all layers must be the same as the key used to acces them, in LetterMonster body.\n\
  - data of Raster and Vector layers must be Rectangular Numpy Arrays.\n\
  - instructions of Vector and Macro layers must be lists of dictionaries.\n\
  - position of Raster and Vector layers must be tuples of 2 integers.\n\
- - transparent of Raster and Vector layers must be a unicode string.
+ - transparent of Raster and Vector layers must be a unicode string.\n\
 '''
         #
         body = self.body
@@ -167,7 +178,8 @@ Valid LMGL file should respect this:\n\
 #---------------------------------------------------------------------------------------------------
     #
     def _execute(self, object):
-        '''Automatically execute object instructions. "Object" must be the name of a LatterMonster layer.'''
+        '''Execute instructions stored inside Vector or Macro layers. "Object" must be the name of a LatterMonster layer 
+that containins instructions.\n'''
         #
         try:
             vElem = self.body[object]
@@ -218,8 +230,12 @@ Valid LMGL file should respect this:\n\
     #
     def Consume(self, image='image.jpg', x=0, y=0, pattern='default', filter=''):
         '''
-Takes a supported image as input, transforms it into a Rectangular Unicode Array and stores it in LetterMonster body.\n\
-You can later on export this "consumed" image into TXT, CSV, HTM, or whatever suits your needs, with Spawn.
+Takes a supported image as input, transforms it into a Rectangular Unicode Array and stores the result 
+in LetterMonster body.\n\
+You can use different patterns for transforming : default, cro, dos, sharp, smooth, vertical, horizontal, numbers, letters.\n\
+You can also apply filters : BLUR, SMOOTH, SMOOTH_MORE, DETAIL, SHARPEN, CONTOUR, EDGE_ENHANCE, EDGE_ENHANCE_MORE.\n\
+Later, you can export this "consumed" image into TXT, CSV, HTM, or whatever suits your needs, with Spawn, 
+or you can Save its representation as LMGL.\n\
 '''
         #
         try: vInput = Image.open( image )
@@ -309,7 +325,8 @@ You can later on export this "consumed" image into TXT, CSV, HTM, or whatever su
     def Spit(self, format='CMD', autoclear=False):
         '''
 Frame-by-frame render function. Represents LetterMonster body.\n\
-All visible Raster and Vector layers are flattened and the result is sent to the specified output.
+All visible Raster and Vector layers are flattened and the result is sent to the specified output.\n\
+Valid outputs are : CMD, SH.\n\
 '''
         #
         if not format in ('CMD', 'SH'):
@@ -343,8 +360,9 @@ All visible Raster and Vector layers are flattened and the result is sent to the
     #
     def Render(self, format='pygame'):
         '''
-Render in loop function. Represents LetterMonster body.\n\
-All visible Raster and Vector layers are flattened and the result is sent to the specified output.
+Render in a loop function. Represents LetterMonster body.\n\
+All visible Raster and Vector layers are flattened and the result is sent to the specified output.\n\
+Valid outputs are : pygame and pyglet.\n\
 '''
         #
         if not format in ('pygame', 'pyglet'):
@@ -403,8 +421,9 @@ All visible Raster and Vector layers are flattened and the result is sent to the
     #
     def Spawn(self, lmgl=None, out='txt', filename='Out'):
         '''
-Export function. Saves engine body on Hard Disk in specific format.\n\
-Can also transform one LMGL into : TXT, Excel, or HTML, without changing engine body.'''
+Export function. Saves engine body on Hard Disk, or transforms one LMGL into a specified format.\n\
+Valid formats are : txt, csv, html, bmp, gif, jpg, png.\n\
+'''
         #
         ti = clock() # Global counter for function.
         if lmgl: # If a LMGL file is specified, export only the LMGL, but don't change self.body.

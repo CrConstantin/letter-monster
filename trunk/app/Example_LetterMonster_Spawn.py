@@ -2,7 +2,7 @@
 '''
 Letter-Monster Engine v0.2.
 Copyright © 2009, Cristi Constantin. All rights reserved.
-Spawn is the export function.
+Spawn is Export function.
 '''
 
 import os, sys

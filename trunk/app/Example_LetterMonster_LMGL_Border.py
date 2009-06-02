@@ -2,7 +2,7 @@
 '''
 Letter-Monster Engine v0.2.
 Copyright © 2009, Cristi Constantin. All rights reserved.
-This module generates a LMGL file to play with. You can use it for Spawn or Spit.
+This module generates a test LMGL file to play with. You can use it for Spawn or Spit.
 '''
 
 import os, sys
@@ -47,7 +47,6 @@ try: os.remove( 'test_bord.lmgl' )
 except: pass
 lm.Save( 'test_bord.lmgl' )
 
-#os.system( 'echo Done. Sleeping 5...&sleep 5' )
-os.system( 'pause' )
+os.system( 'echo Done. Sleeping 5...&sleep 5' )
 
 #

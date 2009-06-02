@@ -2,7 +2,7 @@
 '''
 Letter-Monster Engine v0.2.
 Copyright © 2009, Cristi Constantin. All rights reserved.
-This module generates a LMGL file to play with. You can use it for Spawn, Spit or Execute.
+This module generates a test LMGL file to play with. You can use it for Spawn, Spit or Execute.
 '''
 
 import os, sys
