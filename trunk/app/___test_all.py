@@ -41,6 +41,10 @@ try: import Example_LetterMonster_Spawn
 except: print "Error on importing Example_LetterMonster_Spawn!"
 
 # Test 6.
+try: import Example_LetterMonster_Render
+except: print "Error on importing Example_LetterMonster_Render!"
+
+# Test 7.
 try: import Example_LetterMonster_Spit
 except: print "Error on importing Example_LetterMonster_Spit!"
 

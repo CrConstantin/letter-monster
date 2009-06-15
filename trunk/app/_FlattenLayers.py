@@ -11,12 +11,18 @@ def sort_zorder(x):
 def FlattenLayers( vInput ):
     '''
 This function takes as input a dictionary containing layers, like LetterMonster.body.\n\
-Only layers that have a "data" attribute (Raster and Vector) can be rendered.
-Function returns the flatened result, as Rectangular Unicode Numpy Array.
+Only layers that have a "data" attribute (Raster and Vector) can be rendered.\n\
+Function returns the flatened result, as Rectangular Unicode Numpy Array.\n\
 '''
     #
     ti = clock()
     vOutput = np.zeros((1,1), 'U') # Define one empty Rectangular Unicode Numpy Array.
+    #
+    # If Body has one layer, return it. There is nothing to merge.
+    if len(vInput)==1:
+        tf = clock()
+        print( 'Flatten Layers took %.4f seconds.' % (tf-ti) )
+        return vInput.values()[0].data
     #
     for vElem in sorted(vInput.values(), key=sort_zorder): # For all elements in LetterMonster body, sorted by Z-order...
         if (str(vElem)=='raster' and vElem.visible) or (str(vElem)=='vector' and vElem.visible): # If element is a visible Raster or Vector...
