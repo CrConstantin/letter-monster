@@ -9,6 +9,7 @@
  - Licence
  - Requirements
  - How to use
+ - Changes
  - TODO
 
 ###############
@@ -34,7 +35,7 @@
 ------------
   Licence:
 ------------
-  Letter-Monster engine and Letter-Monster Logo are copyright © 2009, Cristi Constantin. All rights reserved.
+  Letter-Monster Engine and Letter-Monster Logo are copyright © 2009, Cristi Constantin. All rights reserved.
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -79,11 +80,21 @@
     $ python ... path to example file ...
     in Linux.
 
+---------------------------
+ Changes from version 0.1:
+---------------------------
+ * New overwrite engine. Multiple transparent characters are allowed and position will move the layer.
+ * Tested LMGL files with Python 2.5 and 2.6 in Windows, Ubuntu and Mandriva. They are all compatible.
+ * Implemented simple Spawn for : BMP, GIF, JPG, PNG.
+ * Implemented simple Render : pygame, pyglet.
+ * Added a lot of documentation.
+
 --------
   TODO:
 --------
  * Instructions for Macro Layers. This will allow creating/ deleting/ renaming/ changing attributes of other layers from within LMGL.
- * Fast export LMGL as PDF, PS, EPS, GIF animation, Excel animation, SWF app, etc. Exporting as image is currently very slow.
+ * Fast export LMGL as PDF, PS, EPS, GIF animation, Excel animation, SWF app, etc.
  * Draw ASCII shapes: circle, rectangle, polygon, etc, with a lot of options.
  * ASCII blur, sharpen, darken, lighten.
+ * More Speed for all render and export functions.
  * Make a GUI to visualize and edit LMGL files.
