@@ -1,6 +1,6 @@
 # -*- coding: latin-1 -*-
 '''
-    Letter-Monster Engine v0.2 \n\
+    Letter-Monster Engine v0.2.2 \n\
     Copyright © 2009, Cristi Constantin. All rights reserved.\n\
     This module contains Backpack class, with all helper functions and all layer types : Raster, Vector, Event and Macro.\n\
 '''
@@ -10,11 +10,11 @@ import numpy as np
 class Raster:
     '''Raster layer class.\n'''
     #
-    def __init__(self, name='', data=np.zeros((1,1),'U'), transparent=u'', position=(0,0), visible=True, lock=False, z=1):
+    def __init__(self, name='', data=np.array([[]],'U'), transparent=u'', offset=(0,0), visible=True, lock=False, z=1):
         self.name = name
         self.data = data
         self.transparent = transparent
-        self.position = position
+        self.offset = offset
         self.visible = visible
         self.lock = lock
         self.z = z
@@ -28,12 +28,12 @@ class Raster:
 class Vector:
     '''Vector layer class.\n'''
     #
-    def __init__(self, name='', data=np.zeros((1,1),'U'), transparent=u'', instructions=[{}], position=(0,0), visible=True, lock=False, z=1):
+    def __init__(self, name='', data=np.array([[]],'U'), transparent=u'', instructions=[{}], offset=(0,0), visible=True, lock=False, z=1):
         self.name = name
         self.data = data
         self.transparent = transparent
         self.instructions = instructions
-        self.position = position
+        self.offset = offset
         self.visible = visible
         self.lock = lock
         self.z = z

@@ -1,6 +1,6 @@
 # -*- coding: latin-1 -*-
 '''
-Letter-Monster Engine v0.2.
+Letter-Monster Engine v0.2.2.
 Copyright © 2009, Cristi Constantin. All rights reserved.
 This module demonstrates all Backpack functions.
 '''

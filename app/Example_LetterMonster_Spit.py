@@ -1,6 +1,6 @@
 # -*- coding: latin-1 -*-
 '''
-Letter-Monster Engine v0.2.
+Letter-Monster Engine v0.2.2.
 Copyright © 2009, Cristi Constantin. All rights reserved.
 This is a simple example for rendering a LMGL file on the screen, via Windows Command / Linux SH.
 '''
@@ -17,6 +17,6 @@ print
 
 lm.Spit('CMD', autoclear=True)
 
-os.system( 'echo Done. Sleeping 5...&sleep 5' )
+os.system( 'echo Done.&pause' )
 
 #

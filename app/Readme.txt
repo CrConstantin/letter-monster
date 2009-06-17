@@ -63,8 +63,8 @@
  * Python Image Library (PIL). Manipulates and creates images. (www.pythonware.com/products/pil)
 
  * (Optional) Python-Psyco. Makes Letter-Monster 2-3 times faster. It uses quite a lot of memory. (psyco.sourceforge.net)
- * (Optional) Pygame. Used to render in Pygame. (www.pygame.org)
- * (Optional) Pyglet. Used to render in Pyglet. (www.pyglet.org)
+ * (Optional) Pygame. Used for render in Pygame. (www.pygame.org)
+ * (Optional) Pyglet. Used for render in Pyglet. (www.pyglet.org)
 
 ---------------
   How to use:
@@ -88,10 +88,18 @@
  * Implemented simple Spawn for : BMP, GIF, JPG, PNG.
  * Implemented simple Render : pygame, pyglet.
  * Added a lot of documentation.
+---------------------------
+ Changes from version 0.2:
+---------------------------
+ * Fixed 2 bugs in overwrite engine.
+ * Added save as "p:gzip", "p:bz2", "y:bz2", "y".
+ * Renamed Layers attribute "position" into "offset", thus breaking compatibility with previous LMGL files.
+    It's a more representative name.
 
 --------
   TODO:
 --------
+ * Check all documentation. Some information might need updating.
  * Instructions for Macro Layers. This will allow creating/ deleting/ renaming/ changing attributes of other layers from within LMGL.
  * Fast export LMGL as PDF, PS, EPS, GIF animation, Excel animation, SWF app, etc.
  * Draw ASCII shapes: circle, rectangle, polygon, etc, with a lot of options.

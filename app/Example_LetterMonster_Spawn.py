@@ -1,6 +1,6 @@
 # -*- coding: latin-1 -*-
 '''
-Letter-Monster Engine v0.2.
+Letter-Monster Engine v0.2.2.
 Copyright © 2009, Cristi Constantin. All rights reserved.
 Spawn is Export function.
 '''
@@ -15,6 +15,6 @@ lm.DEBUG = True
 print( 'Spawning...\n' )
 lm.Spawn( lmgl='test_cons.lmgl', out='txt' )
 
-os.system( 'echo Done. Sleeping 5...&sleep 5' )
+os.system( 'echo Done.&pause' )
 
 #
