@@ -1,16 +1,19 @@
 # -*- coding: latin-1 -*-
 '''
-    Letter-Monster Engine v0.2 \n\
+    Letter-Monster Engine v0.2.2 \n\
     Copyright © 2009, Cristi Constantin. All rights reserved. \n\
     This module contains Letter-Monster class with all its functions. \n\
 '''
 
-import os, sys                   # Very important System functions.
+import os, sys                   # Important System functions.
 import Image, ImageFilter        # Python-Imaging.
 import ImageFont, ImageDraw      # Python-Imaging.
 import numpy as np               # Numpy arrays.
-from cPickle import dump, load   # Represent Letter-Monster body.
-from bz2 import BZ2File          # Compress and write data.
+import cPickle, yaml             # YAML and cPickle.
+from yaml import CLoader as Loader
+from yaml import CDumper as Dumper
+from yaml import add_representer, add_constructor
+import zlib, gzip, bz2           # Compress and decompress data.
 from time import clock           # Timing operations.
 sys.path.insert(0, os.getcwd() ) # Save current dir in path.
 
@@ -19,8 +22,18 @@ except: pass                               # If Psyco is not available, pass.
 from _classes import *
 from _FlattenLayers import FlattenLayers
 
-print 'I am LM r40!'
+print 'I am LM r45!'
 
+#
+# Define YAML represent for numpy ndarray.
+def ndarray_repr(dumper, data):
+    return dumper.represent_scalar(u'!array', zlib.compress(data.dumps(), 7).decode('latin_1'))
+add_representer(np.ndarray, ndarray_repr)
+#
+# Define YAML construct data for numpy ndarray.
+def ndarray_construct(loader, node):
+    return np.loads(zlib.decompress(loader.construct_scalar(node).encode('latin_1')))
+add_constructor(u'!array', ndarray_construct)
 #
 
 class LetterMonster:
@@ -85,41 +98,91 @@ LetterMonster -> Patterns. List with all valid pattern names, used in Consume fu
     def Load(self, lmgl):
         '''
 Load a LMGL (Letter-Monster Graphical Letters) file.\n\
-LMGL file format is nothing more than a cPickle dump of LetterMonster body, compressed with BZ2.\n\
+LMGL file format is nothing more than a YAML dump of LetterMonster body, compressed with BZ2.\n\
 '''
-        try: vInput = BZ2File( lmgl, 'r', 0, 6 ) # Load for reading, no buffer, compress level 6.
-        except: print( 'Letter-Monster snarls: "`%s` is not a valid path, or BZ2 cannot decompress that file! I cannot load!"' % lmgl ) ; return
+        try:
+            vInput = open( lmgl ) # Opening the file just to read first 3 characters.
+            v3 = vInput.read(3)
+            vInput.close() ; del vInput
+        except: print( 'Letter-Monster snarls: "`%s` is not a valid path!"' % lmgl ) ; return 1
         #
         ti = clock()
-        try: vLmgl = load( vInput )
-        except: print( 'Letter-Monster snarls: "cPickle cannot parse `%s` file! I cannot load!"' % lmgl ) ; return
+        #
+        if v3=='\x1f\x8b\x08': # LMGL file is GZIP format. Only cPickle is saved in here.
+            vInput = gzip.open( lmgl, 'r', 8 )
+            if self.DEBUG: print( 'Letter-Monster says: "Found GZIP cPickle."' )
+            #
+            try: vLmgl = cPickle.load( vInput )
+            except: print( 'Letter-Monster snarls: "`%s` file cannot be parsed by cPickle! Failed to load."' % lmgl ) ; return 1
+        #
+        elif v3=='BZh':        # LMGL file is BZ2 format.
+            vInput = bz2.BZ2File( lmgl, 'r', 0, 8 )
+            if self.DEBUG: print( 'Letter-Monster says: "Found BZ2 cPickle or YAML."' )
+            success = False
+            #
+            try: vLmgl = cPickle.load( vInput ) ; success = True
+            except: pass
+            if not success:
+                vInput.seek(0)
+                try: vLmgl = yaml.load( vInput )
+                except: print( 'Letter-Monster snarls: "`%s` file is neither cPickle, nor YAML! Failed to load."' % lmgl ) ; return 1
+        #
+        elif v3=='---':        # LMGL file is raw YAML.
+            vInput = open( lmgl, 'rb', 0 )
+            if self.DEBUG: print( 'Letter-Monster says: "Found raw YAML."' )
+            #
+            try: vLmgl = yaml.load( vInput )
+            except: print( 'Letter-Monster snarls: "`%s` file cannot be parsed by YAML! Failed to load."' % lmgl ) ; return 1
+        #
+        else: # If not GZIP, BZ2, or YAML...
+            print( 'Letter-Monster snarls: "`%s` canoot be opened! It\'s neither GZIP, BZ2 or YAML!"' % lmgl ) ; return 1
+        #
         self.body = vLmgl # On load, old body is COMPLETELY overwritten.
         vInput.close() ; del vInput
         self.__validate()
-        tf = clock()
         #
+        tf = clock()
         if self.DEBUG: print( 'Letter-Monster says: "Loading LMGL took %.4f seconds total."' % (tf-ti) )
         #
     #
 #---------------------------------------------------------------------------------------------------
     #
-    def Save(self, lmgl):
+    def Save(self, lmgl, mode='p:gzip'):
         '''
 Save body into a LMGL (Letter-Monster Graphical Letters) file.\n\
+Valid modes are : p:gzip (cPickle in gzip file), p:bz2 (cPickle in bz2 file), y:bz2 (YAML in bz2 file), y (YAML).\n\
 You should also check Load function.\n\
 '''
         try:
             vInput = open( lmgl )
-            print( 'Letter-Monster snarls: "`%s` is a LMGL file! I refuse to overwrite!"' % lmgl ) ; return
+            print( 'Letter-Monster snarls: "`%s` is a LMGL file! I refuse to overwrite!"' % lmgl ) ; return 1
         except: pass # If file exists, pass.
         #
         ti = clock()
-        vInput = BZ2File( lmgl, 'w', 0, 6 ) # Load for writing, no buffer, compress level 6.
-        dump( self.body, vInput, 2 ) # Represent LetterMonster body as cPickle, method 2.
+        #
+        if mode=='p:gzip':
+            vInput = gzip.open( lmgl, 'w', 8 )
+            cPickle.dump(self.body, vInput, 2)
+        #
+        elif mode=='p:bz2':
+            vInput = bz2.BZ2File( lmgl, 'w', 0, 8 )
+            cPickle.dump(self.body, vInput, 2)
+        #
+        elif mode=='y:bz2':
+            vInput = bz2.BZ2File( lmgl, 'w', 0, 8 )
+            yaml.dump(self.body, stream=vInput, width=125, indent=2, canonical=False, default_flow_style=False,
+                explicit_start=True, explicit_end=True)
+        #
+        elif mode=='y':
+            vInput = open( lmgl, 'w', 0 )
+            yaml.dump(self.body, stream=vInput, width=125, indent=2, canonical=False, default_flow_style=False,
+                explicit_start=True, explicit_end=True)
+        #
+        else: print( 'Letter-Monster snarls: "`%s` is not a valid mode to save LMGL files!"' % mode ) ; return 1
+        #
         vInput.close() ; del vInput
         self.__validate()
         tf = clock()
-        #
         if self.DEBUG: print( 'Letter-Monster says: "Saving LMGL took %.4f seconds total."' % (tf-ti) )
         #
     #
@@ -133,7 +196,7 @@ Valid LMGL file should respect this:\n\
  - internal name of all layers must be the same as the key used to acces them, in LetterMonster body.\n\
  - data of Raster and Vector layers must be Rectangular Numpy Arrays.\n\
  - instructions of Vector and Macro layers must be lists of dictionaries.\n\
- - position of Raster and Vector layers must be tuples of 2 integers.\n\
+ - offset of Raster and Vector layers must be tuples of 2 integers.\n\
  - transparent of Raster and Vector layers must be a unicode string.\n\
 '''
         #
@@ -160,12 +223,12 @@ Valid LMGL file should respect this:\n\
                         % (str(vElem),vKey) )
             except: pass # If object doesn't have "instructions", pass.
             #
-            try: # Try to get information about object position.
-                if not ( (str(type(vElem.position))=="<type 'list'>" or str(type(vElem.position))=="<type 'tuple'>")
-                and str(type(vElem.position[0]))=="<type 'int'>" and len(vElem.position)==2 ):
-                    print( 'Letter-Monster growls: "Be warned! %s object `%s` position is not a list with two integers!"'
+            try: # Try to get information about objects offset.
+                if not ( (str(type(vElem.offset))=="<type 'list'>" or str(type(vElem.offset))=="<type 'tuple'>")
+                and str(type(vElem.offset[0]))=="<type 'int'>" and len(vElem.offset)==2 ):
+                    print( 'Letter-Monster growls: "Be warned! %s object `%s` offset is not a list with two integers!"'
                         % (str(vElem),vKey) )
-            except: pass # If object doesn't have "position", pass.
+            except: pass # If object doesn't have "offset", pass.
             #
             try: # Try to get information about object transparent.
                 if not str(type(vElem.transparent))=="<type 'unicode'>":
@@ -340,7 +403,7 @@ Valid outputs are : CMD, SH.\n\
             else: vCmd = []
             #
             for vLine in vOutput:
-                vEcho = u''.join(u'^'+i for i in vLine)
+                vEcho = u''.join(u'^'+i for i in u''.join(vLine))
                 if vEcho: vCmd.append( 'echo %s' % vEcho.encode('utf8') )
                 else: vCmd.append( 'echo.' )
             os.system( '&'.join(vCmd) ) # Execute Windows command!
@@ -350,7 +413,7 @@ Valid outputs are : CMD, SH.\n\
             else: vCmd = []
             #
             for vLine in vOutput:
-                vEcho = u''.join(u'\\'+i for i in vLine)
+                vEcho = u''.join(u'\\'+i for i in u''.join(vLine))
                 if vEcho: vCmd.append( 'echo %s' % vEcho.encode('utf8') )
                 else: vCmd.append( 'echo.' )
             os.system( '&&'.join(vCmd) ) # Execute Linux command!
@@ -427,24 +490,20 @@ Valid formats are : txt, csv, html, bmp, gif, jpg, png.\n\
         #
         ti = clock() # Global counter for function.
         if lmgl: # If a LMGL file is specified, export only the LMGL, but don't change self.body.
-            tti = clock() # Local counter.
-            try: vInput = BZ2File( lmgl, 'r', 0, 6 ) # Load for reading, no buffer, compress level 6.
-            except: print( 'Letter-Monster snarls: "`%s` is not a valid path, or BZ2 cannot decompress that file! Exiting spawn!"' % lmgl ) ; return
             #
-            try: vLmgl = load( vInput )
-            except: print( 'Letter-Monster snarls: "cPickle cannot parse `%s` file! Exiting spawn!"' % lmgl ) ; return
+            vOldBody = self.body
+            ret = self.Load( lmgl )
+            if ret: return 1
             #
-            vInput.close() ; del vInput
-            ttf = clock()
-            if self.DEBUG: print( 'Letter-Monster says: "Loading LMGL (Spawn) took %.4f seconds."' % (ttf-tti) )
-        else: vLmgl = self.body
         #
+        vLmgl = self.body # Save body...
         out = out.lower() # Lower letters.
         if out not in ('txt', 'csv', 'html', 'bmp', 'gif', 'jpg', 'png'):
-            print( 'Letter-Monster growls: "I cannot export in `%s` type! Exiting spawn!' % out ) ; return
+            print( 'Letter-Monster growls: "I cannot export in `%s` type! Exiting spawn!' % out ) ; return 1
         #
-        try: vOutput = FlattenLayers( vLmgl )
-        except: print( 'Letter-Monster snarls: "Flatten body layers returned an error! Cannot spawn!"' )
+        #try: 
+        vOutput = FlattenLayers( vLmgl )
+        #except: print( 'Letter-Monster snarls: "Flatten body layers returned an error! Cannot spawn!"' )
         #
         tti = clock() # Local counter.
         #
@@ -486,6 +545,8 @@ Valid formats are : txt, csv, html, bmp, gif, jpg, png.\n\
         # More export formats will be implemented ...
         #
         del vOutput ; del vOut
+        if lmgl:
+            self.body = vOldBody # Restore old Body.
         #
         ttf = clock()
         if self.DEBUG: print( 'Letter-Monster says: "Exporting data took %.4f seconds."' % (ttf-tti) )

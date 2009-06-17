@@ -1,6 +1,6 @@
 # -*- coding: latin-1 -*-
 '''
-Letter-Monster Engine v0.2.
+Letter-Monster Engine v0.2.2.
 Copyright © 2009, Cristi Constantin. All rights reserved.
 This module generates a test LMGL file to play with. You can use it for Spawn or Spit.
 '''
@@ -26,7 +26,7 @@ r = Raster(
     name = 'raster2',
     visible = True,
     transparent = u'-', # Transparent character : -. It will be ignored at rendering.
-    position = (2,2),
+    offset = (2,2),
     data = lm.bp._Transform('s2a', 'I-am-Johny.'),
     z=2, )
 lm.body[ r.name ] = r
@@ -36,7 +36,7 @@ r = Raster(
     name = 'raster3',
     visible = True,
     transparent = u' ',
-    position = (3,2),
+    offset = (3,2),
     data = lm.bp._Transform('s2a', 'Johny Bravo.\n\n\n\n\n\nAm i cool or what ;>'),
     z=3, )
 lm.body[ r.name ] = r
@@ -45,8 +45,8 @@ del r
 print( 'Added data...' )
 try: os.remove( 'test_bord.lmgl' )
 except: pass
-lm.Save( 'test_bord.lmgl' )
+lm.Save( 'test_bord.lmgl', mode='y:bz2' )
 
-os.system( 'echo Done. Sleeping 5...&sleep 5' )
+os.system( 'echo Done.&pause' )
 
 #

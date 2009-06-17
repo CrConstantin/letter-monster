@@ -1,6 +1,6 @@
 # -*- coding: latin-1 -*-
 '''
-Letter-Monster Engine v0.2.
+Letter-Monster Engine v0.2.2.
 Copyright © 2009, Cristi Constantin. All rights reserved.
 This module demonstrates executing instructions stored inside a vector layer, in one LMGL file.
 '''

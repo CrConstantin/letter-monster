@@ -1,6 +1,6 @@
 # -*- coding: latin-1 -*-
 '''
-Letter-Monster Engine v0.2.
+Letter-Monster Engine v0.2.2.
 Copyright © 2009, Cristi Constantin. All rights reserved.
 This module generates a test LMGL file to play with. You can use it for Spawn, Spit or Execute.
 '''
@@ -13,27 +13,18 @@ from _letter_monster import LetterMonster
 lm = LetterMonster()
 lm.DEBUG = True
 
-r = Raster(
-    name = 'raster1',
-    visible = True,
-    data = lm.bp._Transform('s2a', 'R a s t e r 1\nsome data'),
-    z = 2, )
+r = Raster( name = 'raster1', visible = True, transparent = u' ', z = 3, offset = (0,0),
+    data = lm.bp._Transform('s2a', 'R a s t e r 1\nsome data'), )
 lm.body[ r.name ] = r
 del r
 
-r = Raster(
-    name = 'raster2',
-    visible = True,
-    data = lm.bp._Transform('s2a', '00000\n11111\n22222\n33333\n44444'),
-    z = 1, )
+r = Raster( name = 'raster2', visible = True, transparent = u' ', z = 2, offset = (0,0),
+    data = lm.bp._Transform('s2a', '00 00\n11 11\n22 22\n33 33\n44 44'), )
 lm.body[ r.name ] = r
 del r
 
-r = Raster(
-    name = 'raster3',
-    visible = True,
-    data = lm.bp._Transform('s2a', '    .\n    .\nlast line of raster3'),
-    z = 3, )
+r = Raster( name = 'raster3', visible = True, transparent = u' .', z = 4, offset = (0,0),
+    data = lm.bp._Transform('s2a', '. .\n. .\nlast line of raster3'), )
 lm.body[ r.name ] = r
 del r
 
@@ -42,10 +33,11 @@ instruct = [
     {'f':'Rotate90Left','Input':'vect1'},
     {'f':'StripRightSpace','Input':'vect1'},
     {'f':'StripLeftSpace','Input':'vect1'},
-    {'f':'Border','Input':'vect1'} ]
-v = Vector(name = 'vect1', instructions=instruct, position = (99,10))
+    {'f':'Border','Input':'vect1'}
+    ]
+v = Vector( name = 'vect1', instructions=instruct, offset = (99,10) )
 lm.body[ v.name ] = v
-del v
+del v ; del instruct
 
 e = Event(name = 'event1', affects = 'aff')
 lm.body[ e.name ] = e
@@ -58,8 +50,8 @@ del m
 print( 'Added data...' )
 try: os.remove( 'test.lmgl' )
 except: pass
-lm.Save( 'test.lmgl' )
+lm.Save( 'test.lmgl', 'y' )
 
-os.system( 'echo Done. Sleeping 5...&sleep 5' )
+os.system( 'echo Done.&pause' )
 
 #
