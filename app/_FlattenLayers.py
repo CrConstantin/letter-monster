@@ -45,11 +45,11 @@ Function returns the flatened result, as Rectangular Unicode Numpy Array.\n\
         if (str(vElem)=='raster' and vElem.visible) or (str(vElem)=='vector' and vElem.visible): # If element is a visible Raster or Vector...
             #
             # Some pointers...
-            vData = vElem.data          # This should be a Rectangular Unicode Numpy Array.
-            vDataShape = vData.shape    # Element data shape.
-            vOffset = vElem.offset      # This should be a list with 2 integers. First value is down, second value is right.
+            vData = vElem.data       # This should be a Rectangular Unicode Numpy Array.
+            vDataShape = vData.shape # Element data shape.
+            vOffset = vElem.offset   # This should be a list with 2 integers. First value is down, second value is right.
             #
-            if vElem.transparent:       # If there are transparent characters...
+            if vElem.transparent:    # If there are transparent characters...
                 # All "transparent characters" from current Layer Data become empty strings.
                 for vT in vElem.transparent:
                     vMask = vData==vT

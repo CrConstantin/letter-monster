@@ -18,7 +18,7 @@ r = Raster( name = 'raster1', visible = True, transparent = u' ', z = 3, offset 
 lm.body[ r.name ] = r
 del r
 
-r = Raster( name = 'raster2', visible = True, transparent = u' ', z = 2, offset = (0,0),
+r = Raster( name = 'raster2', visible = False, transparent = u' ', z = 2, offset = (0,0),
     data = lm.bp._Transform('s2a', '00 00\n11 11\n22 22\n33 33\n44 44'), )
 lm.body[ r.name ] = r
 del r
@@ -29,13 +29,13 @@ lm.body[ r.name ] = r
 del r
 
 instruct = [
-    {'f':'Rotate90Right','Input':'raster1'},
+    {'f':'Rotate90Right','Input':'raster2'},
     {'f':'Rotate90Left','Input':'vect1'},
     {'f':'StripRightSpace','Input':'vect1'},
     {'f':'StripLeftSpace','Input':'vect1'},
-    {'f':'Border','Input':'vect1'}
+    {'f':'Border','Input':'vect1','Char':'='}
     ]
-v = Vector( name = 'vect1', instructions=instruct, offset = (99,10) )
+v = Vector( name = 'vect1', instructions={'autorun':instruct}, offset = (0,0), z = 2, )
 lm.body[ v.name ] = v
 del v ; del instruct
 
@@ -43,15 +43,22 @@ e = Event(name = 'event1', affects = 'aff')
 lm.body[ e.name ] = e
 del e
 
-m = Macro(name = 'macro1', )
+instruct = [
+    {'f':'new', 'layer':'event', 'name':'event2', 'affects':'', 'affect_macro':''},
+    {'f':'ren', 'name':'event2', 'newname':'event22'},
+    #{'f':'del', 'name':'event22'},
+    #{'f':'change', 'name':'event2', 'affects':'new aff'},
+    ]
+m = Macro( name = 'macro1', instructions={'autorun':instruct} )
 lm.body[ m.name ] = m
-del m
+del m ; del instruct
+
+#
 
 print( 'Added data...' )
 try: os.remove( 'test.lmgl' )
 except: pass
 lm.Save( 'test.lmgl', 'y' )
-
 os.system( 'echo Done.&pause' )
 
 #

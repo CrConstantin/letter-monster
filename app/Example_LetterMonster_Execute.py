@@ -15,12 +15,13 @@ lm.DEBUG = True
 lm.Load( 'test.lmgl' )
 
 print 'Executing vector instructions...\n'
-print 'Instructions are', lm.body['vect1'].instructions
-print 'Instructions are type:', type(lm.body['vect1'].instructions)
-print 'Inside instructions, there is type:', type(lm.body['vect1'].instructions[0]), '\n'
+lm._execute( 'vect1', 'autorun' )
 
-lm._execute( 'vect1' )
+print 'Executing macro instructions...\n'
+lm._execute( 'macro1', 'autorun' )
 
-os.system( 'echo Done. Sleeping 5...&sleep 5' )
+print lm.body
+
+os.system( 'echo Done.&pause' )
 
 #
