@@ -28,7 +28,7 @@ class Raster:
 class Vector:
     '''Vector layer class.\n'''
     #
-    def __init__(self, name='', data=np.array([[]],'U'), transparent=u'', instructions=[{}], offset=(0,0), visible=True, lock=False, z=1):
+    def __init__(self, name='', data=np.array([[]],'U'), transparent=u'', instructions={}, offset=(0,0), visible=True, lock=False, z=1):
         self.name = name
         self.data = data
         self.transparent = transparent
@@ -62,7 +62,7 @@ class Event:
 class Macro:
     '''Macro layer class.\n'''
     #
-    def __init__(self, name='', instructions=[{}]):
+    def __init__(self, name='', instructions={}):
         self.name = name
         self.instructions = instructions
         self.z = -99 # This should be read-only.

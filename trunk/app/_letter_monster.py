@@ -22,7 +22,7 @@ except: pass                               # If Psyco is not available, pass.
 from _classes import *
 from _FlattenLayers import FlattenLayers
 
-print 'I am LM r45!'
+print 'I am LM r46!'
 
 #
 # Define YAML represent for numpy ndarray.
@@ -48,9 +48,8 @@ Initializes the engine.\n\
 LetterMonster -> DEBUG. If False, debug messages will not be printed.\n\
 LetterMonster -> body. This dictionary contains all layers loaded from LMGL and saved into LMGL.\n\
 LetterMonster -> max_morph_rate. TODO.\n\
-LetterMonster -> visible_size. TODO\n\
+LetterMonster -> visible_size. TODO.\n\
 LetterMonster -> bp. It's a Backpack instance. All helper functions can be accessed through it.\n\
-LetterMonster -> data_types. List with all valid layer names.\n\
 LetterMonster -> Filters. List with all valid filter names, used in Consume function.\n\
 LetterMonster -> Patterns. List with all valid pattern names, used in Consume function.\n\
 '''
@@ -62,7 +61,6 @@ LetterMonster -> Patterns. List with all valid pattern names, used in Consume fu
         self.visible_size = (100, 100)
         self.bp = Backpack() # Helper functions instance.
         #
-        self.data_types = ('raster', 'vector', 'event', 'macro')
         self.Filters = ( 'BLUR', 'SMOOTH', 'SMOOTH_MORE', 'DETAIL', 'SHARPEN', # All valid filters.
                          'CONTOUR', 'EDGE_ENHANCE', 'EDGE_ENHANCE_MORE' )
         self.Patterns = {
@@ -98,7 +96,7 @@ LetterMonster -> Patterns. List with all valid pattern names, used in Consume fu
     def Load(self, lmgl):
         '''
 Load a LMGL (Letter-Monster Graphical Letters) file.\n\
-LMGL file format is nothing more than a YAML dump of LetterMonster body, compressed with BZ2.\n\
+LMGL file format is nothing more than a cPickle or YAML dump of LetterMonster body, compressed with Gzip or BZ2.\n\
 '''
         try:
             vInput = open( lmgl ) # Opening the file just to read first 3 characters.
@@ -195,7 +193,7 @@ Errors are printed in console, but cannot be fixed. It is your responsability to
 Valid LMGL file should respect this:\n\
  - internal name of all layers must be the same as the key used to acces them, in LetterMonster body.\n\
  - data of Raster and Vector layers must be Rectangular Numpy Arrays.\n\
- - instructions of Vector and Macro layers must be lists of dictionaries.\n\
+ - instructions of Vector and Macro layers must be a dictionary.\n\
  - offset of Raster and Vector layers must be tuples of 2 integers.\n\
  - transparent of Raster and Vector layers must be a unicode string.\n\
 '''
@@ -217,9 +215,8 @@ Valid LMGL file should respect this:\n\
             except: pass # If object doesn't have "data", pass.
             #
             try: # Try to get information about object instructions.
-                if not ( (str(type(vElem.instructions))=="<type 'list'>" or str(type(vElem.instructions))=="<type 'tuple'>")
-                and str(type(vElem.instructions[0]))=="<type 'dict'>" ):
-                    print( 'Letter-Monster growls: "Be warned! %s object `%s` instructions is not a valid list of dictionaries!"'
+                if not str(type(vElem.instructions))=="<type 'dict'>":
+                    print( 'Letter-Monster growls: "Be warned! %s object `%s` instructions is not a dictionary!"'
                         % (str(vElem),vKey) )
             except: pass # If object doesn't have "instructions", pass.
             #
@@ -240,13 +237,18 @@ Valid LMGL file should respect this:\n\
     #
 #---------------------------------------------------------------------------------------------------
     #
-    def _execute(self, object):
-        '''Execute instructions stored inside Vector or Macro layers. "Object" must be the name of a LatterMonster layer 
-that containins instructions.\n'''
+    def _execute(self, object, instruct_name):
+        '''Execute instructions stored inside Vector or Macro layers.\n\
+"object" must be the name of a LatterMonster layer that containins instructions.\n\
+"instruct_name" must be the name of the instruction.\n\
+All vector instructions are : Rotate90Right, Rotate90Left, FlipH, FlipV, Reverse, StripRightSpace, StripLeftSpace,\n\
+AlignRight, AlignLeft, Center, Crop, Border, RightBorder, LeftBorder.\n\
+All macro instructions are : new, del, ren, change.\n\
+'''
         #
         try:
             vElem = self.body[object]
-            vInstructions = vElem.instructions
+            vInstructions = vElem.instructions[instruct_name]
         except: print( 'Letter-Monster snarls: "`%s` is not an object from my body, or it doesn\'t have valid instructions! I refuse to execute!"' % object ) ; return
         #
         if not vInstructions:
@@ -254,9 +256,9 @@ that containins instructions.\n'''
         #
         ti = clock()
         if str(vElem)=='vector': # Execute vector instructions.
-            for vInstr in vInstructions: # For each dictionary in vector instructions list.
+            for vInstr in vInstructions: # For each instruction in vector instructions list.
                 vFunc = vInstr['f']      # Save function name, then delete this mapping.
-                del vInstr['f']          # All vector function calls are backpack functions.
+                del vInstr['f']          # All vector function-calls are backpack functions.
                 #
                 f = getattr(self.bp, vFunc, 'Error') # Save the function call.
                 #
@@ -264,26 +266,51 @@ that containins instructions.\n'''
                     #
                     # Overwrite the Name of the vector with the Data of the vector.
                     try: vInstr['Input'] = self.body[vInstr['Input']].data
-                    except: print( 'Letter-Monster growls: "Vector `%s` doesn\'t have valid data! Call ignored!"' % object ) ; continue
+                    except: print( 'Letter-Monster growls: "Vector `%s` doesn\'t have valid data! I refuse to execute!"' % object ) ; return
                     #
                     # Try to call the function with parameters and catch the errors.
                     try: vData = f( **vInstr )
-                    except TypeError: print( 'Letter-Monster growls: "Incorrect arguments for function `%s`! Call ignored!"' % vFunc ) ; continue
-                    except: print( 'Letter-Monster growls: "Unknown error occured in `%s` function call! Call ignored!"' % vFunc ) ; continue
+                    except TypeError: print( 'Letter-Monster growls: "Incorrect arguments for function `%s`! I refuse to execute!"' % vFunc ) ; return
+                    except: print( 'Letter-Monster growls: "Unknown error occured in `%s` function call! I refuse to execute!"' % vFunc ) ; return
                     #
                     # Save data in LetterMonster body -> object.
                     if vData is not None: self.body[object].data = vData
                     else: self.body[object].data = np.zeros((1,1),'U')
                     #
                 else:
-                    print( 'Letter-Monster growls: "I refuse to execute that! Vector `%s` tries to call function `%s` which doesn\'t exist!"'
-                        % (object,vFunc) ) ; return
+                    print( 'Letter-Monster growls: "I don\'t know any `%s` function! I refuse to execute!"' % (object,vFunc) ) ; return
                 #
             #
-        if str(vElem)=='macro':
-            pass
-        else:
-            print( 'Letter-Monster sighs: "Instructions for macros not yet implemented! Scheduled for version 0.3."' ) ; return
+        elif str(vElem)=='macro':
+            for vInstr in vInstructions: # For each instruction in macro instructions list.
+                try: vName = vInstr['name']
+                except: print( 'Letter-Monster growls: "Can\'t access `name` attribute in Macro `%s` instruction! I refuse to execute!"' % object ) ; return
+                #
+                if vInstr['f']=='new':   # Create new layer.
+                    vNew = vInstr['layer'].title()
+                    if vNew=='Raster':
+                        self.body[vName] = Raster()
+                    elif vNew=='Vector':
+                        self.body[vName] = Vector()
+                    elif vNew=='Macro':
+                        self.body[vName] = Macro()
+                    elif vNew=='Event':
+                        self.body[vName] = Event()
+                #
+                elif vInstr['f']=='del': # Delete a layer.
+                    del self.body[vName]
+                #
+                elif vInstr['f']=='ren': # Rename a layer.
+                    vNewname = vInstr['newname']
+                    self.body[vNewname] = self.body[vName]
+                    self.body[vNewname].name = vNewname
+                    del self.body[vName]
+                #
+                elif vInstr['f']=='change': # Change attributes of a layer.
+                    pass
+                    #self.body[vName]
+                #
+            #
         #
         tf = clock()
         if self.DEBUG: print( 'Letter-Monster says: "Execute took %.4f seconds."' % (tf-ti) )
