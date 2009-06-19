@@ -60,8 +60,9 @@ Function returns the flatened result, as Rectangular Unicode Numpy Array.\n\
             vMask = vData!=u''
             #
             # Insert all NON-empty values into Final Numpy Array, considering the position.
-            vOutput[ vOffset[0]:vDataShape[0]+vOffset[0], vOffset[1]:vDataShape[1]+vOffset[1]][ vMask ] = vData[ vMask ]
-            del vMask # Just to make sure. :p
+            vView = vOutput[vOffset[0]:vDataShape[0]+vOffset[0], vOffset[1]:vDataShape[1]+vOffset[1]]
+            vOutput[vOffset[0]:vDataShape[0]+vOffset[0], vOffset[1]:vDataShape[1]+vOffset[1]] = np.where( vMask, vData, vView )
+            del vMask, vView, vData # Just to make sure. :p
             #
         # If not Raster or Vector, pass.
     #

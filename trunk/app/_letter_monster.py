@@ -22,7 +22,7 @@ except: pass                               # If Psyco is not available, pass.
 from _classes import *
 from _FlattenLayers import FlattenLayers
 
-print 'I am LM r46!'
+print 'I am LM r47!'
 
 #
 # Define YAML represent for numpy ndarray.
@@ -237,7 +237,7 @@ Valid LMGL file should respect this:\n\
     #
 #---------------------------------------------------------------------------------------------------
     #
-    def _execute(self, object, instruct_name):
+    def _Execute(self, object, instruct_name):
         '''Execute instructions stored inside Vector or Macro layers.\n\
 "object" must be the name of a LatterMonster layer that containins instructions.\n\
 "instruct_name" must be the name of the instruction.\n\
@@ -288,6 +288,8 @@ All macro instructions are : new, del, ren, change.\n\
                 #
                 if vInstr['f']=='new':   # Create new layer.
                     vNew = vInstr['layer'].title()
+                    if self.body.has_key( vName ):
+                        print( 'Letter-Monster growls: "Layer `%s` already exists! I refuse to create new!"' % vName ) ; return
                     if vNew=='Raster':
                         self.body[vName] = Raster()
                     elif vNew=='Vector':
@@ -298,17 +300,21 @@ All macro instructions are : new, del, ren, change.\n\
                         self.body[vName] = Event()
                 #
                 elif vInstr['f']=='del': # Delete a layer.
-                    del self.body[vName]
+                    try: del self.body[vName]
+                    except: print( 'Letter-Monster growls: "Layer `%s` doesn\'t exist! I refuse to delete!"' % vName ) ; return
                 #
                 elif vInstr['f']=='ren': # Rename a layer.
                     vNewname = vInstr['newname']
+                    if self.body.has_key( vNewname ):
+                        print( 'Letter-Monster growls: "Layer `%s` already exists! I refuse to rename!"' % vName ) ; return
                     self.body[vNewname] = self.body[vName]
                     self.body[vNewname].name = vNewname
                     del self.body[vName]
                 #
                 elif vInstr['f']=='change': # Change attributes of a layer.
-                    pass
-                    #self.body[vName]
+                    del vInstr['f']
+                    try: self.body[vName].__dict__ = vInstr
+                    except: print( 'Letter-Monster growls: "Cannot change attributes for `%s` layer!"' % vName ) ; return
                 #
             #
         #

@@ -62,6 +62,7 @@
  * Python-Numpy. All data is represented as Numpy tables; they are fast and use little memory. (numpy.scipy.org)
  * Python Image Library (PIL). Manipulates and creates images. (www.pythonware.com/products/pil)
 
+ * (optional) pyYAML. Used for saving LMGL in YAML format, easy manually to read and write. (www.pyyaml.org)
  * (Optional) Python-Psyco. Makes Letter-Monster 2-3 times faster. It uses quite a lot of memory. (psyco.sourceforge.net)
  * (Optional) Pygame. Used for render in Pygame. (www.pygame.org)
  * (Optional) Pyglet. Used for render in Pyglet. (www.pyglet.org)
@@ -92,9 +93,10 @@
  Changes from version 0.2:
 ---------------------------
  * Fixed 2 bugs in overwrite engine.
- * Added save as "p:gzip", "p:bz2", "y:bz2", "y".
+ * Added save as "p:gzip", "p:bz2", "y:bz2", "y". Need to install pyYAML.
  * Renamed Layers attribute "position" into "offset", thus breaking compatibility with previous LMGL files.
     It's a more representative name.
+ * Implemented macro instructions "new", "del", "ren", "change".
 
 --------
   TODO:

@@ -45,9 +45,9 @@ del e
 
 instruct = [
     {'f':'new', 'layer':'event', 'name':'event2', 'affects':'', 'affect_macro':''},
-    {'f':'ren', 'name':'event2', 'newname':'event22'},
-    #{'f':'del', 'name':'event22'},
-    #{'f':'change', 'name':'event2', 'affects':'new aff'},
+    {'f':'ren', 'name':'event2', 'newname':'event222'},
+    {'f':'change', 'name':'event222', 'affects':'new aff'},
+    {'f':'del', 'name':'event222'},
     ]
 m = Macro( name = 'macro1', instructions={'autorun':instruct} )
 lm.body[ m.name ] = m

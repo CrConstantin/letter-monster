@@ -14,8 +14,7 @@ lm.DEBUG = True
 
 print( 'Loading...\n' )
 lm.Load( 'test.lmgl' )
-print( 'Executing...\n' )
-lm._execute( 'vect1', 'autorun' )
+
 print( 'Spawning...\n' )
 lm.Spawn( out='txt' )
 
