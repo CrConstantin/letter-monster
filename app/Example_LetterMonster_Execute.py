@@ -15,10 +15,10 @@ lm.DEBUG = True
 lm.Load( 'test.lmgl' )
 
 print 'Executing vector instructions...\n'
-lm._execute( 'vect1', 'autorun' )
+lm._Execute( 'vect1', 'autorun' )
 
 print 'Executing macro instructions...\n'
-lm._execute( 'macro1', 'autorun' )
+lm._Execute( 'macro1', 'autorun' )
 
 print lm.body
 
