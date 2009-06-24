@@ -47,10 +47,11 @@ class Vector:
 class Event:
     '''Event layer class.\n'''
     #
-    def __init__(self, name='', affects='', affect_macro=''):
+    def __init__(self, name='', affects='', affect_macro='', visible=False):
         self.name = name
         self.affects = affects
         self.affect_macro = affect_macro
+        self.visible = visible
         self.z = -99 # This should be read-only.
     #
     def __str__(self):
@@ -313,5 +314,18 @@ This is the only function that doesn't take a Rectangular Unicode Array as input
         return self.vContent
         #
     #
+#
 
+class VActions(Backpack):
+    def __init__(self):
+        Backpack.__init__(self)
+        #
+    #
+#
+
+class EActions:
+    def __init__(self):
+        pass
+        #
+    #
 #

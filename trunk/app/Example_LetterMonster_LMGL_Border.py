@@ -17,7 +17,7 @@ r = Raster(
     name = 'raster1',
     visible = True,
     transparent = u'',
-    data = lm.bp._Transform('s2a', '#'*30+'\n' + 10*('#'+'.'*28+'#\n') + '#'*30 ),
+    data = lm.VA._Transform('s2a', '#'*30+'\n' + 10*('#'+'.'*28+'#\n') + '#'*30 ),
     z=1, )
 lm.body[ r.name ] = r
 del r
@@ -27,7 +27,7 @@ r = Raster(
     visible = True,
     transparent = u'-', # Transparent character : -. It will be ignored at rendering.
     offset = (2,2),
-    data = lm.bp._Transform('s2a', 'I-am-Johny.'),
+    data = lm.VA._Transform('s2a', 'I-am-Johny.'),
     z=2, )
 lm.body[ r.name ] = r
 del r
@@ -37,7 +37,7 @@ r = Raster(
     visible = True,
     transparent = u' ',
     offset = (3,2),
-    data = lm.bp._Transform('s2a', 'Johny Bravo.\n\n\n\n\n\nAm i cool or what ;>'),
+    data = lm.VA._Transform('s2a', 'Johny Bravo.\n\n\n\n\n\nAm i cool or what ;>'),
     z=3, )
 lm.body[ r.name ] = r
 del r
