@@ -14,17 +14,17 @@ lm = LetterMonster()
 lm.DEBUG = True
 
 r = Raster( name = 'raster1', visible = True, transparent = u' ', z = 3, offset = (0,0),
-    data = lm.bp._Transform('s2a', 'R a s t e r 1\nsome data'), )
+    data = lm.VA._Transform('s2a', 'R a s t e r 1\nsome data'), )
 lm.body[ r.name ] = r
 del r
 
-r = Raster( name = 'raster2', visible = False, transparent = u' ', z = 2, offset = (0,0),
-    data = lm.bp._Transform('s2a', '00 00\n11 11\n22 22\n33 33\n44 44'), )
+r = Raster( name = 'raster2', visible = True, transparent = u' ', z = 2, offset = (0,0),
+    data = lm.VA._Transform('s2a', '00 00\n11 11\n22 22\n33 33\n44 44'), )
 lm.body[ r.name ] = r
 del r
 
 r = Raster( name = 'raster3', visible = True, transparent = u' .', z = 4, offset = (0,0),
-    data = lm.bp._Transform('s2a', '. .\n. .\nlast line of raster3'), )
+    data = lm.VA._Transform('s2a', '. .\n. .\nlast line of raster3'), )
 lm.body[ r.name ] = r
 del r
 

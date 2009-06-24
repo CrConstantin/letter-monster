@@ -5,7 +5,8 @@
     This module contains Letter-Monster class with all its functions. \n\
 '''
 
-import os, sys                   # Important System functions.
+import os, sys, time             # Important System functions.
+import thread, Queue
 import Image, ImageFilter        # Python-Imaging.
 import ImageFont, ImageDraw      # Python-Imaging.
 import numpy as np               # Numpy arrays.
@@ -17,12 +18,13 @@ import zlib, gzip, bz2           # Compress and decompress data.
 from time import clock           # Timing operations.
 sys.path.insert(0, os.getcwd() ) # Save current dir in path.
 
-try: from psyco import profile ; profile() # Performance boost.
-except: pass                               # If Psyco is not available, pass.
+#try: from psyco import profile ; profile() # Performance boost.
+#except: pass                               # If Psyco is not available, pass.
 from _classes import *
-from _FlattenLayers import FlattenLayers
 
-print 'I am LM r47!'
+
+
+print 'I am LM r48!'
 
 #
 # Define YAML represent for numpy ndarray.
@@ -30,11 +32,102 @@ def ndarray_repr(dumper, data):
     return dumper.represent_scalar(u'!array', zlib.compress(data.dumps(), 7).decode('latin_1'))
 add_representer(np.ndarray, ndarray_repr)
 #
+
 # Define YAML construct data for numpy ndarray.
 def ndarray_construct(loader, node):
     return np.loads(zlib.decompress(loader.construct_scalar(node).encode('latin_1')))
 add_constructor(u'!array', ndarray_construct)
 #
+
+# Sort data for FlattenLayers.
+def sort_zorder(x):
+    return x.z
+#
+
+FrameBuffer = Queue.Queue(5) # Queue with 5.
+vCanLoop = True              # Used in all threading functions.
+vFrame = ''
+
+#
+def FlattenLayers( vInput, vThreading=False ):
+    '''
+This function takes as input a dictionary containing layers, like LetterMonster.body.\n\
+Only layers that have a "data" attribute (Raster and Vector) can be rendered.\n\
+Function returns the flatened result, as Rectangular Unicode Numpy Array.\n\
+'''
+    #
+    global vCanLoop
+    while vCanLoop:
+        #
+        #ti = clock()
+        #
+        # If Body has one layer, return it. There is nothing to flatten.
+        if len(vInput)==1:
+            #tf = clock()
+            #print( 'Flatten Layers took %.4f seconds.' % (tf-ti) )
+            FrameBuffer.put( vOutput, True, None )
+            if not vThreading: return vOutput
+        #
+        S0 = 0 ; S1 = 0
+        # Save maxim shape values for all layers.
+        for vElem in vInput.values():
+            if (str(vElem)=='raster' and vElem.visible) or (str(vElem)=='vector' and vElem.visible):
+                if vElem.data.shape[0]<=1 and vElem.data.shape[1]<=1: continue # Ignore empty arrays.
+                S0 = max( S0, vElem.data.shape[0]+vElem.offset[0] )
+                S1 = max( S1, vElem.data.shape[1]+vElem.offset[1] )
+        #
+        # Create a big empty array for all other arrays to fit in.
+        vOutput = np.zeros( (S0, S1), 'U' )
+        del S0, S1
+        #
+        for vElem in sorted(vInput.values(), key=sort_zorder): # For all elements in LetterMonster body, sorted by Z-order...
+            if (str(vElem)=='raster' and vElem.visible) or (str(vElem)=='vector' and vElem.visible): # If element is a visible Raster or Vector...
+                #
+                # Some pointers...
+                vData = vElem.data       # This should be a Rectangular Unicode Numpy Array.
+                vDataShape = vData.shape # Element data shape.
+                vOffset = vElem.offset   # This should be a list with 2 integers. First value is down, second value is right.
+                #
+                if vElem.transparent:    # If there are transparent characters...
+                    # All "transparent characters" from current Layer Data become empty strings.
+                    for vT in vElem.transparent:
+                        vMask = vData==vT
+                        vData[ vMask ] = u''
+                    #
+                #
+                # Mask == all NON-empty characters.
+                vMask = vData!=u''
+                #
+                # Insert all NON-empty values into Final Numpy Array, considering the position.
+                vView = vOutput[vOffset[0]:vDataShape[0]+vOffset[0], vOffset[1]:vDataShape[1]+vOffset[1]]
+                vOutput[vOffset[0]:vDataShape[0]+vOffset[0], vOffset[1]:vDataShape[1]+vOffset[1]] = np.where( vMask, vData, vView )
+                del vMask, vView, vData # Just to make sure. :p
+                #
+            # If not Raster or Vector, pass.
+        #
+        #tf = clock()
+        #print( 'Flatten Layers took %.4f seconds.' % (tf-ti) )
+        FrameBuffer.put( vOutput, True, None )
+        if not vThreading: return vOutput
+        #
+    #
+#
+
+#
+def QController( max_fps=1 ):
+    global vCanLoop, vFrame
+    x = 1
+    #
+    while vCanLoop:
+        vFrame = FrameBuffer.get()
+        print 'Rendering', x
+        x += 1
+        FrameBuffer.task_done()
+        time.sleep(max_fps)
+    #
+#
+
+
 
 class LetterMonster:
     '''
@@ -47,7 +140,7 @@ It uses no arguments for initialization.\n\
 Initializes the engine.\n\
 LetterMonster -> DEBUG. If False, debug messages will not be printed.\n\
 LetterMonster -> body. This dictionary contains all layers loaded from LMGL and saved into LMGL.\n\
-LetterMonster -> max_morph_rate. TODO.\n\
+LetterMonster -> max_fps. Maximum number of frames per second.\n\
 LetterMonster -> visible_size. TODO.\n\
 LetterMonster -> bp. It's a Backpack instance. All helper functions can be accessed through it.\n\
 LetterMonster -> Filters. List with all valid filter names, used in Consume function.\n\
@@ -57,9 +150,11 @@ LetterMonster -> Patterns. List with all valid pattern names, used in Consume fu
         self.DEBUG = True
         #
         self.body = {}
-        self.max_morph_rate = 1
+        self.max_fps = 10
+        self.fps_nr = 0
         self.visible_size = (100, 100)
-        self.bp = Backpack() # Helper functions instance.
+        self.VA = VActions() # Helper functions instance.
+        self.EA = EActions() # Helper functions instance.
         #
         self.Filters = ( 'BLUR', 'SMOOTH', 'SMOOTH_MORE', 'DETAIL', 'SHARPEN', # All valid filters.
                          'CONTOUR', 'EDGE_ENHANCE', 'EDGE_ENHANCE_MORE' )
@@ -85,10 +180,10 @@ LetterMonster -> Patterns. List with all valid pattern names, used in Consume fu
     #
 #---------------------------------------------------------------------------------------------------
     #
-    def Hatch(self, visible_size=(100,100), max_morph_rate=1):
+    def Hatch(self, visible_size=(100,100), max_fps=10):
         '''Setup the engine.'''
         self.visible_size = visible_size
-        self.max_morph_rate = max_morph_rate
+        self.max_fps = max_fps
         #
     #
 #---------------------------------------------------------------------------------------------------
@@ -135,7 +230,7 @@ LMGL file format is nothing more than a cPickle or YAML dump of LetterMonster bo
         else: # If not GZIP, BZ2, or YAML...
             print( 'Letter-Monster snarls: "`%s` canoot be opened! It\'s neither GZIP, BZ2 or YAML!"' % lmgl ) ; return 1
         #
-        self.body = vLmgl # On load, old body is COMPLETELY overwritten.
+        self.body = vLmgl # On load, old body is COMPLETELY overwritten!
         vInput.close() ; del vInput
         self.__validate()
         #
@@ -260,7 +355,7 @@ All macro instructions are : new, del, ren, change.\n\
                 vFunc = vInstr['f']      # Save function name, then delete this mapping.
                 del vInstr['f']          # All vector function-calls are backpack functions.
                 #
-                f = getattr(self.bp, vFunc, 'Error') # Save the function call.
+                f = getattr(self.VA, vFunc, 'Error') # Save the function call.
                 #
                 if f!='Error': # If function is not Error, means it's valid.
                     #
@@ -464,8 +559,13 @@ Valid outputs are : pygame and pyglet.\n\
         if not format in ('pygame', 'pyglet'):
             print( 'Letter-Monster snarls: "Cannot render in `%s` format! Exiting!"' % format )
         #
-        try: vOutput = FlattenLayers( self.body )
-        except: print( 'Letter-Monster snarls: "Flatten body layers returned an error! Cannot render!"' )
+        global vCanLoop, vFrame
+        #
+        for x in range(2): # Start a few FlattenLayers threads.
+            thread.start_new_thread( FlattenLayers, (self.body, True), )
+            time.sleep(0.1)
+        #
+        thread.start_new_thread( QController, (1,), ) # Start Controller function.
         #
         if format=='pygame': # Pygame render.
             try: import pygame
@@ -480,15 +580,19 @@ Valid outputs are : pygame and pyglet.\n\
             while 1:
                 for event in pygame.event.get():
                     if event.type in (pygame.QUIT, pygame.KEYDOWN):
+                        vCanLoop = False
                         print( 'Letter-Monster says: "Key pressed, exiting..."' )
                         pygame.quit() ; return
-                    #
-                    i = 1
-                    for vLine in vOutput:
-                        vFR = vFont.render(''.join(vLine), True, (0,255,255))
-                        vScreen.blit(vFR, (1,i))
-                        i += vHeight
-                    pygame.display.flip()
+                #
+                vScreen.fill((0,0,0))
+                #
+                i = 1
+                for vLine in vFrame:
+                    vFR = vFont.render(''.join(vLine), True, (0,255,255))
+                    vScreen.blit(vFR, (1,i))
+                    i += vHeight
+                #
+                pygame.display.flip()
                 #
             #
         elif format=='pyglet': # Pyglet render.
@@ -496,15 +600,16 @@ Valid outputs are : pygame and pyglet.\n\
             except: print( 'Letter-Monster snarls: "Could not import Pyglet! Make sure you downloaded and installed it. Check http://www.pyglet.org. Exiting!"' )
             #
             window = pyglet.window.Window(width=800, height=600, caption='Pyglet render', resizable=False, style=None, fullscreen=False, visible=True, vsync=True)
-            label = pyglet.text.Label( text=''.join ( np.hstack( np.hstack( (i,np.array([u'\n'],'U')) ) for i in vOutput ) ).encode('utf8'),
-                font_name='Lucida Console', font_size=8, x=1, y=window.height-1, width=len(vOutput[0]), anchor_x='left', anchor_y='top', multiline=True)
+            label = pyglet.text.Label( text='', font_name='Lucida Console', font_size=8, x=1, y=window.height-1, width=len(vFrame[0]), anchor_x='left', anchor_y='top', multiline=True)
             #
             @window.event
             def on_key_press(symbol, modifiers):
+                vCanLoop = False
                 print( 'Letter-Monster says: "Key pressed, exiting..."' )
                 window.close()
             @window.event
             def on_draw():
+                label.text = u''.join ( np.hstack( np.hstack( (i,np.array([u'\n'],'U')) ) for i in vFrame ) )
                 window.clear()
                 label.draw()
             #
