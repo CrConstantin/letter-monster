@@ -1,6 +1,6 @@
 # -*- coding: latin-1 -*-
 '''
-    Letter-Monster Engine v0.2.2 \n\
+    Letter-Monster Engine v0.2.5 \n\
     Copyright © 2009, Cristi Constantin. All rights reserved. \n\
     This module contains Letter-Monster class with all its functions. \n\
 '''
@@ -18,8 +18,8 @@ import zlib, gzip, bz2           # Compress and decompress data.
 from time import clock           # Timing operations.
 sys.path.insert(0, os.getcwd() ) # Save current dir in path.
 
-#try: from psyco import profile ; profile() # Performance boost.
-#except: pass                               # If Psyco is not available, pass.
+try: import psyco                # Performance boost.
+except: pass                     # If Psyco is not available, pass.
 from _classes import *
 
 
@@ -63,8 +63,7 @@ Function returns the flatened result, as Rectangular Unicode Numpy Array.\n\
         #
         # If Body has one layer, return it. There is nothing to flatten.
         if len(vInput)==1:
-            #tf = clock()
-            #print( 'Flatten Layers took %.4f seconds.' % (tf-ti) )
+            vOutput = vInput.values()[0].data
             FrameBuffer.put( vOutput, True, None )
             if not vThreading: return vOutput
         #
@@ -127,7 +126,7 @@ def QController( max_fps=1 ):
     #
 #
 
-
+#
 
 class LetterMonster:
     '''
@@ -199,6 +198,10 @@ LMGL file format is nothing more than a cPickle or YAML dump of LetterMonster bo
             vInput.close() ; del vInput
         except: print( 'Letter-Monster snarls: "`%s` is not a valid path!"' % lmgl ) ; return 1
         #
+        if self.body.has_key('onload'): # If there is a layer called OnLoad.
+            try: self._Execute( self.body['onload'].affect_macro ) # Try to execute affected macro.
+            except: print( 'Letter-Monster snarls: "Cannot execute ONLOAD instruction!"' )
+        #
         ti = clock()
         #
         if v3=='\x1f\x8b\x08': # LMGL file is GZIP format. Only cPickle is saved in here.
@@ -252,6 +255,10 @@ You should also check Load function.\n\
         except: pass # If file exists, pass.
         #
         ti = clock()
+        #
+        if self.body.has_key('onsave'): # If there is a layer called OnSave.
+            try: self._Execute( self.body['onsave'].affect_macro ) # Try to execute affected macro.
+            except: print( 'Letter-Monster snarls: "Cannot execute ONSAVE instruction!"' )
         #
         if mode=='p:gzip':
             vInput = gzip.open( lmgl, 'w', 8 )
@@ -310,8 +317,8 @@ Valid LMGL file should respect this:\n\
             except: pass # If object doesn't have "data", pass.
             #
             try: # Try to get information about object instructions.
-                if not str(type(vElem.instructions))=="<type 'dict'>":
-                    print( 'Letter-Monster growls: "Be warned! %s object `%s` instructions is not a dictionary!"'
+                if not ( str(type(vElem.instructions))=="<type 'list'>" and str(type(vElem.instructions[0]))=="<type 'dict'>" ):
+                    print( 'Letter-Monster growls: "Be warned! %s object `%s` instructions is not a list of dictionaries!"'
                         % (str(vElem),vKey) )
             except: pass # If object doesn't have "instructions", pass.
             #
@@ -332,10 +339,9 @@ Valid LMGL file should respect this:\n\
     #
 #---------------------------------------------------------------------------------------------------
     #
-    def _Execute(self, object, instruct_name):
+    def _Execute(self, object):
         '''Execute instructions stored inside Vector or Macro layers.\n\
 "object" must be the name of a LatterMonster layer that containins instructions.\n\
-"instruct_name" must be the name of the instruction.\n\
 All vector instructions are : Rotate90Right, Rotate90Left, FlipH, FlipV, Reverse, StripRightSpace, StripLeftSpace,\n\
 AlignRight, AlignLeft, Center, Crop, Border, RightBorder, LeftBorder.\n\
 All macro instructions are : new, del, ren, change.\n\
@@ -343,7 +349,7 @@ All macro instructions are : new, del, ren, change.\n\
         #
         try:
             vElem = self.body[object]
-            vInstructions = vElem.instructions[instruct_name]
+            vInstructions = vElem.instructions
         except: print( 'Letter-Monster snarls: "`%s` is not an object from my body, or it doesn\'t have valid instructions! I refuse to execute!"' % object ) ; return
         #
         if not vInstructions:
@@ -429,6 +435,9 @@ Later, you can export this "consumed" image into TXT, CSV, HTM, or whatever suit
 or you can Save its representation as LMGL.\n\
 '''
         #
+        try: psyco.profile()
+        except: pass
+        #
         try: vInput = Image.open( image )
         except:
             print( 'Letter-Monster snarls: "`%s` is not a valid image path, or Python-Imaging cannot open that type of file! Cannot consume!"'
@@ -513,21 +522,24 @@ or you can Save its representation as LMGL.\n\
     #
 #---------------------------------------------------------------------------------------------------
     #
-    def Spit(self, format='CMD', autoclear=False):
+    def Spit(self, format='py', autoclear=False):
         '''
 Frame-by-frame render function. Represents LetterMonster body.\n\
 All visible Raster and Vector layers are flattened and the result is sent to the specified output.\n\
 Valid outputs are : CMD, SH.\n\
 '''
         #
-        if not format in ('CMD', 'SH'):
+        if not format in ('py', 'CMD', 'SH'):
             print( 'Letter-Monster snarls: "Cannot spit in `%s` format! Exiting!"' % format )
         #
         try: vOutput = FlattenLayers( self.body )
         except: print( 'Letter-Monster snarls: "Flatten body layers returned an error! Cannot spit!"' )
         #
-        if format=='CMD':
-            if autoclear: vCmd = ['cls'] # If autoclear, clear the screen.
+        if format=='py':
+            print u''.join ( np.hstack( np.hstack( (i,np.array([u'\n'],'U')) ) for i in vOutput ) )
+        #
+        elif format=='CMD':
+            if autoclear: vCmd = ['cls'] # If autoclear, add command to clear the screen.
             else: vCmd = []
             #
             for vLine in vOutput:
@@ -537,7 +549,7 @@ Valid outputs are : CMD, SH.\n\
             os.system( '&'.join(vCmd) ) # Execute Windows command!
             #
         elif format=='SH':
-            if autoclear: vCmd = ['clear'] # If autoclear, clear the screen.
+            if autoclear: vCmd = ['clear'] # If autoclear, add command to clear the screen.
             else: vCmd = []
             #
             for vLine in vOutput:
@@ -639,15 +651,15 @@ Valid formats are : txt, csv, html, bmp, gif, jpg, png.\n\
         if out not in ('txt', 'csv', 'html', 'bmp', 'gif', 'jpg', 'png'):
             print( 'Letter-Monster growls: "I cannot export in `%s` type! Exiting spawn!' % out ) ; return 1
         #
-        #try: 
-        vOutput = FlattenLayers( vLmgl )
-        #except: print( 'Letter-Monster snarls: "Flatten body layers returned an error! Cannot spawn!"' )
+        try: vOutput = FlattenLayers( vLmgl )
+        except: print( 'Letter-Monster snarls: "Flatten body layers returned an error! Cannot spawn!"' )
         #
         tti = clock() # Local counter.
         #
         if out=='txt':
             vOut = open( filename+'.'+out, 'w' ) # Filename + Extension.
-            vOut.write( ''.join ( np.hstack( np.hstack( (i,np.array([u'\n'],'U')) ) for i in vOutput # Concatenate all arrays with an array containing ['\n'].
+            vOut.write( ''.join ( np.hstack(
+                                            np.hstack( (i,np.array([u'\n'],'U')) ) for i in vOutput # Concatenate all arrays with an array containing ['\n'].
                                            )
                                 ).encode('utf8')
                       )

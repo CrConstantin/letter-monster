@@ -48,6 +48,7 @@ except: print "Error on importing Example_LetterMonster_Render!"
 try: import Example_LetterMonster_Spit
 except: print "Error on importing Example_LetterMonster_Spit!"
 
+# Del pyc and lmgl.
 pyc = glob.glob( '*.pyc' )
 for p in pyc:
     try: os.remove( p )

@@ -1,6 +1,6 @@
 # -*- coding: latin-1 -*-
 '''
-Letter-Monster Engine v0.2.2.
+Letter-Monster Engine v0.2.5
 Copyright © 2009, Cristi Constantin. All rights reserved.
 This module generates a test LMGL file to play with. You can use it for Spawn, Spit or Execute.
 '''
@@ -35,7 +35,7 @@ instruct = [
     {'f':'StripLeftSpace','Input':'vect1'},
     {'f':'Border','Input':'vect1','Char':'='}
     ]
-v = Vector( name = 'vect1', instructions={'autorun':instruct}, offset = (0,0), z = 2, )
+v = Vector( name = 'vect1', instructions=instruct, offset = (0,0), z = 2, )
 lm.body[ v.name ] = v
 del v ; del instruct
 
@@ -49,7 +49,7 @@ instruct = [
     {'f':'change', 'name':'event222', 'affects':'new aff'},
     {'f':'del', 'name':'event222'},
     ]
-m = Macro( name = 'macro1', instructions={'autorun':instruct} )
+m = Macro( name = 'macro1', instructions=instruct )
 lm.body[ m.name ] = m
 del m ; del instruct
 
