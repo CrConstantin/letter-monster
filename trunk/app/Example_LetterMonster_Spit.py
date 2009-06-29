@@ -1,6 +1,6 @@
 # -*- coding: latin-1 -*-
 '''
-Letter-Monster Engine v0.2.2.
+Letter-Monster Engine v0.2.5
 Copyright © 2009, Cristi Constantin. All rights reserved.
 This is a simple example for rendering a LMGL file on the screen, via Windows Command / Linux SH.
 '''

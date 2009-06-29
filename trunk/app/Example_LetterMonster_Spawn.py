@@ -1,6 +1,6 @@
 # -*- coding: latin-1 -*-
 '''
-Letter-Monster Engine v0.2.2.
+Letter-Monster Engine v0.2.5
 Copyright © 2009, Cristi Constantin. All rights reserved.
 Spawn is Export function.
 '''
@@ -13,7 +13,7 @@ lm = LetterMonster()
 lm.DEBUG = True
 
 print( 'Loading...\n' )
-lm.Load( 'test.lmgl' )
+lm.Load( 'test_bord.lmgl' )
 
 print( 'Spawning...\n' )
 lm.Spawn( out='txt' )

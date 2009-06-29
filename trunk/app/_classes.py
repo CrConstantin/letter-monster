@@ -1,6 +1,6 @@
 # -*- coding: latin-1 -*-
 '''
-    Letter-Monster Engine v0.2.2 \n\
+    Letter-Monster Engine v0.2.5 \n\
     Copyright © 2009, Cristi Constantin. All rights reserved.\n\
     This module contains Backpack class, with all helper functions and all layer types : Raster, Vector, Event and Macro.\n\
 '''
