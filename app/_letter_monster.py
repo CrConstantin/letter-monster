@@ -22,9 +22,9 @@ try: import psyco                # Performance boost.
 except: pass                     # If Psyco is not available, pass.
 from _classes import *
 
+#
 
-
-print 'I am LM r48!'
+print 'I am LM r50 !'
 
 #
 # Define YAML represent for numpy ndarray.
@@ -44,27 +44,26 @@ def sort_zorder(x):
     return x.z
 #
 
-FrameBuffer = Queue.Queue(5) # Queue with 5.
+FrameBuffer = Queue.Queue(2) # Queue with 4 slots.
 vCanLoop = True              # Used in all threading functions.
-vFrame = ''
 
 #
+
 def FlattenLayers( vInput, vThreading=False ):
     '''
 This function takes as input a dictionary containing layers, like LetterMonster.body.\n\
 Only layers that have a "data" attribute (Raster and Vector) can be rendered.\n\
-Function returns the flatened result, as Rectangular Unicode Numpy Array.\n\
+Function pushes the flatened result (as Rectangular Unicode Numpy Array) into FrameBuffer.\n\
 '''
     #
-    global vCanLoop
-    while vCanLoop:
-        #
-        #ti = clock()
+    global vCanLoop, FrameBuffer
+    #
+    while vCanLoop: # Loop Flatten Layers ...
         #
         # If Body has one layer, return it. There is nothing to flatten.
         if len(vInput)==1:
             vOutput = vInput.values()[0].data
-            FrameBuffer.put( vOutput, True, None )
+            FrameBuffer.put( vOutput, True ) # Put data in Queue when there's one free slot.
             if not vThreading: return vOutput
         #
         S0 = 0 ; S1 = 0
@@ -104,25 +103,9 @@ Function returns the flatened result, as Rectangular Unicode Numpy Array.\n\
                 #
             # If not Raster or Vector, pass.
         #
-        #tf = clock()
-        #print( 'Flatten Layers took %.4f seconds.' % (tf-ti) )
-        FrameBuffer.put( vOutput, True, None )
+        FrameBuffer.put( vOutput, True ) # Put data in Queue when there's one free slot.
         if not vThreading: return vOutput
         #
-    #
-#
-
-#
-def QController( max_fps=1 ):
-    global vCanLoop, vFrame
-    x = 1
-    #
-    while vCanLoop:
-        vFrame = FrameBuffer.get()
-        print 'Rendering', x
-        x += 1
-        FrameBuffer.task_done()
-        time.sleep(max_fps)
     #
 #
 
@@ -140,6 +123,7 @@ Initializes the engine.\n\
 LetterMonster -> DEBUG. If False, debug messages will not be printed.\n\
 LetterMonster -> body. This dictionary contains all layers loaded from LMGL and saved into LMGL.\n\
 LetterMonster -> max_fps. Maximum number of frames per second.\n\
+LetterMonster -> fps_nr. Current frame number.\n\
 LetterMonster -> visible_size. TODO.\n\
 LetterMonster -> bp. It's a Backpack instance. All helper functions can be accessed through it.\n\
 LetterMonster -> Filters. List with all valid filter names, used in Consume function.\n\
@@ -149,7 +133,7 @@ LetterMonster -> Patterns. List with all valid pattern names, used in Consume fu
         self.DEBUG = True
         #
         self.body = {}
-        self.max_fps = 10
+        self.max_fps = 0.5
         self.fps_nr = 0
         self.visible_size = (100, 100)
         self.VA = VActions() # Helper functions instance.
@@ -198,10 +182,6 @@ LMGL file format is nothing more than a cPickle or YAML dump of LetterMonster bo
             vInput.close() ; del vInput
         except: print( 'Letter-Monster snarls: "`%s` is not a valid path!"' % lmgl ) ; return 1
         #
-        if self.body.has_key('onload'): # If there is a layer called OnLoad.
-            try: self._Execute( self.body['onload'].affect_macro ) # Try to execute affected macro.
-            except: print( 'Letter-Monster snarls: "Cannot execute ONLOAD instruction!"' )
-        #
         ti = clock()
         #
         if v3=='\x1f\x8b\x08': # LMGL file is GZIP format. Only cPickle is saved in here.
@@ -235,6 +215,11 @@ LMGL file format is nothing more than a cPickle or YAML dump of LetterMonster bo
         #
         self.body = vLmgl # On load, old body is COMPLETELY overwritten!
         vInput.close() ; del vInput
+        #
+        #if self.body.has_key('onload'): # If there is a layer called OnLoad.
+        #    try: self._Execute( self.body['onload'].call_macro ) # Try to call affected macro.
+        #    except: print( 'Letter-Monster snarls: "Cannot execute ONLOAD instruction!"' )
+        #
         self.__validate()
         #
         tf = clock()
@@ -256,9 +241,9 @@ You should also check Load function.\n\
         #
         ti = clock()
         #
-        if self.body.has_key('onsave'): # If there is a layer called OnSave.
-            try: self._Execute( self.body['onsave'].affect_macro ) # Try to execute affected macro.
-            except: print( 'Letter-Monster snarls: "Cannot execute ONSAVE instruction!"' )
+        #if self.body.has_key('onsave'): # If there is a layer called OnSave.
+        #    try: self._Execute( self.body['onsave'].call_macro ) # Try to execute affected macro.
+        #    except: print( 'Letter-Monster snarls: "Cannot execute ONSAVE instruction!"' )
         #
         if mode=='p:gzip':
             vInput = gzip.open( lmgl, 'w', 8 )
@@ -292,32 +277,38 @@ You should also check Load function.\n\
         '''
 Private validation function. After load or save, each LMGL file MUST be validated.\n\
 Errors are printed in console, but cannot be fixed. It is your responsability to do the fixing.\n\
-Valid LMGL file should respect this:\n\
+Valid LMGL file should respect the following :\n\
  - internal name of all layers must be the same as the key used to acces them, in LetterMonster body.\n\
- - data of Raster and Vector layers must be Rectangular Numpy Arrays.\n\
- - instructions of Vector and Macro layers must be a dictionary.\n\
- - offset of Raster and Vector layers must be tuples of 2 integers.\n\
- - transparent of Raster and Vector layers must be a unicode string.\n\
+ - data of a Raster or a Vector layer must be a Rectangular Numpy Array.\n\
+ - instructions of a Vector or a Macro layer must be a tuple/list of dictionaries.\n\
+ - offset of a Raster or Vector layer must be a tuple/list of 2 integers.\n\
+ - transparent of Raster or a Vector layer must be a unicode string.\n\
 '''
         #
+        result = True
         body = self.body
         #
         if not body:
+            result = False
             print( 'Letter-Monster snarls: "My body is empty! I have nothing to validate."' ) ; return
         #
         for vKey, vElem in body.items():
             if vKey!=vElem.name: # If body name is not the same as internal object name...
+                result = False
                 print( 'Letter-Monster growls: "Be warned! Inside my body, %s object label is ambiguous! Body name is `%s` and object name is `%s`!"'
                     % (str(vElem),vKey,vElem.name) )
             #
             try: # Try to get information about object data.
                 if not ( str(type(vElem.data))=="<type 'numpy.ndarray'>" and str(type(vElem.data[0]))=="<type 'numpy.ndarray'>" ):
+                    result = False
                     print( 'Letter-Monster growls: "Be warned! %s object `%s` data is not a valid rectangular Numpy Array!"'
                         % (str(vElem),vKey) )
             except: pass # If object doesn't have "data", pass.
             #
             try: # Try to get information about object instructions.
-                if not ( str(type(vElem.instructions))=="<type 'list'>" and str(type(vElem.instructions[0]))=="<type 'dict'>" ):
+                if not ( (str(type(vElem.instructions))=="<type 'list'>" or str(type(vElem.instructions))=="<type 'tuple'>")
+                and str(type(vElem.instructions[0]))=="<type 'dict'>" ):
+                    result = False
                     print( 'Letter-Monster growls: "Be warned! %s object `%s` instructions is not a list of dictionaries!"'
                         % (str(vElem),vKey) )
             except: pass # If object doesn't have "instructions", pass.
@@ -325,23 +316,27 @@ Valid LMGL file should respect this:\n\
             try: # Try to get information about objects offset.
                 if not ( (str(type(vElem.offset))=="<type 'list'>" or str(type(vElem.offset))=="<type 'tuple'>")
                 and str(type(vElem.offset[0]))=="<type 'int'>" and len(vElem.offset)==2 ):
+                    result = False
                     print( 'Letter-Monster growls: "Be warned! %s object `%s` offset is not a list with two integers!"'
                         % (str(vElem),vKey) )
             except: pass # If object doesn't have "offset", pass.
             #
             try: # Try to get information about object transparent.
                 if not str(type(vElem.transparent))=="<type 'unicode'>":
+                    result = False
                     print( 'Letter-Monster growls: "Be warned! %s object `%s` transparent is not a unicode string!"'
                         % (str(vElem),vKey) )
             except: pass # If object doesn't have "transparent", pass.
             #
+        #
+        return result # Will probably need this.
         #
     #
 #---------------------------------------------------------------------------------------------------
     #
     def _Execute(self, object):
         '''Execute instructions stored inside Vector or Macro layers.\n\
-"object" must be the name of a LatterMonster layer that containins instructions.\n\
+"object" is the name of a LatterMonster layer that containins instructions.\n\
 All vector instructions are : Rotate90Right, Rotate90Left, FlipH, FlipV, Reverse, StripRightSpace, StripLeftSpace,\n\
 AlignRight, AlignLeft, Center, Crop, Border, RightBorder, LeftBorder.\n\
 All macro instructions are : new, del, ren, change.\n\
@@ -353,7 +348,7 @@ All macro instructions are : new, del, ren, change.\n\
         except: print( 'Letter-Monster snarls: "`%s` is not an object from my body, or it doesn\'t have valid instructions! I refuse to execute!"' % object ) ; return
         #
         if not vInstructions:
-            print( 'Letter-Monster growls: "`%s` has NULL instructions! I refuse to execute!"' % object ) ; return
+            print( 'Letter-Monster growls: "`%s` has NULL instructions! I have nothing to execute!"' % object ) ; return
         #
         ti = clock()
         if str(vElem)=='vector': # Execute vector instructions.
@@ -382,12 +377,13 @@ All macro instructions are : new, del, ren, change.\n\
                     print( 'Letter-Monster growls: "I don\'t know any `%s` function! I refuse to execute!"' % (object,vFunc) ) ; return
                 #
             #
+        #
         elif str(vElem)=='macro':
             for vInstr in vInstructions: # For each instruction in macro instructions list.
                 try: vName = vInstr['name']
                 except: print( 'Letter-Monster growls: "Can\'t access `name` attribute in Macro `%s` instruction! I refuse to execute!"' % object ) ; return
                 #
-                if vInstr['f']=='new':   # Create new layer.
+                if vInstr['f']=='new':   # Instruction to create new layer.
                     vNew = vInstr['layer'].title()
                     if self.body.has_key( vName ):
                         print( 'Letter-Monster growls: "Layer `%s` already exists! I refuse to create new!"' % vName ) ; return
@@ -400,11 +396,11 @@ All macro instructions are : new, del, ren, change.\n\
                     elif vNew=='Event':
                         self.body[vName] = Event()
                 #
-                elif vInstr['f']=='del': # Delete a layer.
+                elif vInstr['f']=='del': # Instruction to delete a layer.
                     try: del self.body[vName]
                     except: print( 'Letter-Monster growls: "Layer `%s` doesn\'t exist! I refuse to delete!"' % vName ) ; return
                 #
-                elif vInstr['f']=='ren': # Rename a layer.
+                elif vInstr['f']=='ren': # Instruction to rename a layer.
                     vNewname = vInstr['newname']
                     if self.body.has_key( vNewname ):
                         print( 'Letter-Monster growls: "Layer `%s` already exists! I refuse to rename!"' % vName ) ; return
@@ -412,7 +408,7 @@ All macro instructions are : new, del, ren, change.\n\
                     self.body[vNewname].name = vNewname
                     del self.body[vName]
                 #
-                elif vInstr['f']=='change': # Change attributes of a layer.
+                elif vInstr['f']=='change': # Instruction to change attributes of a layer.
                     del vInstr['f']
                     try: self.body[vName].__dict__ = vInstr
                     except: print( 'Letter-Monster growls: "Cannot change attributes for `%s` layer!"' % vName ) ; return
@@ -577,11 +573,11 @@ Valid outputs are : pygame and pyglet.\n\
             thread.start_new_thread( FlattenLayers, (self.body, True), )
             time.sleep(0.1)
         #
-        thread.start_new_thread( QController, (1,), ) # Start Controller function.
+        #thread.start_new_thread( QController, (1,), ) # Start Controller function.
         #
         if format=='pygame': # Pygame render.
             try: import pygame
-            except: print( 'Letter-Monster snarls: "Could not import Pygame! Make sure you downloaded and installed it. Check http://www.pygame.org. Exiting!"' )
+            except: print( 'Letter-Monster snarls: "Could not import Pygame! Make sure you downloaded and installed it. Check http://www.pygame.org. Exiting!"' ) ; return
             pygame.init()
             #
             vSize = width, height = 320, 240
@@ -590,29 +586,47 @@ Valid outputs are : pygame and pyglet.\n\
             vHeight = vFont.get_height()
             #
             while 1:
+                #
+                self.fps_nr += 1 # Increment Frame Number.
+                #
+                #ti = clock()
+                #time.sleep( 0.01 )
+                print 'rendering frame', self.fps_nr
+                #if self.body.has_key('onrender'): # If there is a layer called OnRender.
+                #    try: self._Execute( self.body['onrender'].call_macro ) # Try to execute affected macro.
+                #    except: print( 'Letter-Monster snarls: "Cannot execute OnRender instruction!"' ) ; return
+                render_time = self.max_fps #- (clock()-ti)
+                #
+                if render_time>0: # If time for executing OnRender is bigger than 0...
+                    time.sleep( render_time ) # Sleep a little...
+                #
                 for event in pygame.event.get():
                     if event.type in (pygame.QUIT, pygame.KEYDOWN):
                         vCanLoop = False
                         print( 'Letter-Monster says: "Key pressed, exiting..."' )
                         pygame.quit() ; return
                 #
-                vScreen.fill((0,0,0))
+                vScreen.fill((0, 0, 0)) # Paint screen with black.
                 #
+                vFrame = FrameBuffer.get()
+                FrameBuffer.task_done()
                 i = 1
+                #
                 for vLine in vFrame:
-                    vFR = vFont.render(''.join(vLine), True, (0,255,255))
+                    vFR = vFont.render(''.join(vLine), True, (0, 255, 255)) # Render font with blue.
                     vScreen.blit(vFR, (1,i))
                     i += vHeight
                 #
                 pygame.display.flip()
                 #
             #
+        #
         elif format=='pyglet': # Pyglet render.
             try: import pyglet
-            except: print( 'Letter-Monster snarls: "Could not import Pyglet! Make sure you downloaded and installed it. Check http://www.pyglet.org. Exiting!"' )
+            except: print( 'Letter-Monster snarls: "Could not import Pyglet! Make sure you downloaded and installed it. Check http://www.pyglet.org. Exiting!"' ) ; return
             #
             window = pyglet.window.Window(width=800, height=600, caption='Pyglet render', resizable=False, style=None, fullscreen=False, visible=True, vsync=True)
-            label = pyglet.text.Label( text='', font_name='Lucida Console', font_size=8, x=1, y=window.height-1, width=len(vFrame[0]), anchor_x='left', anchor_y='top', multiline=True)
+            label = pyglet.text.Label( text='', font_name='Lucida Console', font_size=8, x=1, y=window.height-1, width=1, anchor_x='left', anchor_y='top', multiline=True)
             #
             @window.event
             def on_key_press(symbol, modifiers):
@@ -621,6 +635,22 @@ Valid outputs are : pygame and pyglet.\n\
                 window.close()
             @window.event
             def on_draw():
+                self.fps_nr += 1 # Increment Frame Number.
+                #
+                #ti = clock()
+                #time.sleep( 0.01 )
+                print 'rendering frame', self.fps_nr
+                #if self.body.has_key('onrender'): # If there is a layer called OnRender.
+                #    try: self._Execute( self.body['onrender'].call_macro ) # Try to execute affected macro.
+                #    except: print( 'Letter-Monster snarls: "Cannot execute OnRender instruction!"' ) ; return
+                render_time = self.max_fps #- (clock()-ti)
+                #
+                if render_time>0: # If time for executing OnRender is bigger than 0...
+                    time.sleep( render_time ) # Sleep a little...
+                #
+                vFrame = FrameBuffer.get()
+                FrameBuffer.task_done()
+                label.width = len(vFrame[0])
                 label.text = u''.join ( np.hstack( np.hstack( (i,np.array([u'\n'],'U')) ) for i in vFrame ) )
                 window.clear()
                 label.draw()

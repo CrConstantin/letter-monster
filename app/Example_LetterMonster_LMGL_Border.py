@@ -13,6 +13,7 @@ from _letter_monster import LetterMonster
 lm = LetterMonster()
 lm.DEBUG = True
 
+# Background layer.
 r = Raster(
     name = 'raster1',
     visible = True,
@@ -22,6 +23,7 @@ r = Raster(
 lm.body[ r.name ] = r
 del r
 
+# Some text layer.
 r = Raster(
     name = 'raster2',
     visible = True,
@@ -32,6 +34,7 @@ r = Raster(
 lm.body[ r.name ] = r
 del r
 
+# Text layer no 2.
 r = Raster(
     name = 'raster3',
     visible = True,

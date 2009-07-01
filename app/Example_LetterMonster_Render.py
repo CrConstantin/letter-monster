@@ -12,7 +12,7 @@ from _letter_monster import LetterMonster
 lm = LetterMonster()
 lm.DEBUG = True
 
-lm.Load( 'test_bord.lmgl' )
+lm.Load( 'test_event.lmgl' )
 print
 
 lm.Render('pygame')
