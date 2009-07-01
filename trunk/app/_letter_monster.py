@@ -24,7 +24,7 @@ from _classes import *
 
 #
 
-print 'I am LM r50 !'
+print 'I am LM r52 !'
 
 #
 # Define YAML represent for numpy ndarray.
@@ -44,7 +44,7 @@ def sort_zorder(x):
     return x.z
 #
 
-FrameBuffer = Queue.Queue(2) # Queue with 4 slots.
+FrameBuffer = Queue.Queue(4) # Queue with 4 slots.
 vCanLoop = True              # Used in all threading functions.
 
 #
@@ -159,116 +159,6 @@ LetterMonster -> Patterns. List with all valid pattern names, used in Consume fu
     def __str__(self):
         '''String representation of the engine. It's just a fun function to have.\n'''
         return 'I am Letter-Monster! Be afraid! Baaah!'
-        #
-    #
-#---------------------------------------------------------------------------------------------------
-    #
-    def Hatch(self, visible_size=(100,100), max_fps=10):
-        '''Setup the engine.'''
-        self.visible_size = visible_size
-        self.max_fps = max_fps
-        #
-    #
-#---------------------------------------------------------------------------------------------------
-    #
-    def Load(self, lmgl):
-        '''
-Load a LMGL (Letter-Monster Graphical Letters) file.\n\
-LMGL file format is nothing more than a cPickle or YAML dump of LetterMonster body, compressed with Gzip or BZ2.\n\
-'''
-        try:
-            vInput = open( lmgl ) # Opening the file just to read first 3 characters.
-            v3 = vInput.read(3)
-            vInput.close() ; del vInput
-        except: print( 'Letter-Monster snarls: "`%s` is not a valid path!"' % lmgl ) ; return 1
-        #
-        ti = clock()
-        #
-        if v3=='\x1f\x8b\x08': # LMGL file is GZIP format. Only cPickle is saved in here.
-            vInput = gzip.open( lmgl, 'r', 8 )
-            if self.DEBUG: print( 'Letter-Monster says: "Found GZIP cPickle."' )
-            #
-            try: vLmgl = cPickle.load( vInput )
-            except: print( 'Letter-Monster snarls: "`%s` file cannot be parsed by cPickle! Failed to load."' % lmgl ) ; return 1
-        #
-        elif v3=='BZh':        # LMGL file is BZ2 format.
-            vInput = bz2.BZ2File( lmgl, 'r', 0, 8 )
-            if self.DEBUG: print( 'Letter-Monster says: "Found BZ2 cPickle or YAML."' )
-            success = False
-            #
-            try: vLmgl = cPickle.load( vInput ) ; success = True
-            except: pass
-            if not success:
-                vInput.seek(0)
-                try: vLmgl = yaml.load( vInput )
-                except: print( 'Letter-Monster snarls: "`%s` file is neither cPickle, nor YAML! Failed to load."' % lmgl ) ; return 1
-        #
-        elif v3=='---':        # LMGL file is raw YAML.
-            vInput = open( lmgl, 'rb', 0 )
-            if self.DEBUG: print( 'Letter-Monster says: "Found raw YAML."' )
-            #
-            try: vLmgl = yaml.load( vInput )
-            except: print( 'Letter-Monster snarls: "`%s` file cannot be parsed by YAML! Failed to load."' % lmgl ) ; return 1
-        #
-        else: # If not GZIP, BZ2, or YAML...
-            print( 'Letter-Monster snarls: "`%s` canoot be opened! It\'s neither GZIP, BZ2 or YAML!"' % lmgl ) ; return 1
-        #
-        self.body = vLmgl # On load, old body is COMPLETELY overwritten!
-        vInput.close() ; del vInput
-        #
-        #if self.body.has_key('onload'): # If there is a layer called OnLoad.
-        #    try: self._Execute( self.body['onload'].call_macro ) # Try to call affected macro.
-        #    except: print( 'Letter-Monster snarls: "Cannot execute ONLOAD instruction!"' )
-        #
-        self.__validate()
-        #
-        tf = clock()
-        if self.DEBUG: print( 'Letter-Monster says: "Loading LMGL took %.4f seconds total."' % (tf-ti) )
-        #
-    #
-#---------------------------------------------------------------------------------------------------
-    #
-    def Save(self, lmgl, mode='p:gzip'):
-        '''
-Save body into a LMGL (Letter-Monster Graphical Letters) file.\n\
-Valid modes are : p:gzip (cPickle in gzip file), p:bz2 (cPickle in bz2 file), y:bz2 (YAML in bz2 file), y (YAML).\n\
-You should also check Load function.\n\
-'''
-        try:
-            vInput = open( lmgl )
-            print( 'Letter-Monster snarls: "`%s` is a LMGL file! I refuse to overwrite!"' % lmgl ) ; return 1
-        except: pass # If file exists, pass.
-        #
-        ti = clock()
-        #
-        #if self.body.has_key('onsave'): # If there is a layer called OnSave.
-        #    try: self._Execute( self.body['onsave'].call_macro ) # Try to execute affected macro.
-        #    except: print( 'Letter-Monster snarls: "Cannot execute ONSAVE instruction!"' )
-        #
-        if mode=='p:gzip':
-            vInput = gzip.open( lmgl, 'w', 8 )
-            cPickle.dump(self.body, vInput, 2)
-        #
-        elif mode=='p:bz2':
-            vInput = bz2.BZ2File( lmgl, 'w', 0, 8 )
-            cPickle.dump(self.body, vInput, 2)
-        #
-        elif mode=='y:bz2':
-            vInput = bz2.BZ2File( lmgl, 'w', 0, 8 )
-            yaml.dump(self.body, stream=vInput, width=125, indent=2, canonical=False, default_flow_style=False,
-                explicit_start=True, explicit_end=True)
-        #
-        elif mode=='y':
-            vInput = open( lmgl, 'w', 0 )
-            yaml.dump(self.body, stream=vInput, width=125, indent=2, canonical=False, default_flow_style=False,
-                explicit_start=True, explicit_end=True)
-        #
-        else: print( 'Letter-Monster snarls: "`%s` is not a valid mode to save LMGL files!"' % mode ) ; return 1
-        #
-        vInput.close() ; del vInput
-        self.__validate()
-        tf = clock()
-        if self.DEBUG: print( 'Letter-Monster says: "Saving LMGL took %.4f seconds total."' % (tf-ti) )
         #
     #
 #---------------------------------------------------------------------------------------------------
@@ -421,6 +311,116 @@ All macro instructions are : new, del, ren, change.\n\
     #
 #---------------------------------------------------------------------------------------------------
     #
+    def Hatch(self, visible_size=(100,100), max_fps=10):
+        '''Setup the engine.'''
+        self.visible_size = visible_size
+        self.max_fps = max_fps
+        #
+    #
+#---------------------------------------------------------------------------------------------------
+    #
+    def Load(self, lmgl):
+        '''
+Load a LMGL (Letter-Monster Graphical Letters) file.\n\
+LMGL file format is nothing more than a cPickle or YAML dump of LetterMonster body, compressed with Gzip or BZ2.\n\
+'''
+        try:
+            vInput = open( lmgl ) # Opening the file just to read first 3 characters.
+            v3 = vInput.read(3)
+            vInput.close() ; del vInput
+        except: print( 'Letter-Monster snarls: "`%s` is not a valid path!"' % lmgl ) ; return 1
+        #
+        ti = clock()
+        #
+        if v3=='\x1f\x8b\x08': # LMGL file is GZIP format. Only cPickle is saved in here.
+            vInput = gzip.open( lmgl, 'r', 8 )
+            if self.DEBUG: print( 'Letter-Monster says: "Found GZIP cPickle."' )
+            #
+            try: vLmgl = cPickle.load( vInput )
+            except: print( 'Letter-Monster snarls: "`%s` file cannot be parsed by cPickle! Failed to load."' % lmgl ) ; return 1
+        #
+        elif v3=='BZh':        # LMGL file is BZ2 format.
+            vInput = bz2.BZ2File( lmgl, 'r', 0, 8 )
+            if self.DEBUG: print( 'Letter-Monster says: "Found BZ2 cPickle or YAML."' )
+            success = False
+            #
+            try: vLmgl = cPickle.load( vInput ) ; success = True
+            except: pass
+            if not success:
+                vInput.seek(0)
+                try: vLmgl = yaml.load( vInput )
+                except: print( 'Letter-Monster snarls: "`%s` file is neither cPickle, nor YAML! Failed to load."' % lmgl ) ; return 1
+        #
+        elif v3=='---':        # LMGL file is raw YAML.
+            vInput = open( lmgl, 'rb', 0 )
+            if self.DEBUG: print( 'Letter-Monster says: "Found raw YAML."' )
+            #
+            try: vLmgl = yaml.load( vInput )
+            except: print( 'Letter-Monster snarls: "`%s` file cannot be parsed by YAML! Failed to load."' % lmgl ) ; return 1
+        #
+        else: # If not GZIP, BZ2, or YAML...
+            print( 'Letter-Monster snarls: "`%s` canoot be opened! It\'s neither GZIP, BZ2 or YAML!"' % lmgl ) ; return 1
+        #
+        self.body = vLmgl # On load, old body is COMPLETELY overwritten!
+        vInput.close() ; del vInput
+        #
+        #if self.body.has_key('onload'): # If there is a layer called OnLoad.
+        #    try: self._Execute( self.body['onload'].call_macro ) # Try to call affected macro.
+        #    except: print( 'Letter-Monster snarls: "Cannot execute ONLOAD instruction!"' )
+        #
+        self.__validate()
+        #
+        tf = clock()
+        if self.DEBUG: print( 'Letter-Monster says: "Loading LMGL took %.4f seconds total."' % (tf-ti) )
+        #
+    #
+#---------------------------------------------------------------------------------------------------
+    #
+    def Save(self, lmgl, mode='p:gzip'):
+        '''
+Save body into a LMGL (Letter-Monster Graphical Letters) file.\n\
+Valid modes are : p:gzip (cPickle in gzip file), p:bz2 (cPickle in bz2 file), y:bz2 (YAML in bz2 file), y (YAML).\n\
+You should also check Load function.\n\
+'''
+        try:
+            vInput = open( lmgl )
+            print( 'Letter-Monster snarls: "`%s` is a LMGL file! I refuse to overwrite!"' % lmgl ) ; return 1
+        except: pass # If file exists, pass.
+        #
+        ti = clock()
+        #
+        #if self.body.has_key('onsave'): # If there is a layer called OnSave.
+        #    try: self._Execute( self.body['onsave'].call_macro ) # Try to execute affected macro.
+        #    except: print( 'Letter-Monster snarls: "Cannot execute ONSAVE instruction!"' )
+        #
+        if mode=='p:gzip':
+            vInput = gzip.open( lmgl, 'w', 8 )
+            cPickle.dump(self.body, vInput, 2)
+        #
+        elif mode=='p:bz2':
+            vInput = bz2.BZ2File( lmgl, 'w', 0, 8 )
+            cPickle.dump(self.body, vInput, 2)
+        #
+        elif mode=='y:bz2':
+            vInput = bz2.BZ2File( lmgl, 'w', 0, 8 )
+            yaml.dump(self.body, stream=vInput, width=125, indent=2, canonical=False, default_flow_style=False,
+                explicit_start=True, explicit_end=True)
+        #
+        elif mode=='y':
+            vInput = open( lmgl, 'w', 0 )
+            yaml.dump(self.body, stream=vInput, width=125, indent=2, canonical=False, default_flow_style=False,
+                explicit_start=True, explicit_end=True)
+        #
+        else: print( 'Letter-Monster snarls: "`%s` is not a valid mode to save LMGL files!"' % mode ) ; return 1
+        #
+        vInput.close() ; del vInput
+        self.__validate()
+        tf = clock()
+        if self.DEBUG: print( 'Letter-Monster says: "Saving LMGL took %.4f seconds total."' % (tf-ti) )
+        #
+    #
+#---------------------------------------------------------------------------------------------------
+    #
     def Consume(self, image='image.jpg', x=0, y=0, pattern='default', filter=''):
         '''
 Takes a supported image as input, transforms it into a Rectangular Unicode Array and stores the result 
@@ -557,6 +557,80 @@ Valid outputs are : CMD, SH.\n\
     #
 #---------------------------------------------------------------------------------------------------
     #
+    def Spawn(self, lmgl=None, out='txt', filename='Out'):
+        '''
+Export function. Saves engine body on Hard Disk, or transforms one LMGL into a specified format.\n\
+Valid formats are : txt, csv, html, bmp, gif, jpg, png.\n\
+'''
+        #
+        ti = clock() # Global counter for function.
+        if lmgl: # If a LMGL file is specified, export only the LMGL, but don't change self.body.
+            #
+            vOldBody = self.body
+            ret = self.Load( lmgl )
+            if ret: return 1
+            #
+        #
+        vLmgl = self.body # Save body...
+        out = out.lower() # Lower letters.
+        if out not in ('txt', 'csv', 'html', 'bmp', 'gif', 'jpg', 'png'):
+            print( 'Letter-Monster growls: "I cannot export in `%s` type! Exiting spawn!' % out ) ; return 1
+        #
+        try: vOutput = FlattenLayers( vLmgl )
+        except: print( 'Letter-Monster snarls: "Flatten body layers returned an error! Cannot spawn!"' )
+        #
+        tti = clock() # Local counter.
+        #
+        if out=='txt':
+            vOut = open( filename+'.'+out, 'w' ) # Filename + Extension.
+            vOut.write( ''.join ( np.hstack(
+                                            np.hstack( (i,np.array([u'\n'],'U')) ) for i in vOutput # Concatenate all arrays with an array containing ['\n'].
+                                           )
+                                ).encode('utf8')
+                      )
+            vOut.close()
+        #
+        elif out=='csv':
+            vOut = open( filename+'.'+out, 'w' ) # Filename + Extension.
+            vOut.write( '"\n'.join('",'.join('"%s' % j for j in i) for i in vOutput) ) # Put each value into " ", pairs.
+            vOut.write( '"\n' )
+            vOut.close()
+        #
+        elif out=='html':
+            vOut = open( filename+'.'+out, 'w' ) # Filename + Extension.
+            vOut.write('<html>\n<body>\n<table border="0" cellpadding="0" cellspacing="0" style="font-family: Lucida Console, Courier New; font-size: 3px; font-weight: bold; letter-spacing: 1px;">\n<tr>')
+            vOut.write( '</td></tr>\n<tr>'.join('</td>'.join('<td>%s' % j for j in i) for i in vOutput) ) # Put each value into <td> </td> pairs.
+            vOut.write('</td></tr>\n</table>\n</body>\n</html>')
+            vOut.close()
+        #
+        elif out in ('bmp', 'gif', 'jpg', 'png'):
+            lenW = len(vOutput[0]) # Get vOutput width and height.
+            lenH = len(vOutput)
+            vFont = ImageFont.truetype('c:/windows/fonts/lucon.ttf', 8) # Load font.
+            vLtrSize = (vFont.getsize('x')[0], int(2*vFont.getsize('x')[1]/3))          # Get true size of a letter drawn with this font.
+            vOut = Image.new('RGB', ((lenW+1)*vLtrSize[0],lenH*vLtrSize[1]), "#ffffee") # New image: Type, Width, Height, Background.
+            vDraw = ImageDraw.Draw(vOut)
+            i = 1
+            for line in vOutput: # For each line...
+                vDraw.text((1,i), ''.join ( line ).encode('utf8'), fill="#000066", font=vFont) # Draw line.
+                i += vLtrSize[0]-1
+            del i
+            vOut.save( filename+'.'+out )
+        #
+        # More export formats will be implemented ...
+        #
+        del vOutput ; del vOut
+        if lmgl:
+            self.body = vOldBody # Restore old Body.
+        #
+        ttf = clock()
+        if self.DEBUG: print( 'Letter-Monster says: "Exporting data took %.4f seconds."' % (ttf-tti) )
+        tf = clock()
+        if self.DEBUG: print( 'Letter-Monster says: "Spawn took %.4f seconds total."' % (tf-ti) )
+        #
+    #
+#---------------------------------------------------------------------------------------------------
+    #
     def Render(self, format='pygame'):
         '''
 Render in a loop function. Represents LetterMonster body.\n\
@@ -660,79 +734,4 @@ Valid outputs are : pygame and pyglet.\n\
         #
         # More formats will be implemented soon.
     #
-#---------------------------------------------------------------------------------------------------
-    #
-    def Spawn(self, lmgl=None, out='txt', filename='Out'):
-        '''
-Export function. Saves engine body on Hard Disk, or transforms one LMGL into a specified format.\n\
-Valid formats are : txt, csv, html, bmp, gif, jpg, png.\n\
-'''
-        #
-        ti = clock() # Global counter for function.
-        if lmgl: # If a LMGL file is specified, export only the LMGL, but don't change self.body.
-            #
-            vOldBody = self.body
-            ret = self.Load( lmgl )
-            if ret: return 1
-            #
-        #
-        vLmgl = self.body # Save body...
-        out = out.lower() # Lower letters.
-        if out not in ('txt', 'csv', 'html', 'bmp', 'gif', 'jpg', 'png'):
-            print( 'Letter-Monster growls: "I cannot export in `%s` type! Exiting spawn!' % out ) ; return 1
-        #
-        try: vOutput = FlattenLayers( vLmgl )
-        except: print( 'Letter-Monster snarls: "Flatten body layers returned an error! Cannot spawn!"' )
-        #
-        tti = clock() # Local counter.
-        #
-        if out=='txt':
-            vOut = open( filename+'.'+out, 'w' ) # Filename + Extension.
-            vOut.write( ''.join ( np.hstack(
-                                            np.hstack( (i,np.array([u'\n'],'U')) ) for i in vOutput # Concatenate all arrays with an array containing ['\n'].
-                                           )
-                                ).encode('utf8')
-                      )
-            vOut.close()
-        #
-        elif out=='csv':
-            vOut = open( filename+'.'+out, 'w' ) # Filename + Extension.
-            vOut.write( '"\n'.join('",'.join('"%s' % j for j in i) for i in vOutput) ) # Put each value into " ", pairs.
-            vOut.write( '"\n' )
-            vOut.close()
-        #
-        elif out=='html':
-            vOut = open( filename+'.'+out, 'w' ) # Filename + Extension.
-            vOut.write('<html>\n<body>\n<table border="0" cellpadding="0" cellspacing="0" style="font-family: Lucida Console, Courier New; font-size: 3px; font-weight: bold; letter-spacing: 1px;">\n<tr>')
-            vOut.write( '</td></tr>\n<tr>'.join('</td>'.join('<td>%s' % j for j in i) for i in vOutput) ) # Put each value into <td> </td> pairs.
-            vOut.write('</td></tr>\n</table>\n</body>\n</html>')
-            vOut.close()
-        #
-        elif out in ('bmp', 'gif', 'jpg', 'png'):
-            lenW = len(vOutput[0]) # Get vOutput width and height.
-            lenH = len(vOutput)
-            vFont = ImageFont.truetype('c:/windows/fonts/lucon.ttf', 8) # Load font.
-            vLtrSize = (vFont.getsize('x')[0], int(2*vFont.getsize('x')[1]/3))          # Get true size of a letter drawn with this font.
-            vOut = Image.new('RGB', ((lenW+1)*vLtrSize[0],lenH*vLtrSize[1]), "#ffffee") # New image: Type, Width, Height, Background.
-            vDraw = ImageDraw.Draw(vOut)
-            i = 1
-            for line in vOutput: # For each line...
-                vDraw.text((1,i), ''.join ( line ).encode('utf8'), fill="#000066", font=vFont) # Draw line.
-                i += vLtrSize[0]-1
-            del i
-            vOut.save( filename+'.'+out )
-        #
-        # More export formats will be implemented ...
-        #
-        del vOutput ; del vOut
-        if lmgl:
-            self.body = vOldBody # Restore old Body.
-        #
-        ttf = clock()
-        if self.DEBUG: print( 'Letter-Monster says: "Exporting data took %.4f seconds."' % (ttf-tti) )
-        tf = clock()
-        if self.DEBUG: print( 'Letter-Monster says: "Spawn took %.4f seconds total."' % (tf-ti) )
-        #
-    #
-
 #
