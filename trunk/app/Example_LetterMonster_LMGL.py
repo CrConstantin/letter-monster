@@ -34,21 +34,21 @@ instruct = [
     {'f':'StripRightSpace','Input':'vect1'},
     {'f':'StripLeftSpace','Input':'vect1'},
     {'f':'Border','Input':'vect1','Char':'='}
-    ]
+           ]
 v = Vector( name = 'vect1', instructions=instruct, offset = (0,0), z = 2, )
 lm.body[ v.name ] = v
 del v ; del instruct
 
-e = Event(name = 'event1', affects = 'aff')
+e = Event(name = 'event1', call_macro = 'aff')
 lm.body[ e.name ] = e
 del e
 
 instruct = [
-    {'f':'new', 'layer':'event', 'name':'event2', 'affects':'', 'affect_macro':''},
+    {'f':'new', 'layer':'event', 'name':'event2', 'call_macro':''},
     {'f':'ren', 'name':'event2', 'newname':'event222'},
-    {'f':'change', 'name':'event222', 'affects':'new aff'},
+    {'f':'change', 'name':'event222', 'call_macro':'New Aff!'},
     {'f':'del', 'name':'event222'},
-    ]
+           ]
 m = Macro( name = 'macro1', instructions=instruct )
 lm.body[ m.name ] = m
 del m ; del instruct
