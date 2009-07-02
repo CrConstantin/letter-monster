@@ -24,7 +24,7 @@ from _classes import *
 
 #
 
-print 'I am LM r53 !'
+print 'I am LM r54 !'
 
 #
 # Define YAML represent for numpy ndarray.
@@ -70,9 +70,11 @@ LetterMonster -> Patterns. List with all valid pattern names, used in Consume fu
         #
         self.body = {}
         self.max_fps = 1
+        self.visible_size = (100, 100)
+        #
+        self.__fps_lock = thread.allocate_lock()
         self.fps_nr = 0
         self.Number_Of_Threads = 2
-        self.visible_size = (100, 100)
         self.VA = VActions() # Helper functions instance.
         #self.EA = EActions() # Helper functions instance. Will need this.
         #
@@ -175,6 +177,9 @@ AlignRight, AlignLeft, Center, Crop, Border, RightBorder, LeftBorder.\n\
 All macro instructions are : new, del, ren, change.\n\
 '''
         #
+        #try: psyco.full() # Cannot use psyco! It kills Pyglet events...
+        #except: pass
+        #
         try:
             vElem = self.body[object]
             vInstructions = vElem.instructions
@@ -246,8 +251,17 @@ All macro instructions are : new, del, ren, change.\n\
                         if key == 'f':
                             pass
                         if key == 'offset':
-                            exec( 'x='+vInstr[key][0] )
-                            exec( 'y='+vInstr[key][1] )
+                            k0 = vInstr[key][0]
+                            k1 = vInstr[key][1]
+                            #
+                            if type(k0)==type(''): exec( 'x='+k0 )
+                            elif type(k0)==type(0): x=k0
+                            else: print( 'Letter-Monster growls: "Macro Execute - Offset for `%s` layer is neither STR, not INT! Canceling."' % vName ) ; return
+                            #
+                            if type(k1)==type(''): exec( 'y='+k1 )
+                            elif type(k1)==type(0): y=k1
+                            else: print( 'Letter-Monster growls: "Macro Execute - Offset for `%s` layer is neither STR, not INT! Canceling."' % vName ) ; return
+                            #
                             try: self.body[vName].__dict__[key] = (x, y)
                             except: print( 'Letter-Monster growls: "Macro Execute - Cannot change offset for `%s` layer! Canceling."' % vName ) ; return
                         else:
@@ -288,8 +302,8 @@ All macro instructions are : new, del, ren, change.\n\
             for vElem in vInput.values():
                 if (str(vElem)=='raster' and vElem.visible) or (str(vElem)=='vector' and vElem.visible):
                     if vElem.data.shape[0]<=1 and vElem.data.shape[1]<=1: continue # Ignore empty arrays.
-                    S0 = max( S0, vElem.data.shape[0]+vElem.offset[0] )
-                    S1 = max( S1, vElem.data.shape[1]+vElem.offset[1] )
+                    S0 = max( S0, vElem.data.shape[0]+vElem.offset[0] ) # Offset 0 is down.
+                    S1 = max( S1, vElem.data.shape[1]+vElem.offset[1] ) # Offset 1 is right.
             #
             # Create a big empty array for all other arrays to fit in.
             vOutput = np.zeros( (S0, S1), 'U' )
@@ -326,6 +340,10 @@ All macro instructions are : new, del, ren, change.\n\
             if self.body.has_key('onrender'): # If there is a layer called OnRender.
                 try: self._Execute( self.body['onrender'].call_macro ) # Try to execute affected macro.
                 except: print( 'Letter-Monster snarls: "Cannot execute OnRender instruction!"' ) ; return False
+            #
+            self.__fps_lock.acquire()
+            self.fps_nr += 1
+            self.__fps_lock.release()
             #
         #
     #
@@ -549,7 +567,7 @@ Valid outputs are : CMD, SH.\n\
             print( 'Letter-Monster snarls: "Cannot spit in `%s` format! Exiting!"' % format ) ; return 1
         #
         try: vOutput = self.FlattenLayers( self.body )
-        except: print( 'Letter-Monster snarls: "Flatten body layers returned an error! Cannot spit!"' ) ; return 1
+        except: print( 'Letter-Monster snarls: "Flatten body layers returned error! Cannot spit!"' ) ; return 1
         #
         if format=='py':
             print u''.join ( np.hstack( np.hstack( (i,np.array([u'\n'],'U')) ) for i in vOutput ) )
@@ -596,11 +614,8 @@ Valid formats are : txt, csv, html, bmp, gif, jpg, png.\n\
         if out not in ('txt', 'csv', 'html', 'bmp', 'gif', 'jpg', 'png'):
             print( 'Letter-Monster growls: "I cannot export in `%s` type! Exiting spawn!' % out ) ; return 1
         #
-        #try: 
-        
-        vOutput = self.FlattenLayers( )
-        
-        #except: print( 'Letter-Monster snarls: "Flatten body layers returned an error! Cannot spawn!"' ) ; return 1
+        try: vOutput = self.FlattenLayers( )
+        except: print( 'Letter-Monster snarls: "Flatten body layers returned error! Cannot spawn!"' ) ; return 1
         #
         tti = clock() # Local counter.
         #
@@ -679,7 +694,6 @@ Valid outputs are : pygame and pyglet.\n\
             #
             while 1:
                 #
-                self.fps_nr += 1 # Increment Frame Number.
                 time.sleep( self.max_fps ) # Sleep a little...
                 #
                 for event in pygame.event.get():
@@ -718,7 +732,6 @@ Valid outputs are : pygame and pyglet.\n\
             @window.event
             def on_draw():
                 #
-                self.fps_nr += 1 # Increment Frame Number.
                 time.sleep( self.max_fps ) # Sleep a little...
                 #
                 vFrame = self.FrameBuffer.get()

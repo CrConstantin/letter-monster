@@ -57,7 +57,7 @@ del e
 instruct = [ {
             'f':'change',
             'name':'raster3',
-            'offset':("2+self.fps_nr%2", "2+self.fps_nr%2"),
+            'offset':('8-self.fps_nr%8', 5),
            }, ]
 m = Macro( name = 'onrender_macro', instructions=instruct )
 lm.body[ m.name ] = m
