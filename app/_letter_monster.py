@@ -24,7 +24,7 @@ from _classes import *
 
 #
 
-print 'I am LM r52 !'
+print 'I am LM r53 !'
 
 #
 # Define YAML represent for numpy ndarray.
@@ -44,73 +44,9 @@ def sort_zorder(x):
     return x.z
 #
 
-FrameBuffer = Queue.Queue(4) # Queue with 4 slots.
-vCanLoop = True              # Used in all threading functions.
-
-#
-
-def FlattenLayers( vInput, vThreading=False ):
-    '''
-This function takes as input a dictionary containing layers, like LetterMonster.body.\n\
-Only layers that have a "data" attribute (Raster and Vector) can be rendered.\n\
-Function pushes the flatened result (as Rectangular Unicode Numpy Array) into FrameBuffer.\n\
-'''
-    #
-    global vCanLoop, FrameBuffer
-    #
-    while vCanLoop: # Loop Flatten Layers ...
-        #
-        # If Body has one layer, return it. There is nothing to flatten.
-        if len(vInput)==1:
-            vOutput = vInput.values()[0].data
-            FrameBuffer.put( vOutput, True ) # Put data in Queue when there's one free slot.
-            if not vThreading: return vOutput
-        #
-        S0 = 0 ; S1 = 0
-        # Save maxim shape values for all layers.
-        for vElem in vInput.values():
-            if (str(vElem)=='raster' and vElem.visible) or (str(vElem)=='vector' and vElem.visible):
-                if vElem.data.shape[0]<=1 and vElem.data.shape[1]<=1: continue # Ignore empty arrays.
-                S0 = max( S0, vElem.data.shape[0]+vElem.offset[0] )
-                S1 = max( S1, vElem.data.shape[1]+vElem.offset[1] )
-        #
-        # Create a big empty array for all other arrays to fit in.
-        vOutput = np.zeros( (S0, S1), 'U' )
-        del S0, S1
-        #
-        for vElem in sorted(vInput.values(), key=sort_zorder): # For all elements in LetterMonster body, sorted by Z-order...
-            if (str(vElem)=='raster' and vElem.visible) or (str(vElem)=='vector' and vElem.visible): # If element is a visible Raster or Vector...
-                #
-                # Some pointers...
-                vData = vElem.data       # This should be a Rectangular Unicode Numpy Array.
-                vDataShape = vData.shape # Element data shape.
-                vOffset = vElem.offset   # This should be a list with 2 integers. First value is down, second value is right.
-                #
-                if vElem.transparent:    # If there are transparent characters...
-                    # All "transparent characters" from current Layer Data become empty strings.
-                    for vT in vElem.transparent:
-                        vMask = vData==vT
-                        vData[ vMask ] = u''
-                    #
-                #
-                # Mask == all NON-empty characters.
-                vMask = vData!=u''
-                #
-                # Insert all NON-empty values into Final Numpy Array, considering the position.
-                vView = vOutput[vOffset[0]:vDataShape[0]+vOffset[0], vOffset[1]:vDataShape[1]+vOffset[1]]
-                vOutput[vOffset[0]:vDataShape[0]+vOffset[0], vOffset[1]:vDataShape[1]+vOffset[1]] = np.where( vMask, vData, vView )
-                del vMask, vView, vData # Just to make sure. :p
-                #
-            # If not Raster or Vector, pass.
-        #
-        FrameBuffer.put( vOutput, True ) # Put data in Queue when there's one free slot.
-        if not vThreading: return vOutput
-        #
-    #
 #
 
 #
-
 class LetterMonster:
     '''
 This is Letter-Monster Class. You would have never guessed it, right? ^_^\n\
@@ -133,11 +69,18 @@ LetterMonster -> Patterns. List with all valid pattern names, used in Consume fu
         self.DEBUG = True
         #
         self.body = {}
-        self.max_fps = 0.5
+        self.max_fps = 1
         self.fps_nr = 0
+        self.Number_Of_Threads = 2
         self.visible_size = (100, 100)
         self.VA = VActions() # Helper functions instance.
-        self.EA = EActions() # Helper functions instance.
+        #self.EA = EActions() # Helper functions instance. Will need this.
+        #
+
+        self.FrameBuffer = Queue.Queue(2) # Queue with a few slots.
+        self.vCanLoop = True              # Used in all threading functions.
+        self.vBodyAcces = thread.allocate_lock()
+
         #
         self.Filters = ( 'BLUR', 'SMOOTH', 'SMOOTH_MORE', 'DETAIL', 'SHARPEN', # All valid filters.
                          'CONTOUR', 'EDGE_ENHANCE', 'EDGE_ENHANCE_MORE' )
@@ -252,31 +195,31 @@ All macro instructions are : new, del, ren, change.\n\
                     #
                     # Overwrite the Name of the vector with the Data of the vector.
                     try: vInstr['Input'] = self.body[vInstr['Input']].data
-                    except: print( 'Letter-Monster growls: "Vector `%s` doesn\'t have valid data! I refuse to execute!"' % object ) ; return
+                    except: print( 'Letter-Monster growls: "Vector Execute - Vector `%s` doesn\'t have valid data! Canceling."' % object ) ; return
                     #
                     # Try to call the function with parameters and catch the errors.
                     try: vData = f( **vInstr )
-                    except TypeError: print( 'Letter-Monster growls: "Incorrect arguments for function `%s`! I refuse to execute!"' % vFunc ) ; return
-                    except: print( 'Letter-Monster growls: "Unknown error occured in `%s` function call! I refuse to execute!"' % vFunc ) ; return
+                    except TypeError: print( 'Letter-Monster growls: "Vector Execute - Incorrect arguments for function `%s`! Canceling."' % vFunc ) ; return
+                    except: print( 'Letter-Monster growls: "Vector Execute - Unknown error occured in `%s` function call! Canceling."' % vFunc ) ; return
                     #
                     # Save data in LetterMonster body -> object.
                     if vData is not None: self.body[object].data = vData
                     else: self.body[object].data = np.zeros((1,1),'U')
                     #
                 else:
-                    print( 'Letter-Monster growls: "I don\'t know any `%s` function! I refuse to execute!"' % (object,vFunc) ) ; return
+                    print( 'Letter-Monster growls: "Vector Execute - I don\'t know any `%s` function! Canceling."' % (object,vFunc) ) ; return
                 #
             #
         #
         elif str(vElem)=='macro':
             for vInstr in vInstructions: # For each instruction in macro instructions list.
                 try: vName = vInstr['name']
-                except: print( 'Letter-Monster growls: "Can\'t access `name` attribute in Macro `%s` instruction! I refuse to execute!"' % object ) ; return
+                except: print( 'Letter-Monster growls: "Macro Execute - Can\'t access `name` attribute in Macro `%s` instruction! Canceling."' % object ) ; return
                 #
                 if vInstr['f']=='new':   # Instruction to create new layer.
                     vNew = vInstr['layer'].title()
                     if self.body.has_key( vName ):
-                        print( 'Letter-Monster growls: "Layer `%s` already exists! I refuse to create new!"' % vName ) ; return
+                        print( 'Letter-Monster growls: "Macro Execute - Layer `%s` already exists! Canceling."' % vName ) ; return
                     if vNew=='Raster':
                         self.body[vName] = Raster()
                     elif vNew=='Vector':
@@ -288,25 +231,102 @@ All macro instructions are : new, del, ren, change.\n\
                 #
                 elif vInstr['f']=='del': # Instruction to delete a layer.
                     try: del self.body[vName]
-                    except: print( 'Letter-Monster growls: "Layer `%s` doesn\'t exist! I refuse to delete!"' % vName ) ; return
+                    except: print( 'Letter-Monster growls: "Macro Execute - Layer `%s` doesn\'t exist! Canceling."' % vName ) ; return
                 #
                 elif vInstr['f']=='ren': # Instruction to rename a layer.
                     vNewname = vInstr['newname']
                     if self.body.has_key( vNewname ):
-                        print( 'Letter-Monster growls: "Layer `%s` already exists! I refuse to rename!"' % vName ) ; return
+                        print( 'Letter-Monster growls: "Macro Execute - Layer `%s` already exists! Canceling."' % vName ) ; return
                     self.body[vNewname] = self.body[vName]
                     self.body[vNewname].name = vNewname
                     del self.body[vName]
                 #
                 elif vInstr['f']=='change': # Instruction to change attributes of a layer.
-                    del vInstr['f']
-                    try: self.body[vName].__dict__ = vInstr
-                    except: print( 'Letter-Monster growls: "Cannot change attributes for `%s` layer!"' % vName ) ; return
+                    for key in vInstr:
+                        if key == 'f':
+                            pass
+                        if key == 'offset':
+                            exec( 'x='+vInstr[key][0] )
+                            exec( 'y='+vInstr[key][1] )
+                            try: self.body[vName].__dict__[key] = (x, y)
+                            except: print( 'Letter-Monster growls: "Macro Execute - Cannot change offset for `%s` layer! Canceling."' % vName ) ; return
+                        else:
+                            try: self.body[vName].__dict__[key] = vInstr[key]
+                            except: print( 'Letter-Monster growls: "Macro Execute - Cannot change attributes for `%s` layer! Canceling."' % vName ) ; return
+                        #
+                    #
                 #
             #
         #
         tf = clock()
         if self.DEBUG: print( 'Letter-Monster says: "Execute took %.4f seconds."' % (tf-ti) )
+        #
+    #
+#-------
+    #
+    def FlattenLayers( self, vThreading=False ):
+        '''
+    This function takes as input a dictionary containing layers, like LetterMonster.body.\n\
+    Only layers that have a "data" attribute (Raster and Vector) can be rendered.\n\
+    Function pushes the flatened result (as Rectangular Unicode Numpy Array) into FrameBuffer.\n\
+    '''
+        #
+        while self.vCanLoop: # Loop Flatten Layers ...
+            #
+            self.vBodyAcces.acquire()
+            vInput = self.body
+            self.vBodyAcces.release()
+            #
+            # If Body has one layer, return it. There is nothing to flatten.
+            if len(vInput)==1:
+                vOutput = vInput.values()[0].data
+                if not vThreading: return vOutput
+                self.FrameBuffer.put( vOutput, True ) # Put data in Queue when there's one free slot.
+            #
+            S0 = 0 ; S1 = 0
+            # Save maxim shape values for all visible layers.
+            for vElem in vInput.values():
+                if (str(vElem)=='raster' and vElem.visible) or (str(vElem)=='vector' and vElem.visible):
+                    if vElem.data.shape[0]<=1 and vElem.data.shape[1]<=1: continue # Ignore empty arrays.
+                    S0 = max( S0, vElem.data.shape[0]+vElem.offset[0] )
+                    S1 = max( S1, vElem.data.shape[1]+vElem.offset[1] )
+            #
+            # Create a big empty array for all other arrays to fit in.
+            vOutput = np.zeros( (S0, S1), 'U' )
+            del S0, S1
+            #
+            for vElem in sorted(vInput.values(), key=sort_zorder): # For all elements in LetterMonster body, sorted by Z-order...
+                if (str(vElem)=='raster' and vElem.visible) or (str(vElem)=='vector' and vElem.visible): # If element is a visible Raster or Vector...
+                    #
+                    # Some pointers...
+                    vData = vElem.data       # This should be a Rectangular Unicode Numpy Array.
+                    vDataShape = vData.shape # Element data shape.
+                    vOffset = vElem.offset   # This should be a list with 2 integers. First value is down, second value is right.
+                    #
+                    if vElem.transparent:    # If there are transparent characters...
+                        # All "transparent characters" from current Layer Data become empty strings.
+                        for vT in vElem.transparent:
+                            vMask = vData==vT
+                            vData[ vMask ] = u''
+                        #
+                    #
+                    # Mask == all NON-empty characters.
+                    vMask = vData!=u''
+                    #
+                    # Insert all NON-empty values into Final Numpy Array, considering the position.
+                    vView = vOutput[vOffset[0]:vDataShape[0]+vOffset[0], vOffset[1]:vDataShape[1]+vOffset[1]]
+                    vOutput[vOffset[0]:vDataShape[0]+vOffset[0], vOffset[1]:vDataShape[1]+vOffset[1]] = np.where( vMask, vData, vView )
+                    del vMask, vView, vData # Just to make sure. :p
+                    #
+                # If not Raster or Vector, pass.
+            #
+            if not vThreading: return vOutput
+            self.FrameBuffer.put( vOutput, True ) # Put data in Queue when there's one free slot.
+            #
+            if self.body.has_key('onrender'): # If there is a layer called OnRender.
+                try: self._Execute( self.body['onrender'].call_macro ) # Try to execute affected macro.
+                except: print( 'Letter-Monster snarls: "Cannot execute OnRender instruction!"' ) ; return False
+            #
         #
     #
 #---------------------------------------------------------------------------------------------------
@@ -431,7 +451,7 @@ Later, you can export this "consumed" image into TXT, CSV, HTM, or whatever suit
 or you can Save its representation as LMGL.\n\
 '''
         #
-        try: psyco.profile()
+        try: psyco.full()
         except: pass
         #
         try: vInput = Image.open( image )
@@ -526,10 +546,10 @@ Valid outputs are : CMD, SH.\n\
 '''
         #
         if not format in ('py', 'CMD', 'SH'):
-            print( 'Letter-Monster snarls: "Cannot spit in `%s` format! Exiting!"' % format )
+            print( 'Letter-Monster snarls: "Cannot spit in `%s` format! Exiting!"' % format ) ; return 1
         #
-        try: vOutput = FlattenLayers( self.body )
-        except: print( 'Letter-Monster snarls: "Flatten body layers returned an error! Cannot spit!"' )
+        try: vOutput = self.FlattenLayers( self.body )
+        except: print( 'Letter-Monster snarls: "Flatten body layers returned an error! Cannot spit!"' ) ; return 1
         #
         if format=='py':
             print u''.join ( np.hstack( np.hstack( (i,np.array([u'\n'],'U')) ) for i in vOutput ) )
@@ -576,8 +596,11 @@ Valid formats are : txt, csv, html, bmp, gif, jpg, png.\n\
         if out not in ('txt', 'csv', 'html', 'bmp', 'gif', 'jpg', 'png'):
             print( 'Letter-Monster growls: "I cannot export in `%s` type! Exiting spawn!' % out ) ; return 1
         #
-        try: vOutput = FlattenLayers( vLmgl )
-        except: print( 'Letter-Monster snarls: "Flatten body layers returned an error! Cannot spawn!"' )
+        #try: 
+        
+        vOutput = self.FlattenLayers( )
+        
+        #except: print( 'Letter-Monster snarls: "Flatten body layers returned an error! Cannot spawn!"' ) ; return 1
         #
         tti = clock() # Local counter.
         #
@@ -639,51 +662,36 @@ Valid outputs are : pygame and pyglet.\n\
 '''
         #
         if not format in ('pygame', 'pyglet'):
-            print( 'Letter-Monster snarls: "Cannot render in `%s` format! Exiting!"' % format )
+            print( 'Letter-Monster snarls: "Cannot render in `%s` format! Exiting!"' % format ) ; return 1
         #
-        global vCanLoop, vFrame
-        #
-        for x in range(2): # Start a few FlattenLayers threads.
-            thread.start_new_thread( FlattenLayers, (self.body, True), )
+        for x in range(self.Number_Of_Threads): # Start a few FlattenLayers threads.
+            thread.start_new_thread( self.FlattenLayers, (True, ), )
             time.sleep(0.1)
-        #
-        #thread.start_new_thread( QController, (1,), ) # Start Controller function.
         #
         if format=='pygame': # Pygame render.
             try: import pygame
             except: print( 'Letter-Monster snarls: "Could not import Pygame! Make sure you downloaded and installed it. Check http://www.pygame.org. Exiting!"' ) ; return
             pygame.init()
             #
-            vSize = width, height = 320, 240
-            vScreen = pygame.display.set_mode(vSize)
+            vScreen = pygame.display.set_mode( (320, 240) )
             vFont = pygame.font.SysFont('Lucida Console', 12)
             vHeight = vFont.get_height()
             #
             while 1:
                 #
                 self.fps_nr += 1 # Increment Frame Number.
-                #
-                #ti = clock()
-                #time.sleep( 0.01 )
-                print 'rendering frame', self.fps_nr
-                #if self.body.has_key('onrender'): # If there is a layer called OnRender.
-                #    try: self._Execute( self.body['onrender'].call_macro ) # Try to execute affected macro.
-                #    except: print( 'Letter-Monster snarls: "Cannot execute OnRender instruction!"' ) ; return
-                render_time = self.max_fps #- (clock()-ti)
-                #
-                if render_time>0: # If time for executing OnRender is bigger than 0...
-                    time.sleep( render_time ) # Sleep a little...
+                time.sleep( self.max_fps ) # Sleep a little...
                 #
                 for event in pygame.event.get():
                     if event.type in (pygame.QUIT, pygame.KEYDOWN):
-                        vCanLoop = False
+                        self.vCanLoop = False
                         print( 'Letter-Monster says: "Key pressed, exiting..."' )
                         pygame.quit() ; return
                 #
                 vScreen.fill((0, 0, 0)) # Paint screen with black.
                 #
-                vFrame = FrameBuffer.get()
-                FrameBuffer.task_done()
+                vFrame = self.FrameBuffer.get()
+                self.FrameBuffer.task_done()
                 i = 1
                 #
                 for vLine in vFrame:
@@ -704,26 +712,17 @@ Valid outputs are : pygame and pyglet.\n\
             #
             @window.event
             def on_key_press(symbol, modifiers):
-                vCanLoop = False
+                self.vCanLoop = False
                 print( 'Letter-Monster says: "Key pressed, exiting..."' )
-                window.close()
+                window.close() ; return
             @window.event
             def on_draw():
+                #
                 self.fps_nr += 1 # Increment Frame Number.
+                time.sleep( self.max_fps ) # Sleep a little...
                 #
-                #ti = clock()
-                #time.sleep( 0.01 )
-                print 'rendering frame', self.fps_nr
-                #if self.body.has_key('onrender'): # If there is a layer called OnRender.
-                #    try: self._Execute( self.body['onrender'].call_macro ) # Try to execute affected macro.
-                #    except: print( 'Letter-Monster snarls: "Cannot execute OnRender instruction!"' ) ; return
-                render_time = self.max_fps #- (clock()-ti)
-                #
-                if render_time>0: # If time for executing OnRender is bigger than 0...
-                    time.sleep( render_time ) # Sleep a little...
-                #
-                vFrame = FrameBuffer.get()
-                FrameBuffer.task_done()
+                vFrame = self.FrameBuffer.get()
+                self.FrameBuffer.task_done()
                 label.width = len(vFrame[0])
                 label.text = u''.join ( np.hstack( np.hstack( (i,np.array([u'\n'],'U')) ) for i in vFrame ) )
                 window.clear()
