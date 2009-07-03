@@ -1,6 +1,6 @@
 # -*- coding: latin-1 -*-
 '''
-Letter-Monster Engine v0.2.5
+Letter-Monster Engine v0.2.8
 Copyright © 2009, Cristi Constantin. All rights reserved.
 Spawn is Export function.
 '''
