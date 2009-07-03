@@ -24,7 +24,7 @@ from _classes import *
 
 #
 
-print 'I am LM r57 !'
+print 'I am LM 0.2.8 !'
 
 #
 # Define YAML represent for numpy ndarray.
@@ -93,6 +93,7 @@ LetterMonster -> Patterns. List with all valid pattern names, used in Consume fu
         'numbers'    : u'0684912357',
         'letters'    : u'NADXEIQOVJL ',
         }
+        self.Spawns = ('txt', 'csv', 'html', 'bmp', 'gif', 'jpg', 'png', 'pdf', 'ps')
         #
     #
 #---------------------------------------------------------------------------------------------------
@@ -173,8 +174,8 @@ AlignRight, AlignLeft, Center, Crop, Border, RightBorder, LeftBorder.\n\
 All macro instructions are : hideall, unhideall, lockall, unlockall, new, del, ren, change.\n\
 '''
         #
-        try: psyco.profile() # Psyco boost.
-        except: pass
+        #try: psyco.profile() # Psyco boost.
+        #except: pass
         #
         try:
             vElem = self.body[object]
@@ -216,33 +217,36 @@ All macro instructions are : hideall, unhideall, lockall, unlockall, new, del, r
             for vInstr in vInstructions: # For each instruction in macro instructions list.
                 #
                 # A few mass instructions...
-                if vInstr['f']=='hideall': # Make all layers invisible, then return.
+                if vInstr['f']=='hideall': # Make all Vector and Raster layers invisible, then break.
                     for key in self.body:
-                        try: self.body[key].visible = False
-                        except: pass
-                    return
+                        if str(self.body[key])=='raster' or str(self.body[key])=='vector':
+                            try: self.body[key].visible = False
+                            except: pass
+                    continue
                 #
-                elif vInstr['f']=='unhideall': # Make all layers visible, then return.
+                elif vInstr['f']=='unhideall': # Make all layers visible, then break.
                     for key in self.body:
-                        try: self.body[key].visible = True
-                        except: pass
-                    return
+                        if str(self.body[key])=='raster' or str(self.body[key])=='vector':
+                            try: self.body[key].visible = True
+                            except: pass
+                    continue
                 #
-                elif vInstr['f']=='lockall': # Lock all layers, then return.
+                elif vInstr['f']=='lockall': # Lock all layers, then break.
                     for key in self.body:
                         try: self.body[key].lock = True
                         except: pass
-                    return
+                    continue
                 #
-                elif vInstr['f']=='unlockall': # Unlock all layers, then return.
+                elif vInstr['f']=='unlockall': # Unlock all layers, then break.
                     for key in self.body:
                         try: self.body[key].lock = False
                         except: pass
-                    return
+                    continue
                 #
                 # It's not a mass instruction, so it affects only 1 layer. Save the name of that layer.
-                try: vName = vInstr['name']
-                except: print( 'Letter-Monster growls: "Macro Execute - Can\'t access `name` attribute in Macro `%s` instruction! Canceling."' % object ) ; return
+                #try: 
+                exec('vName = ' + vInstr['name'])
+                #except: print( 'Letter-Monster growls: "Macro Execute - Can\'t access `name` attribute in Macro `%s` instruction! Canceling."' % object ) ; return
                 #
                 if vInstr['f']=='new':   # Instruction to create new layer.
                     vNew = vInstr['layer'].title()
@@ -366,10 +370,12 @@ or returns the result.\n\
             self.__lock.acquire() # This code is multithreaded, so must ensure that only ONE function can access it.
             #
             if self.body.has_key('onrender') and self.body['onrender'].visible: # If there is a layer called OnRender and it's visible.
-                try: self._Execute( self.body['onrender'].call_macro )          # Try to execute affected macro. Else, exit.
-                except: print( 'Letter-Monster snarls: "Flatten Layers - Cannot execute OnRender instruction!"' ) ; vThreaded = False ; return False
+                #try: 
+                self._Execute( self.body['onrender'].call_macro )          # Try to execute affected macro. Else, exit.
+                #except: print( 'Letter-Monster snarls: "Flatten Layers - Cannot execute OnRender instruction!"' ) ; vThreaded = False ; return False
             #
-            self.fps_nr += 1      # Auto-Increment frame number.
+            self.fps_nr += 1 # Auto-Increment frame number.
+            print '- frame number', self.fps_nr
             #
             self.__lock.release() # Ok, now can release lock.
             #
@@ -639,7 +645,7 @@ Valid formats are : txt, csv, html, bmp, gif, jpg, png.\n\
         #
         vLmgl = self.body # Save body...
         out = out.lower() # Lower letters.
-        if out not in ('txt', 'csv', 'html', 'bmp', 'gif', 'jpg', 'png', 'pdf', 'ps'): # Valid formats.
+        if out not in self.Spawns: # Valid formats.
             print( 'Letter-Monster growls: "I cannot export in `%s` type! Exiting spawn!' % out ) ; return 1
         #
         try: vOutput = self.FlattenLayers( )

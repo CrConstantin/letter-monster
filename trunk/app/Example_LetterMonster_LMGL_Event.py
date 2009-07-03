@@ -54,15 +54,15 @@ e = Event(name = 'onrender', call_macro = 'onrender_macro')
 lm.body[ e.name ] = e
 del e
 
-# This macro is called for each render loop.
+# This macro is called each render loop.
 instruct = [ {
             'f':'change',
-            'name':'raster3',
-            'offset':'8-self.fps_nr%8,5',
+            'name':'raster+str(3)',
+            'offset':'8-self.fps_nr%8,5', # Move up, from 1 to 8.
             },{
             'f':'change',
             'name':'raster2',
-            'visible':'not bool(self.fps_nr%8)',
+            'visible':'not bool(self.fps_nr%8)', # Visible only when frame number is % 8.
             }, ]
 m = Macro( name = 'onrender_macro', instructions=instruct )
 lm.body[ m.name ] = m

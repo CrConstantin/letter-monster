@@ -1,19 +1,19 @@
 
 import os, sys, thread, time, pygame
-sys.path.insert( 0, os.getcwd() )
+sys.path.insert( 0, os.getcwd().replace('Examples','')[:-1] )
 from _letter_monster import LetterMonster
 
 lm = LetterMonster()
 lm.DEBUG = True
-lm.Load( 'test_event.lmgl' )
+lm.Load( 'LM_Anim.lmgl' )
 
-for x in range(lm.Number_Of_Threads): # Start a few FlattenLayers threads.
+for x in range(4): # Start a few FlattenLayers threads.
     thread.start_new_thread( lm.FlattenLayers, (True, ), )
     time.sleep(0.1)
 
 pygame.init()
-vScreen = pygame.display.set_mode( (320, 240) )
-vFont = pygame.font.SysFont('Lucida Console', 12)
+vScreen = pygame.display.set_mode( (330, 580) )
+vFont = pygame.font.SysFont('Lucida Console', 8)
 vHeight = vFont.get_height()
 
 #
@@ -34,7 +34,7 @@ while 1:
     i = 1
     #
     for vLine in vFrame:
-        vFR = vFont.render(''.join(vLine), True, (0, 255, 255)) # Render font with blue.
+        vFR = vFont.render(''.join(vLine), True, (200, 233, 255)) # Render font with blue.
         vScreen.blit(vFR, (1,i))
         i += vHeight
     #

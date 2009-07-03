@@ -17,7 +17,7 @@
 ----------
   About:
 ----------
- * Letter-Monster is a multi-layer text rendering engine.
+ * Letter-Monster is an open, layer-based, text rendering engine.
     It renders letters in a very similar way to a 2D/3D engine that renders pixels.
  * Can transform images (BMP, JPG, PNG, PSD, TGA) into : ASCII Text, CSV, mono-color HTML tables, ASCII images.
  * Can create complex text shapes and text interfaces.
@@ -63,9 +63,10 @@
  * Python Image Library (PIL). Manipulates and creates images. (www.pythonware.com/products/pil)
 
  * (optional) pyYAML. Used for saving LMGL in YAML format, easy manually to read and write. (www.pyyaml.org)
- * (Optional) Python-Psyco. Makes Letter-Monster 2-3 times faster. It uses quite a lot of memory. (psyco.sourceforge.net)
+ * (Optional) Python-Psyco. Makes Letter-Monster 2x-10x times faster. It uses quite a lot of memory. (psyco.sf.net)
  * (Optional) Pygame. Used for render in Pygame. (www.pygame.org)
  * (Optional) Pyglet. Used for render in Pyglet. (www.pyglet.org)
+ * (Optional) ReportLab. Used to spawn as PDF and PS. (www.reportlab.org)
 
 ---------------
   How to use:
@@ -80,6 +81,8 @@
     in Windows, or
     $ python ... path to example file ...
     in Linux.
+ * Note : Letter-Monster was created on a Windows XP machine, so there might be some incompatibilities with other OS.
+    Please let me know if you find any.
 
 ---------------------------
  Changes from version 0.1:
@@ -92,17 +95,19 @@
 ---------------------------
  Changes from version 0.2:
 ---------------------------
- * Fixed 2 bugs in overwrite engine.
+ * Fixed a lot of bugs in overwrite engine. All engine is now multi-threaded.
  * Added save as "p:gzip", "p:bz2", "y:bz2", "y". Need to install pyYAML.
  * Renamed Layers attribute "position" into "offset", thus breaking compatibility with previous LMGL files.
     It's a more representative name.
- * Implemented macro instructions "new", "del", "ren", "change".
+ * Implemented macro instructions "new", "del", "ren", "change", "hideall", "unhideall", "lockall", "unlockall".
+ * Implemented events "onload", "onsave", "onrender".
+ * Implemented render as "py".
+ * Implemented spawn as "pdf" and "ps", with ReportLab.
 
 --------
   TODO:
 --------
  * Check all documentation. Some information might need updating.
- * Instructions for Macro Layers. This will allow creating/ deleting/ renaming/ changing attributes of other layers from within LMGL.
  * Fast export LMGL as PDF, PS, EPS, GIF animation, Excel animation, SWF app, etc.
  * Draw ASCII shapes: circle, rectangle, polygon, etc, with a lot of options.
  * ASCII blur, sharpen, darken, lighten.
