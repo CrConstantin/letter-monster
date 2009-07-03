@@ -1,6 +1,6 @@
 # -*- coding: latin-1 -*-
 '''
-Letter-Monster Engine v0.2.5
+Letter-Monster Engine v0.2.9
 Copyright © 2009, Cristi Constantin. All rights reserved.
 This module demonstrates all Backpack functions.
 '''
@@ -56,6 +56,6 @@ vResult = _bp.Border( vResult, Char='#', Thick=2 )
 print
 print ''.join (np.hstack( np.hstack( (i,np.array([u'\n'],'U')) ) for i in vResult ))
 
-os.system( 'echo Done. Sleeping 5...&sleep 5' )
+os.system( 'echo Done.&pause' )
 
 #

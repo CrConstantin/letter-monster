@@ -1,4 +1,9 @@
 
+'''
+Letter-Monster Engine 0.2.9.
+Some example i played with.
+'''
+
 import os, sys, thread, time, pygame
 sys.path.insert( 0, os.getcwd().replace('Examples','')[:-1] )
 from _letter_monster import LetterMonster

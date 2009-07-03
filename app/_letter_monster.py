@@ -1,6 +1,6 @@
 # -*- coding: latin-1 -*-
 '''
-    Letter-Monster Engine v0.2.8 \n\
+    Letter-Monster Engine v0.2.9 \n\
     Copyright © 2009, Cristi Constantin. All rights reserved. \n\
     This module contains Letter-Monster class with all its functions. \n\
 '''
@@ -24,7 +24,7 @@ from _classes import *
 
 #
 
-print 'I am LM 0.2.8 !'
+print 'I am LM 0.2.9 !'
 
 #
 # Define YAML represent for numpy ndarray.

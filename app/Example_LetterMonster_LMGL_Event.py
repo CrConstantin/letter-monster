@@ -1,8 +1,8 @@
 # -*- coding: latin-1 -*-
 '''
-Letter-Monster Engine v0.2.8
+Letter-Monster Engine v0.2.9
 Copyright © 2009, Cristi Constantin. All rights reserved.
-This module generates a test LMGL file to play with. It can be used for Render.
+This module generates a test LMGL file to play with. It can be used for Events, or Render.
 '''
 
 import os, sys

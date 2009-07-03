@@ -1,6 +1,6 @@
 # -*- coding: latin-1 -*-
 '''
-Letter-Monster Engine v0.2.8
+Letter-Monster Engine v0.2.9
 Copyright © 2009, Cristi Constantin. All rights reserved.
 This is a simple example for rendering a LMGL file on the screen, via Pygame.
 '''
@@ -12,7 +12,7 @@ from _letter_monster import LetterMonster
 lm = LetterMonster()
 lm.DEBUG = True
 
-lm.Load( 'test_event.lmgl' )
+lm.Load( 'test_bord.lmgl' )
 print
 
 lm.Render('pygame')
