@@ -17,11 +17,11 @@ from _letter_monster import LetterMonster
 lm = LetterMonster()
 lm.DEBUG = True
 
-lm.Consume( image='Logo.jpg', x=0, y=0, pattern='default', filter='' )
+lm.Consume( image='Logo.png', x=0, y=0, pattern='default', filter='' )
 
 try: os.remove( 'test_cons.lmgl' )
 except: pass
-lm.Save( 'test_cons.lmgl', 'p:bz2' )
+lm.Save( 'test_cons.lmgl', 'y' )
 
 print 'Body 1: ', lm.body, '\n'
 print 'Data is len:', len(lm.body['raster1'].data)

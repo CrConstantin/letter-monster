@@ -13,7 +13,7 @@ lm = LetterMonster()
 lm.DEBUG = True
 
 print( 'Loading...\n' )
-lm.Load( 'test_bord.lmgl' )
+lm.Load( 'test_cons.lmgl' )
 
 print( 'Spawning...\n' )
 lm.Spawn( out='txt' )
