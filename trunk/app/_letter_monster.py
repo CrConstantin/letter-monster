@@ -24,7 +24,7 @@ from _classes import *
 
 #
 
-print 'I am LM r56 !'
+print 'I am LM r57 !'
 
 #
 # Define YAML represent for numpy ndarray.
@@ -639,7 +639,7 @@ Valid formats are : txt, csv, html, bmp, gif, jpg, png.\n\
         #
         vLmgl = self.body # Save body...
         out = out.lower() # Lower letters.
-        if out not in ('txt', 'csv', 'html', 'bmp', 'gif', 'jpg', 'png'): # Valid formats.
+        if out not in ('txt', 'csv', 'html', 'bmp', 'gif', 'jpg', 'png', 'pdf', 'ps'): # Valid formats.
             print( 'Letter-Monster growls: "I cannot export in `%s` type! Exiting spawn!' % out ) ; return 1
         #
         try: vOutput = self.FlattenLayers( )
@@ -683,6 +683,29 @@ Valid formats are : txt, csv, html, bmp, gif, jpg, png.\n\
             del i
             vOut.save( filename+'.'+out )
         #
+        elif out in ('pdf', 'ps'):
+            try: import reportlab
+            except: print( 'Letter-Monster snarls: "Could not import Reportlab! Make sure you download and install it. Check http://www.reportlab.org. Exiting!"' ) ; return
+            #
+            from reportlab.pdfgen import canvas
+            from reportlab.lib.pagesizes import A4
+            from reportlab.lib.units import mm
+            #
+            vOut = canvas.Canvas( filename+'.'+out, pagesize=A4 )
+            vOut.setAuthor('Letter-Monster Engine')
+            vOut.setTitle('Letter-Monster Spawn')
+            vOut.setSubject('Letter-Monster Spawn')
+            vOut.setKeywords('pdf, project')
+            #
+            textobject = vOut.beginText()
+            textobject.setTextOrigin(5*mm, 290*mm)
+            textobject.setFont("Courier", 12)
+            textobject.textLines( u''.join( np.hstack( np.hstack( (i,np.array([u'\n'],'U')) ) for i in vOutput ) ).encode('utf8') )
+            #
+            vOut.drawText(textobject)
+            vOut.showPage()
+            vOut.save()
+        #
         # More export formats will be implemented soon ...
         #
         del vOutput ; del vOut
@@ -725,7 +748,7 @@ Valid outputs are : py, pygame and pyglet.\n\
         #
         elif format=='pygame': # Pygame render.
             try: import pygame
-            except: print( 'Letter-Monster snarls: "Could not import Pygame! Make sure you downloaded and installed it. Check http://www.pygame.org. Exiting!"' ) ; return
+            except: print( 'Letter-Monster snarls: "Could not import Pygame! Make sure you download and install it. Check http://www.pygame.org. Exiting!"' ) ; return
             pygame.init()
             #
             vScreen = pygame.display.set_mode( (320, 240) )
@@ -759,7 +782,7 @@ Valid outputs are : py, pygame and pyglet.\n\
         #
         elif format=='pyglet': # Pyglet render.
             try: import pyglet
-            except: print( 'Letter-Monster snarls: "Could not import Pyglet! Make sure you downloaded and installed it. Check http://www.pyglet.org. Exiting!"' ) ; return
+            except: print( 'Letter-Monster snarls: "Could not import Pyglet! Make sure you download and install it. Check http://www.pyglet.org. Exiting!"' ) ; return
             #
             window = pyglet.window.Window(width=800, height=600, caption='Pyglet render', resizable=False, style=None, fullscreen=False, visible=True, vsync=True)
             label = pyglet.text.Label( text='', font_name='Lucida Console', font_size=8, x=1, y=window.height-1, width=1, anchor_x='left', anchor_y='top', multiline=True)
