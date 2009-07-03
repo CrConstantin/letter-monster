@@ -24,7 +24,7 @@ from _classes import *
 
 #
 
-print 'I am LM r55 !'
+print 'I am LM r56 !'
 
 #
 # Define YAML represent for numpy ndarray.
@@ -75,7 +75,7 @@ LetterMonster -> Patterns. List with all valid pattern names, used in Consume fu
         self.Number_Of_Threads = 4        # Maxim number of spawned threads.
         self.FrameBuffer = Queue.Queue(4) # Queue with a few slots.
         self.vCanLoop = True              # Very importand, used in all threading functions.
-        self.__fps_lock = thread.allocate_lock()
+        self.__lock = thread.allocate_lock()
         #
         self.VA = VActions() # Helper functions instance.
         #self.EA = EActions() # Helper functions instance. Will probably need this.
@@ -184,7 +184,7 @@ All macro instructions are : hideall, unhideall, lockall, unlockall, new, del, r
         if not vInstructions:
             print( 'Letter-Monster growls: "`%s` has NULL instructions! I have nothing to execute!"' % object ) ; return
         #
-        ti = clock()
+        #ti = clock()
         if str(vElem)=='vector': # Execute vector instructions.
             for vInstr in vInstructions: # For each instruction in vector instructions list.
                 vFunc = vInstr['f']      # Save function name, then delete this mapping.
@@ -251,12 +251,17 @@ All macro instructions are : hideall, unhideall, lockall, unlockall, new, del, r
                     # Create new instance.
                     if vNew=='Raster':
                         self.body[vName] = Raster()
+                        self.body[vName].name = vName
                     elif vNew=='Vector':
                         self.body[vName] = Vector()
+                        self.body[vName].name = vName
                     elif vNew=='Macro':
                         self.body[vName] = Macro()
+                        self.body[vName].name = vName
                     elif vNew=='Event':
                         self.body[vName] = Event()
+                        self.body[vName].name = vName
+                    else: print( 'Letter-Monster growls: "Macro Execute - `%s` is not a layer type! Canceling."' % vNew ) ; return
                 #
                 elif vInstr['f']=='del': # Instruction to delete a layer.
                     try: del self.body[vName]
@@ -273,44 +278,42 @@ All macro instructions are : hideall, unhideall, lockall, unlockall, new, del, r
                 #
                 elif vInstr['f']=='change': # Instruction to change attributes of a layer.
                     for key in vInstr:      # For each key in change instruction.
-                        if key == 'f': pass # This is the name of the function and must be ignored.
                         #
-                        if key == 'offset':
-                            k0 = vInstr[key][0]
-                            k1 = vInstr[key][1]
-                            #
-                            if type(k0)==type(''): exec( 'x='+k0 )
-                            elif type(k0)==type(0): x=k0
-                            else: print( 'Letter-Monster growls: "Macro Execute - Offset for `%s` layer is neither STR, not INT! Canceling."' % vName ) ; return
-                            #
-                            if type(k1)==type(''): exec( 'y='+k1 )
-                            elif type(k1)==type(0): y=k1
-                            else: print( 'Letter-Monster growls: "Macro Execute - Offset for `%s` layer is neither STR, not INT! Canceling."' % vName ) ; return
-                            #
-                            try: self.body[vName].__dict__[key] = (x, y)
-                            except: print( 'Letter-Monster growls: "Macro Execute - Cannot change offset for `%s` layer! Canceling."' % vName ) ; return
-                        else:
-                            try: self.body[vName].__dict__[key] = vInstr[key]
-                            except: print( 'Letter-Monster growls: "Macro Execute - Cannot change attributes for `%s` layer! Canceling."' % vName ) ; return
+                        if key=='f' or key=='name': pass # This keys must be ignored.
                         #
+                        else: # This is either a new value, OR a string to execute.
+                            #
+                            if type(vInstr[key])==type(''): # It's probably a string to execute.
+                                try: exec( 'val=' + vInstr[key] )
+                                except: print( 'Letter-Monster growls: "Macro Execute - Cannot execute string instruct `%s` layer! Canceling."' % vName ) ; return
+                                self.body[vName].__dict__[key] = val
+                            #
+                            else: # It's probably a static value to pass.
+                                try: self.body[vName].__dict__[key] = vInstr[key]
+                                except: print( 'Letter-Monster growls: "Macro Execute - Cannot change attributes for `%s` layer! Canceling."' % vName ) ; return
+                            #
+                        # Loop for every key.
                     #
+                #
+                else: print( 'Letter-Monster growls: "Macro Execute - `%s` is not an instruction! Canceling."' % vInstr['f'] ) ; return
                 #
             #
         #
-        tf = clock()
-        if self.DEBUG: print( 'Letter-Monster says: "Execute took %.4f seconds."' % (tf-ti) )
+        #tf = clock()
+        #if self.DEBUG: print( 'Letter-Monster says: "Execute took %.4f seconds."' % (tf-ti) )
         #
     #
 #---------------------------------------------------------------------------------------------------
     #
     def FlattenLayers( self, vThreaded=False ):
         '''
-    This function takes as input a dictionary containing layers, like LetterMonster.body.\n\
-    Only layers that have a "data" attribute (Raster and Vector) can be rendered.\n\
-    Function pushes the flatened result (as Rectangular Unicode Numpy Array) into FrameBuffer.\n\
-    '''
+Flatten Layers.\n\
+Only layers that have a "data" attribute (Raster and Vector) can be rendered.\n\
+Function pushes the flatened result (as Rectangular Unicode Numpy Array) into FrameBuffer
+or returns the result.\n\
+'''
         #
-        while self.vCanLoop: # Loop Flatten Layers ...
+        while self.vCanLoop: # Loop Flatten Layers if CanLoop ...
             #
             vInput = self.body
             #
@@ -360,15 +363,15 @@ All macro instructions are : hideall, unhideall, lockall, unlockall, new, del, r
             if not vThreaded: return vOutput      # If this function is not threaded, only 1 execution is needed, so return the result.
             self.FrameBuffer.put( vOutput, True ) # For threaded functions, put data in Queue when there's one free slot.
             #
-            self.__fps_lock.acquire() # This code is multithreaded, so must ensure that only ONE function can access it.
+            self.__lock.acquire() # This code is multithreaded, so must ensure that only ONE function can access it.
             #
             if self.body.has_key('onrender') and self.body['onrender'].visible: # If there is a layer called OnRender and it's visible.
-                try: self._Execute( self.body['onrender'].call_macro ) # Try to execute affected macro. Else, return false.
-                except: print( 'Letter-Monster snarls: "Cannot execute OnRender instruction!"' ) ; return False
+                try: self._Execute( self.body['onrender'].call_macro )          # Try to execute affected macro. Else, exit.
+                except: print( 'Letter-Monster snarls: "Flatten Layers - Cannot execute OnRender instruction!"' ) ; vThreaded = False ; return False
             #
-            self.fps_nr += 1          # Auto-Increment frame number.
+            self.fps_nr += 1      # Auto-Increment frame number.
             #
-            self.__fps_lock.release() # Ok, now can release lock.
+            self.__lock.release() # Ok, now can release lock.
             #
         #
     #
@@ -698,17 +701,29 @@ Valid formats are : txt, csv, html, bmp, gif, jpg, png.\n\
         '''
 Render in a loop function. Represents LetterMonster body.\n\
 All visible Raster and Vector layers are flattened and the result is sent to the specified output.\n\
-Valid outputs are : pygame and pyglet.\n\
+Valid outputs are : py, pygame and pyglet.\n\
 '''
         #
-        if not format in ('pygame', 'pyglet'): # Valid formats.
+        if not format in ('py', 'pygame', 'pyglet'): # Valid formats.
             print( 'Letter-Monster snarls: "Cannot render in `%s` format! Exiting!"' % format ) ; return 1
         #
         for x in range(self.Number_Of_Threads): # Start a few FlattenLayers threads.
             thread.start_new_thread( self.FlattenLayers, (True, ), )
             time.sleep(0.1)
         #
-        if format=='pygame': # Pygame render.
+        if format=='py':
+            while 1:
+                #
+                time.sleep( self.max_fps ) # Sleep a little...
+                #
+                vFrame = self.FrameBuffer.get()
+                self.FrameBuffer.task_done()
+                #
+                print( u''.join ( np.hstack( np.hstack( (i,np.array([u'\n'],'U')) ) for i in vFrame ) ) )
+                #
+            #
+        #
+        elif format=='pygame': # Pygame render.
             try: import pygame
             except: print( 'Letter-Monster snarls: "Could not import Pygame! Make sure you downloaded and installed it. Check http://www.pygame.org. Exiting!"' ) ; return
             pygame.init()

@@ -1,8 +1,8 @@
 # -*- coding: latin-1 -*-
 '''
-Letter-Monster Engine v0.2.5
+Letter-Monster Engine v0.2.8
 Copyright © 2009, Cristi Constantin. All rights reserved.
-This module generates a test LMGL file to play with. You can use it for Spawn, Spit or Execute.
+This module generates a test LMGL file to play with. It can be used for Render.
 '''
 
 import os, sys
@@ -13,42 +13,43 @@ from _letter_monster import LetterMonster
 lm = LetterMonster()
 lm.DEBUG = True
 
-# Background layer is a border with dots inside.
+# Create a background layer : a border with dots inside
 r = Raster( name = 'raster1', visible = True, transparent = u' ', z = 1, offset = (0,0),
         data = lm.VA._Transform('s2a', '#'*30+'\n' + 10*('#'+'.'*28+'#\n') + '#'*30), )
 lm.body[ r.name ] = r
 del r
 
-# Middle layer is a grid of * (stars).
+# Create middle layer : a grid with '*' (stars)
 r = Raster( name = 'raster2', visible = False, transparent = u' ', z = 2, offset = (1,1),
         data = lm.VA._Transform('s2a', ('* '*14+'\n')*10 ), )
 lm.body[ r.name ] = r
 del r
 
-# This layer move to create an animation.
-r = Raster( name = 'raster3', visible = True, transparent = u'', z = 3, offset = (5,5),
-        data = lm.VA._Transform('s2a', '.^.\n^|^\n^.^'), )
+# A little object to move around. Transparent char : '.'
+r = Raster( name = 'raster3', visible = True, transparent = u'.', z = 3, offset = (5,5),
+        data = lm.VA._Transform('s2a', '..^..\n-^|^-\n.^.^.'), )
 lm.body[ r.name ] = r
 del r
 
-# Event onload.
+# Set event onload.
 e = Event(name = 'onload', call_macro = 'onload_macro')
 lm.body[ e.name ] = e
 del e
 
 # This macro will be called be called imediately after loading the LMGL file.
 instruct = [ {
-            'f':'new',
+            'f':'new', # Create new layer, vector connected to raster2.
             'layer':'vector',
             'name':'vector2',
+            'visible':False,
             'instructions':[{'f':'Border','Input':'raster2','Char':'.'}],
             'z':2,
-           }, ]
+            }, ]
 m = Macro( name = 'onload_macro', instructions=instruct )
 lm.body[ m.name ] = m
 del m ; del instruct
 
-# Event onrender.
+# Set event onrender.
 e = Event(name = 'onrender', call_macro = 'onrender_macro')
 lm.body[ e.name ] = e
 del e
@@ -57,19 +58,17 @@ del e
 instruct = [ {
             'f':'change',
             'name':'raster3',
-            'offset':('8-self.fps_nr%8', 5),
-           }, ]
+            'offset':'8-self.fps_nr%8,5',
+            },{
+            'f':'change',
+            'name':'raster2',
+            'visible':'not bool(self.fps_nr%8)',
+            }, ]
 m = Macro( name = 'onrender_macro', instructions=instruct )
 lm.body[ m.name ] = m
 del m ; del instruct
 
-# This macro is called on load.
-m = Macro( name = 'onload_macro', instructions=[{'f':'unhideall'}] )
-lm.body[ m.name ] = m
-del m
-
-#
-
+# Save everything on HDD.
 print( 'Added data...' )
 try: os.remove( 'test_event.lmgl' )
 except: pass
