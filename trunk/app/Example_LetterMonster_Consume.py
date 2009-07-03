@@ -1,10 +1,10 @@
 # -*- coding: latin-1 -*-
 '''
-Letter-Monster Engine v0.2.5
+Letter-Monster Engine v0.2.9
 Copyright © 2009, Cristi Constantin. All rights reserved.
 This module demonstrates transforming an Image into a LMGL file.
 This file can be later rendered (check Spit example) or exported (check Spawn example).
-The transformation can be direct from Image to ASCII, by calling Consume, then Spawn as txt.
+The transformation can be direct from Image to ASCII : call Consume, then Spawn as txt.
 You can choose another pattern for transformation.
 Filters can be applied on the image, separated by "|" (vertical line).
 For the list of valid patterns and filters check "LetterMonster" class, function "__init__".

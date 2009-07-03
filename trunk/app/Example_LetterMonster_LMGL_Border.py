@@ -1,8 +1,8 @@
 # -*- coding: latin-1 -*-
 '''
-Letter-Monster Engine v0.2.5
+Letter-Monster Engine v0.2.9
 Copyright © 2009, Cristi Constantin. All rights reserved.
-This module generates a test LMGL file to play with. You can use it for Spawn or Spit.
+This module generates a test LMGL file to play with. You can use it for Spawn, Spit or Render.
 '''
 
 import os, sys
