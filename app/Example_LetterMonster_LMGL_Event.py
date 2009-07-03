@@ -63,6 +63,11 @@ m = Macro( name = 'onrender_macro', instructions=instruct )
 lm.body[ m.name ] = m
 del m ; del instruct
 
+# This macro is called on load.
+m = Macro( name = 'onload_macro', instructions=[{'f':'unhideall'}] )
+lm.body[ m.name ] = m
+del m
+
 #
 
 print( 'Added data...' )

@@ -1,6 +1,6 @@
 # -*- coding: latin-1 -*-
 '''
-    Letter-Monster Engine v0.2.5 \n\
+    Letter-Monster Engine v0.2.8 \n\
     Copyright © 2009, Cristi Constantin. All rights reserved.\n\
     This module contains Backpack class, with all helper functions and all layer types : Raster, Vector, Event and Macro.\n\
 '''
@@ -62,10 +62,9 @@ class Event:
 class Macro:
     '''Macro layer class.\n'''
     #
-    def __init__(self, name='', instructions=[{}], visible=True):
+    def __init__(self, name='', instructions=[{}]):
         self.name = name
         self.instructions = instructions
-        self.visible = visible
         self.z = -99 # This should be read-only.
     #
     def __str__(self):

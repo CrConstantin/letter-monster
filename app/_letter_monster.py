@@ -1,20 +1,20 @@
 # -*- coding: latin-1 -*-
 '''
-    Letter-Monster Engine v0.2.5 \n\
+    Letter-Monster Engine v0.2.8 \n\
     Copyright © 2009, Cristi Constantin. All rights reserved. \n\
     This module contains Letter-Monster class with all its functions. \n\
 '''
 
 import os, sys, time             # Important System functions.
-import thread, Queue
+import thread, Queue             # Multithreading.
+import zlib, gzip, bz2           # Compress and decompress data.
+import cPickle, yaml             # YAML and cPickle.
 import Image, ImageFilter        # Python-Imaging.
 import ImageFont, ImageDraw      # Python-Imaging.
 import numpy as np               # Numpy arrays.
-import cPickle, yaml             # YAML and cPickle.
 from yaml import CLoader as Loader
 from yaml import CDumper as Dumper
 from yaml import add_representer, add_constructor
-import zlib, gzip, bz2           # Compress and decompress data.
 from time import clock           # Timing operations.
 sys.path.insert(0, os.getcwd() ) # Save current dir in path.
 
@@ -24,7 +24,7 @@ from _classes import *
 
 #
 
-print 'I am LM r54 !'
+print 'I am LM r55 !'
 
 #
 # Define YAML represent for numpy ndarray.
@@ -67,22 +67,18 @@ LetterMonster -> Patterns. List with all valid pattern names, used in Consume fu
 '''
         #
         self.DEBUG = True
-        #
         self.body = {}
-        self.max_fps = 1
+        self.max_fps = 0.1
         self.visible_size = (100, 100)
         #
+        self.fps_nr = 0                   # Frame number in animations.
+        self.Number_Of_Threads = 4        # Maxim number of spawned threads.
+        self.FrameBuffer = Queue.Queue(4) # Queue with a few slots.
+        self.vCanLoop = True              # Very importand, used in all threading functions.
         self.__fps_lock = thread.allocate_lock()
-        self.fps_nr = 0
-        self.Number_Of_Threads = 2
-        self.VA = VActions() # Helper functions instance.
-        #self.EA = EActions() # Helper functions instance. Will need this.
         #
-
-        self.FrameBuffer = Queue.Queue(2) # Queue with a few slots.
-        self.vCanLoop = True              # Used in all threading functions.
-        self.vBodyAcces = thread.allocate_lock()
-
+        self.VA = VActions() # Helper functions instance.
+        #self.EA = EActions() # Helper functions instance. Will probably need this.
         #
         self.Filters = ( 'BLUR', 'SMOOTH', 'SMOOTH_MORE', 'DETAIL', 'SHARPEN', # All valid filters.
                          'CONTOUR', 'EDGE_ENHANCE', 'EDGE_ENHANCE_MORE' )
@@ -174,11 +170,11 @@ Valid LMGL file should respect the following :\n\
 "object" is the name of a LatterMonster layer that containins instructions.\n\
 All vector instructions are : Rotate90Right, Rotate90Left, FlipH, FlipV, Reverse, StripRightSpace, StripLeftSpace,\n\
 AlignRight, AlignLeft, Center, Crop, Border, RightBorder, LeftBorder.\n\
-All macro instructions are : new, del, ren, change.\n\
+All macro instructions are : hideall, unhideall, lockall, unlockall, new, del, ren, change.\n\
 '''
         #
-        #try: psyco.full() # Cannot use psyco! It kills Pyglet events...
-        #except: pass
+        try: psyco.profile() # Psyco boost.
+        except: pass
         #
         try:
             vElem = self.body[object]
@@ -218,6 +214,33 @@ All macro instructions are : new, del, ren, change.\n\
         #
         elif str(vElem)=='macro':
             for vInstr in vInstructions: # For each instruction in macro instructions list.
+                #
+                # A few mass instructions...
+                if vInstr['f']=='hideall': # Make all layers invisible, then return.
+                    for key in self.body:
+                        try: self.body[key].visible = False
+                        except: pass
+                    return
+                #
+                elif vInstr['f']=='unhideall': # Make all layers visible, then return.
+                    for key in self.body:
+                        try: self.body[key].visible = True
+                        except: pass
+                    return
+                #
+                elif vInstr['f']=='lockall': # Lock all layers, then return.
+                    for key in self.body:
+                        try: self.body[key].lock = True
+                        except: pass
+                    return
+                #
+                elif vInstr['f']=='unlockall': # Unlock all layers, then return.
+                    for key in self.body:
+                        try: self.body[key].lock = False
+                        except: pass
+                    return
+                #
+                # It's not a mass instruction, so it affects only 1 layer. Save the name of that layer.
                 try: vName = vInstr['name']
                 except: print( 'Letter-Monster growls: "Macro Execute - Can\'t access `name` attribute in Macro `%s` instruction! Canceling."' % object ) ; return
                 #
@@ -225,6 +248,7 @@ All macro instructions are : new, del, ren, change.\n\
                     vNew = vInstr['layer'].title()
                     if self.body.has_key( vName ):
                         print( 'Letter-Monster growls: "Macro Execute - Layer `%s` already exists! Canceling."' % vName ) ; return
+                    # Create new instance.
                     if vNew=='Raster':
                         self.body[vName] = Raster()
                     elif vNew=='Vector':
@@ -242,14 +266,15 @@ All macro instructions are : new, del, ren, change.\n\
                     vNewname = vInstr['newname']
                     if self.body.has_key( vNewname ):
                         print( 'Letter-Monster growls: "Macro Execute - Layer `%s` already exists! Canceling."' % vName ) ; return
+                    # Copy the old element into a new key, change new elements name, delete the old element.
                     self.body[vNewname] = self.body[vName]
                     self.body[vNewname].name = vNewname
                     del self.body[vName]
                 #
                 elif vInstr['f']=='change': # Instruction to change attributes of a layer.
-                    for key in vInstr:
-                        if key == 'f':
-                            pass
+                    for key in vInstr:      # For each key in change instruction.
+                        if key == 'f': pass # This is the name of the function and must be ignored.
+                        #
                         if key == 'offset':
                             k0 = vInstr[key][0]
                             k1 = vInstr[key][1]
@@ -276,9 +301,9 @@ All macro instructions are : new, del, ren, change.\n\
         if self.DEBUG: print( 'Letter-Monster says: "Execute took %.4f seconds."' % (tf-ti) )
         #
     #
-#-------
+#---------------------------------------------------------------------------------------------------
     #
-    def FlattenLayers( self, vThreading=False ):
+    def FlattenLayers( self, vThreaded=False ):
         '''
     This function takes as input a dictionary containing layers, like LetterMonster.body.\n\
     Only layers that have a "data" attribute (Raster and Vector) can be rendered.\n\
@@ -287,14 +312,12 @@ All macro instructions are : new, del, ren, change.\n\
         #
         while self.vCanLoop: # Loop Flatten Layers ...
             #
-            self.vBodyAcces.acquire()
             vInput = self.body
-            self.vBodyAcces.release()
             #
             # If Body has one layer, return it. There is nothing to flatten.
             if len(vInput)==1:
                 vOutput = vInput.values()[0].data
-                if not vThreading: return vOutput
+                if not vThreaded: return vOutput
                 self.FrameBuffer.put( vOutput, True ) # Put data in Queue when there's one free slot.
             #
             S0 = 0 ; S1 = 0
@@ -334,16 +357,18 @@ All macro instructions are : new, del, ren, change.\n\
                     #
                 # If not Raster or Vector, pass.
             #
-            if not vThreading: return vOutput
-            self.FrameBuffer.put( vOutput, True ) # Put data in Queue when there's one free slot.
+            if not vThreaded: return vOutput      # If this function is not threaded, only 1 execution is needed, so return the result.
+            self.FrameBuffer.put( vOutput, True ) # For threaded functions, put data in Queue when there's one free slot.
             #
-            if self.body.has_key('onrender'): # If there is a layer called OnRender.
-                try: self._Execute( self.body['onrender'].call_macro ) # Try to execute affected macro.
+            self.__fps_lock.acquire() # This code is multithreaded, so must ensure that only ONE function can access it.
+            #
+            if self.body.has_key('onrender') and self.body['onrender'].visible: # If there is a layer called OnRender and it's visible.
+                try: self._Execute( self.body['onrender'].call_macro ) # Try to execute affected macro. Else, return false.
                 except: print( 'Letter-Monster snarls: "Cannot execute OnRender instruction!"' ) ; return False
             #
-            self.__fps_lock.acquire()
-            self.fps_nr += 1
-            self.__fps_lock.release()
+            self.fps_nr += 1          # Auto-Increment frame number.
+            #
+            self.__fps_lock.release() # Ok, now can release lock.
             #
         #
     #
@@ -360,7 +385,7 @@ All macro instructions are : new, del, ren, change.\n\
     def Load(self, lmgl):
         '''
 Load a LMGL (Letter-Monster Graphical Letters) file.\n\
-LMGL file format is nothing more than a cPickle or YAML dump of LetterMonster body, compressed with Gzip or BZ2.\n\
+LMGL file format is nothing more than a cPickle / YAML dump of LetterMonster body, compressed with Gzip / BZ2.\n\
 '''
         try:
             vInput = open( lmgl ) # Opening the file just to read first 3 characters.
@@ -402,9 +427,9 @@ LMGL file format is nothing more than a cPickle or YAML dump of LetterMonster bo
         self.body = vLmgl # On load, old body is COMPLETELY overwritten!
         vInput.close() ; del vInput
         #
-        #if self.body.has_key('onload'): # If there is a layer called OnLoad.
-        #    try: self._Execute( self.body['onload'].call_macro ) # Try to call affected macro.
-        #    except: print( 'Letter-Monster snarls: "Cannot execute ONLOAD instruction!"' )
+        if self.body.has_key('onload') and self.body['onload'].visible: # If there is a layer called OnLoad and it's visible.
+            try: self._Execute( self.body['onload'].call_macro ) # Try to execute affected macro. Else, pass.
+            except: print( 'Letter-Monster snarls: "Cannot execute ONLOAD instruction!"' )
         #
         self.__validate()
         #
@@ -427,9 +452,9 @@ You should also check Load function.\n\
         #
         ti = clock()
         #
-        #if self.body.has_key('onsave'): # If there is a layer called OnSave.
-        #    try: self._Execute( self.body['onsave'].call_macro ) # Try to execute affected macro.
-        #    except: print( 'Letter-Monster snarls: "Cannot execute ONSAVE instruction!"' )
+        if self.body.has_key('onsave') and self.body['onsave'].visible: # If there is a layer called OnSave and it's visible.
+            try: self._Execute( self.body['onsave'].call_macro ) # Try to execute affected macro. Else, pass.
+            except: print( 'Letter-Monster snarls: "Cannot execute ONSAVE instruction!"' )
         #
         if mode=='p:gzip':
             vInput = gzip.open( lmgl, 'w', 8 )
@@ -469,7 +494,7 @@ Later, you can export this "consumed" image into TXT, CSV, HTM, or whatever suit
 or you can Save its representation as LMGL.\n\
 '''
         #
-        try: psyco.full()
+        try: psyco.full() # Psyco boost.
         except: pass
         #
         try: vInput = Image.open( image )
@@ -536,16 +561,16 @@ or you can Save its representation as LMGL.\n\
         #
         ttf = clock()
         if self.DEBUG: print( 'Letter-Monster says: "Transformation took %.4f seconds."' % (ttf-tti) )
-        for x in range(1, 999):
-            if not 'raster'+str(x) in self.body: # If "raster+x" doesn't exist.
-                vElem = Raster()
-                vElem.name = 'raster'+str(x)
+        for x in range(1, 999): # 999 should be enough.
+            rName = 'raster'+str(x) # Save possible raster name.
+            if not rName in self.body: # If element "raster+x" doesn't exist in body.
+                vElem = Raster()       # Create new instance, and populate it.
+                vElem.name = rName
                 vElem.data = vResult
                 vElem.visible = True
-                vElem.lock = False
-                self.body['raster'+str(x)] = vElem # Save raster in body.
+                self.body[rName] = vElem # Now save raster in body.
                 del vElem
-                break
+                break # Exit 999 loop.
             #
         #
         del vResult ; del vInput
@@ -560,13 +585,13 @@ or you can Save its representation as LMGL.\n\
         '''
 Frame-by-frame render function. Represents LetterMonster body.\n\
 All visible Raster and Vector layers are flattened and the result is sent to the specified output.\n\
-Valid outputs are : CMD, SH.\n\
+Valid outputs are : py, CMD, SH.\n\
 '''
         #
-        if not format in ('py', 'CMD', 'SH'):
+        if not format in ('py', 'CMD', 'SH'): # Valid formats.
             print( 'Letter-Monster snarls: "Cannot spit in `%s` format! Exiting!"' % format ) ; return 1
         #
-        try: vOutput = self.FlattenLayers( self.body )
+        try: vOutput = self.FlattenLayers( )
         except: print( 'Letter-Monster snarls: "Flatten body layers returned error! Cannot spit!"' ) ; return 1
         #
         if format=='py':
@@ -611,7 +636,7 @@ Valid formats are : txt, csv, html, bmp, gif, jpg, png.\n\
         #
         vLmgl = self.body # Save body...
         out = out.lower() # Lower letters.
-        if out not in ('txt', 'csv', 'html', 'bmp', 'gif', 'jpg', 'png'):
+        if out not in ('txt', 'csv', 'html', 'bmp', 'gif', 'jpg', 'png'): # Valid formats.
             print( 'Letter-Monster growls: "I cannot export in `%s` type! Exiting spawn!' % out ) ; return 1
         #
         try: vOutput = self.FlattenLayers( )
@@ -655,7 +680,7 @@ Valid formats are : txt, csv, html, bmp, gif, jpg, png.\n\
             del i
             vOut.save( filename+'.'+out )
         #
-        # More export formats will be implemented ...
+        # More export formats will be implemented soon ...
         #
         del vOutput ; del vOut
         if lmgl:
@@ -676,7 +701,7 @@ All visible Raster and Vector layers are flattened and the result is sent to the
 Valid outputs are : pygame and pyglet.\n\
 '''
         #
-        if not format in ('pygame', 'pyglet'):
+        if not format in ('pygame', 'pyglet'): # Valid formats.
             print( 'Letter-Monster snarls: "Cannot render in `%s` format! Exiting!"' % format ) ; return 1
         #
         for x in range(self.Number_Of_Threads): # Start a few FlattenLayers threads.
@@ -744,6 +769,6 @@ Valid outputs are : pygame and pyglet.\n\
             pyglet.app.run()
             #
         #
-        # More formats will be implemented soon.
+        # More formats will be implemented soon ...
     #
 #
