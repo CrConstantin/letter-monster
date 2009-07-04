@@ -15,7 +15,7 @@ lm.DEBUG = True
 lm.Load( 'test_bord.lmgl' )
 print
 
-lm.Render('pygame')
+lm.Render('pygame', size=(640,480))
 
 os.system( 'echo Done.&pause' )
 
