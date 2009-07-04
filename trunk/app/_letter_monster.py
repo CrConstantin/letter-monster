@@ -726,7 +726,7 @@ Valid formats are : txt, csv, html, bmp, gif, jpg, png.\n\
     #
 #---------------------------------------------------------------------------------------------------
     #
-    def Render(self, format='pygame'):
+    def Render(self, format='pygame', size=(320, 240), fontsize=8, txtcolor=(200, 233, 255), bgcolor=(0, 0, 0)):
         '''
 Render in a loop function. Represents LetterMonster body.\n\
 All visible Raster and Vector layers are flattened and the result is sent to the specified output.\n\
@@ -757,8 +757,8 @@ Valid outputs are : py, pygame and pyglet.\n\
             except: print( 'Letter-Monster snarls: "Could not import Pygame! Make sure you download and install it. Check http://www.pygame.org. Exiting!"' ) ; return
             pygame.init()
             #
-            vScreen = pygame.display.set_mode( (320, 240) )
-            vFont = pygame.font.SysFont('Lucida Console', 12)
+            vScreen = pygame.display.set_mode( size )
+            vFont = pygame.font.SysFont('Lucida Console', fontsize)
             vHeight = vFont.get_height()
             #
             while 1:
@@ -771,14 +771,14 @@ Valid outputs are : py, pygame and pyglet.\n\
                         print( 'Letter-Monster says: "Key pressed, exiting..."' )
                         pygame.quit() ; return
                 #
-                vScreen.fill((0, 0, 0)) # Paint screen with black.
+                vScreen.fill( bgcolor ) # Paint screen with black.
                 #
                 vFrame = self.FrameBuffer.get()
                 self.FrameBuffer.task_done()
                 i = 1
                 #
                 for vLine in vFrame:
-                    vFR = vFont.render(''.join(vLine), True, (0, 255, 255)) # Render font with blue.
+                    vFR = vFont.render(''.join(vLine), True, txtcolor) # Render font with blue.
                     vScreen.blit(vFR, (1,i))
                     i += vHeight
                 #
@@ -790,8 +790,10 @@ Valid outputs are : py, pygame and pyglet.\n\
             try: import pyglet
             except: print( 'Letter-Monster snarls: "Could not import Pyglet! Make sure you download and install it. Check http://www.pyglet.org. Exiting!"' ) ; return
             #
-            window = pyglet.window.Window(width=800, height=600, caption='Pyglet render', resizable=False, style=None, fullscreen=False, visible=True, vsync=True)
-            label = pyglet.text.Label( text='', font_name='Lucida Console', font_size=8, x=1, y=window.height-1, width=1, anchor_x='left', anchor_y='top', multiline=True)
+            window = pyglet.window.Window(width=size[0], height=size[1], caption='Pyglet render',
+                resizable=False, style=None, fullscreen=False, visible=True, vsync=True)
+            label = pyglet.text.Label( text='', font_name='Lucida Console', font_size=fontsize, color=txtcolor,
+                x=1, y=window.height-1, width=1, anchor_x='left', anchor_y='top', multiline=True)
             #
             @window.event
             def on_key_press(symbol, modifiers):
