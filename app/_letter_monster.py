@@ -219,16 +219,14 @@ All macro instructions are : hideall, unhideall, lockall, unlockall, new, del, r
                 # A few mass instructions...
                 if vInstr['f']=='hideall': # Make all Vector and Raster layers invisible, then break.
                     for key in self.body:
-                        if str(self.body[key])=='raster' or str(self.body[key])=='vector':
-                            try: self.body[key].visible = False
-                            except: pass
+                        try: self.body[key].visible = False
+                        except: pass
                     continue
                 #
                 elif vInstr['f']=='unhideall': # Make all layers visible, then break.
                     for key in self.body:
-                        if str(self.body[key])=='raster' or str(self.body[key])=='vector':
-                            try: self.body[key].visible = True
-                            except: pass
+                        try: self.body[key].visible = True
+                        except: pass
                     continue
                 #
                 elif vInstr['f']=='lockall': # Lock all layers, then break.
@@ -436,9 +434,9 @@ LMGL file format is nothing more than a cPickle / YAML dump of LetterMonster bod
         self.body = vLmgl # On load, old body is COMPLETELY overwritten!
         vInput.close() ; del vInput
         #
-        if self.body.has_key('onload') and self.body['onload'].visible: # If there is a layer called OnLoad and it's visible.
-            try: self._Execute( self.body['onload'].call_macro ) # Try to execute affected macro. Else, pass.
-            except: print( 'Letter-Monster snarls: "Cannot execute ONLOAD instruction!"' )
+        #if self.body.has_key('onload'): # If there is a layer called OnLoad and it's visible.
+        #    try: self._Execute( self.body['onload'].call_macro ) # Try to execute affected macro. Else, pass.
+        #    except: print( 'Letter-Monster snarls: "Cannot execute ONLOAD instruction!"' )
         #
         self.__validate()
         #
@@ -461,9 +459,9 @@ You should also check Load function.\n\
         #
         ti = clock()
         #
-        if self.body.has_key('onsave') and self.body['onsave'].visible: # If there is a layer called OnSave and it's visible.
-            try: self._Execute( self.body['onsave'].call_macro ) # Try to execute affected macro. Else, pass.
-            except: print( 'Letter-Monster snarls: "Cannot execute ONSAVE instruction!"' )
+        #if self.body.has_key('onsave'): # If there is a layer called OnSave and it's visible.
+        #    try: self._Execute( self.body['onsave'].call_macro ) # Try to execute affected macro. Else, pass.
+        #    except: print( 'Letter-Monster snarls: "Cannot execute ONSAVE instruction!"' )
         #
         if mode=='p:gzip':
             vInput = gzip.open( lmgl, 'w', 8 )
