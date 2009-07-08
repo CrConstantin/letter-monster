@@ -31,37 +31,20 @@ r = Raster( name = 'raster3', visible = True, transparent = u'.', z = 3, offset 
 lm.body[ r.name ] = r
 del r
 
-# Set event onload.
-e = Event(name = 'onload', call_macro = 'onload_macro')
-lm.body[ e.name ] = e
-del e
-
-# This macro will be called be called imediately after loading the LMGL file.
-instruct = [ {
-            'f':'new', # Create new layer, vector connected to raster2.
-            'layer':'vector',
-            'name':'vector2',
-            'visible':False,
-            'instructions':[{'f':'Border','Input':'raster2','Char':'.'}],
-            'z':2,
-            }, ]
-m = Macro( name = 'onload_macro', instructions=instruct )
-lm.body[ m.name ] = m
-del m ; del instruct
-
+#
 # Set event onrender.
 e = Event(name = 'onrender', call_macro = 'onrender_macro')
 lm.body[ e.name ] = e
 del e
-
+#
 # This macro is called each render loop.
 instruct = [ {
             'f':'change',
-            'name':'raster+str(3)',
+            'name':'"raster3"',
             'offset':'8-self.fps_nr%8,5', # Move up, from 1 to 8.
             },{
             'f':'change',
-            'name':'raster2',
+            'name':'"raster2"',
             'visible':'not bool(self.fps_nr%8)', # Visible only when frame number is % 8.
             }, ]
 m = Macro( name = 'onrender_macro', instructions=instruct )
