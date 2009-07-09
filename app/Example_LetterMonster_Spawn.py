@@ -17,7 +17,9 @@ print( 'Loading...\n' )
 lm.Load( 'test_cons.lmgl' )
 
 print( 'Spawning...\n' )
-lm.Spawn( out='txt' )
+#lm.Export( out='txt', filename='Export' )
+lm.Spawn( out='txt', filename='Export' ) # Spawn == Export.
+
 
 os.system( 'echo Done.&pause' )
 

@@ -11,6 +11,7 @@ from _letter_monster import LetterMonster
 
 lm = LetterMonster()
 lm.DEBUG = True
+lm.Number_Of_Threads = 1
 
 lm.Load( 'test_event.lmgl' )
 print

@@ -14,5 +14,6 @@ from _letter_monster import LetterMonster
 
 lm = LetterMonster()
 lm.DEBUG = True
+lm.Number_Of_Threads = 1
 lm.Load( 'LM_Rotating_Skeleton.lmgl' ) # Change LMGL file here.
-lm.Render( 'pygame', size=(330,580) )
+lm.Render( 'pygame', size=(323,577), txtcolor=(255, 255, 255), bgcolor=(33, 33, 66) )
