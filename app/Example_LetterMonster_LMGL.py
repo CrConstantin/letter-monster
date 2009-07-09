@@ -44,10 +44,10 @@ lm.body[ e.name ] = e
 del e
 
 instruct = [
-    {'f':'new', 'layer':'event', 'name':'event2', 'call_macro':''},
-    {'f':'ren', 'name':'event2', 'newname':'event222'},
-    {'f':'change', 'name':'event222', 'call_macro':'New Aff!'},
-    {'f':'del', 'name':'event222'},
+    {'f':'new', 'layer':'event', 'name':'"event2"', 'call_macro':''},
+    {'f':'ren', 'name':'"event2"', 'newname':'event222'},
+    {'f':'change', 'name':'"event222"', 'call_macro':'New Aff!'},
+    {'f':'del', 'name':'"event222"'},
            ]
 m = Macro( name = 'macro1', instructions=instruct )
 lm.body[ m.name ] = m

@@ -65,8 +65,7 @@ class Macro:
     def __init__(self, name='', instructions=[{}]):
         self.name = name
         self.instructions = instructions
-        self.visible = True # This should be read-only.
-        self.z = -99        # This should be read-only.
+        self.z = -99   # This should be read-only.
     #
     def __str__(self):
         '''This func is used to identify the type of layer when more layers are stored inside LetterMonster body dictionary.\n'''
