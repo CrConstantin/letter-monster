@@ -367,7 +367,7 @@ or returns the result.\n\
             #
             self.__lock.acquire() # This code is multithreaded, so must ensure that only ONE function can access it.
             #
-            if self.body.has_key('onrender') and self.body['onrender'].visible: # If there is a layer called OnRender and it's visible.
+            if self.body.has_key('onrender'): # If there is a layer called OnRender and it's visible.
                 #try: 
                 self._Execute( self.body['onrender'].call_macro )          # Try to execute affected macro. Else, exit.
                 #except: print( 'Letter-Monster snarls: "Flatten Layers - Cannot execute OnRender instruction!"' ) ; vThreaded = False ; return False
@@ -541,14 +541,16 @@ or you can Save its representation as LMGL.\n\
             vPattern = self.Patterns['default']
         #
         ti = clock() # Global counter.
-        tti = clock() # Local counter.
-        #
-        vResult = np.empty( (vInput.size[1],vInput.size[0]), 'U' )
-        if self.DEBUG: print( 'Letter-Monster says: "Starting consume..."' )
         #
         vLen = len( vPattern )
-        pxaccess = vInput.load()
-        ch = len(vInput.getbands())
+        vResult = np.empty( (vInput.size[1],vInput.size[0]), 'U' )
+        #
+        if vInput.mode=='L' or 'P': # Convert grayscale / indexed images to RGB.
+            pxaccess = vInput.convert('RGB').load()
+            ch = 3
+        else:
+            pxaccess = vInput.load()
+            ch = len(vInput.getbands())
         #
         for py in range(vInput.size[1]): # Cycle through the image's pixels, one by one
             #
@@ -566,8 +568,6 @@ or you can Save its representation as LMGL.\n\
                 #
             #
         #
-        ttf = clock()
-        if self.DEBUG: print( 'Letter-Monster says: "Transformation took %.4f seconds."' % (ttf-tti) )
         for x in range(1, 999): # 999 should be enough.
             rName = 'raster'+str(x) # Save possible raster name.
             if not rName in self.body: # If element "raster+x" doesn't exist in body.
@@ -790,7 +790,7 @@ Valid outputs are : py, pygame and pyglet.\n\
             #
             window = pyglet.window.Window(width=size[0], height=size[1], caption='Pyglet render',
                 resizable=False, style=None, fullscreen=False, visible=True, vsync=True)
-            label = pyglet.text.Label( text='', font_name='Lucida Console', font_size=fontsize, color=txtcolor,
+            label = pyglet.text.Label( text='', font_name='Lucida Console', font_size=fontsize, color=list(txtcolor)+[255],
                 x=1, y=window.height-1, width=1, anchor_x='left', anchor_y='top', multiline=True)
             #
             @window.event

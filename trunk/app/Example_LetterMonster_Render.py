@@ -15,7 +15,7 @@ lm.DEBUG = True
 lm.Load( 'test_event.lmgl' )
 print
 
-lm.Render('pygame', size=(640,480))
+lm.Render('pygame', size=(300,200), fontsize=10, txtcolor=(166, 166, 255), bgcolor=(33, 33, 33))
 
 os.system( 'echo Done.&pause' )
 
