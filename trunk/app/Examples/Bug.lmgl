@@ -2,7 +2,6 @@
 onrender: !!python/object:_classes.Event
   call_macro: onrender_macro
   name: onrender
-  visible: true
   z: -99
 onrender_macro: !!python/object:_classes.Macro
   instructions:

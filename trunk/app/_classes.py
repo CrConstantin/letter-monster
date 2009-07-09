@@ -50,8 +50,7 @@ class Event:
     def __init__(self, name='', call_macro=''):
         self.name = name
         self.call_macro = call_macro
-        self.visible = True # This should be read-only.
-        self.z = -99        # This should be read-only.
+        self.z = -99   # This should be read-only.
     #
     def __str__(self):
         '''This func is used to identify the type of layer when more layers are stored inside LetterMonster body dictionary.\n'''

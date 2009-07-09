@@ -174,8 +174,8 @@ AlignRight, AlignLeft, Center, Crop, Border, RightBorder, LeftBorder.\n\
 All macro instructions are : hideall, unhideall, lockall, unlockall, new, del, ren, change.\n\
 '''
         #
-        #try: psyco.profile() # Psyco boost.
-        #except: pass
+        try: psyco.profile() # Psyco boost.
+        except: pass
         #
         try:
             vElem = self.body[object]
@@ -217,34 +217,36 @@ All macro instructions are : hideall, unhideall, lockall, unlockall, new, del, r
             for vInstr in vInstructions: # For each instruction in macro instructions list.
                 #
                 # A few mass instructions...
+                #
                 if vInstr['f']=='hideall': # Make all Vector and Raster layers invisible, then break.
                     for key in self.body:
-                        try: self.body[key].visible = False
-                        except: pass
+                        if str(self.body[key])=='raster' or str(self.body[key])=='vector':
+                            if not self.body[key].lock: # If it's Raster of Vector and it's not Locked.
+                                self.body[key].visible = False
                     continue
                 #
                 elif vInstr['f']=='unhideall': # Make all layers visible, then break.
                     for key in self.body:
-                        try: self.body[key].visible = True
-                        except: pass
+                        if str(self.body[key])=='raster' or str(self.body[key])=='vector':
+                            if not self.body[key].lock: # If it's Raster of Vector and it's not Locked.
+                                self.body[key].visible = True
                     continue
                 #
                 elif vInstr['f']=='lockall': # Lock all layers, then break.
                     for key in self.body:
-                        try: self.body[key].lock = True
-                        except: pass
+                        if str(self.body[key])=='Raster' or 'Vector':
+                            self.body[key].lock = True
                     continue
                 #
                 elif vInstr['f']=='unlockall': # Unlock all layers, then break.
                     for key in self.body:
-                        try: self.body[key].lock = False
-                        except: pass
+                        if str(self.body[key])=='Raster' or 'Vector':
+                            self.body[key].lock = False
                     continue
                 #
                 # It's not a mass instruction, so it affects only 1 layer. Save the name of that layer.
-                #try: 
-                exec('vName = ' + vInstr['name'])
-                #except: print( 'Letter-Monster growls: "Macro Execute - Can\'t access `name` attribute in Macro `%s` instruction! Canceling."' % object ) ; return
+                try: exec('vName = ' + vInstr['name'])
+                except: print( 'Letter-Monster growls: "Macro Execute - Can\'t access `name` attribute in Macro `%s` instruction! Canceling."' % object ) ; return
                 #
                 if vInstr['f']=='new':   # Instruction to create new layer.
                     vNew = vInstr['layer'].title()
@@ -588,42 +590,10 @@ or you can Save its representation as LMGL.\n\
     #
 #---------------------------------------------------------------------------------------------------
     #
-    def Spit(self, format='py', autoclear=False):
-        '''
-Frame-by-frame render function. Represents LetterMonster body.\n\
-All visible Raster and Vector layers are flattened and the result is sent to the specified output.\n\
-Valid outputs are : py, CMD, SH.\n\
-'''
+    def Export(self, lmgl=None, out='txt', filename='Out'):
         #
-        if not format in ('py', 'CMD', 'SH'): # Valid formats.
-            print( 'Letter-Monster snarls: "Cannot spit in `%s` format! Exiting!"' % format ) ; return 1
+        return self.Spawn(lmgl=lmgl, out=out, filename=filename)
         #
-        try: vOutput = self.FlattenLayers( )
-        except: print( 'Letter-Monster snarls: "Flatten body layers returned error! Cannot spit!"' ) ; return 1
-        #
-        if format=='py':
-            print u''.join ( np.hstack( np.hstack( (i,np.array([u'\n'],'U')) ) for i in vOutput ) )
-        #
-        elif format=='CMD':
-            if autoclear: vCmd = ['cls'] # If autoclear, add command to clear the screen.
-            else: vCmd = []
-            #
-            for vLine in vOutput:
-                vEcho = u''.join(u'^'+i for i in u''.join(vLine))
-                if vEcho: vCmd.append( 'echo %s' % vEcho.encode('utf8') )
-                else: vCmd.append( 'echo.' )
-            os.system( '&'.join(vCmd) ) # Execute Windows command!
-            #
-        elif format=='SH':
-            if autoclear: vCmd = ['clear'] # If autoclear, add command to clear the screen.
-            else: vCmd = []
-            #
-            for vLine in vOutput:
-                vEcho = u''.join(u'\\'+i for i in u''.join(vLine))
-                if vEcho: vCmd.append( 'echo %s' % vEcho.encode('utf8') )
-                else: vCmd.append( 'echo.' )
-            os.system( '&&'.join(vCmd) ) # Execute Linux command!
-            #
     #
 #---------------------------------------------------------------------------------------------------
     #
@@ -721,6 +691,45 @@ Valid formats are : txt, csv, html, bmp, gif, jpg, png.\n\
         tf = clock()
         if self.DEBUG: print( 'Letter-Monster says: "Spawn took %.4f seconds total."' % (tf-ti) )
         #
+    #
+#---------------------------------------------------------------------------------------------------
+    #
+    def Spit(self, format='py', autoclear=False):
+        '''
+Frame-by-frame render function. Represents LetterMonster body.\n\
+All visible Raster and Vector layers are flattened and the result is sent to the specified output.\n\
+Valid outputs are : py, CMD, SH.\n\
+'''
+        #
+        if not format in ('py', 'CMD', 'SH'): # Valid formats.
+            print( 'Letter-Monster snarls: "Cannot spit in `%s` format! Exiting!"' % format ) ; return 1
+        #
+        try: vOutput = self.FlattenLayers( )
+        except: print( 'Letter-Monster snarls: "Flatten body layers returned error! Cannot spit!"' ) ; return 1
+        #
+        if format=='py':
+            print u''.join ( np.hstack( np.hstack( (i,np.array([u'\n'],'U')) ) for i in vOutput ) )
+        #
+        elif format=='CMD':
+            if autoclear: vCmd = ['cls'] # If autoclear, add command to clear the screen.
+            else: vCmd = []
+            #
+            for vLine in vOutput:
+                vEcho = u''.join(u'^'+i for i in u''.join(vLine))
+                if vEcho: vCmd.append( 'echo %s' % vEcho.encode('utf8') )
+                else: vCmd.append( 'echo.' )
+            os.system( '&'.join(vCmd) ) # Execute Windows command!
+            #
+        elif format=='SH':
+            if autoclear: vCmd = ['clear'] # If autoclear, add command to clear the screen.
+            else: vCmd = []
+            #
+            for vLine in vOutput:
+                vEcho = u''.join(u'\\'+i for i in u''.join(vLine))
+                if vEcho: vCmd.append( 'echo %s' % vEcho.encode('utf8') )
+                else: vCmd.append( 'echo.' )
+            os.system( '&&'.join(vCmd) ) # Execute Linux command!
+            #
     #
 #---------------------------------------------------------------------------------------------------
     #

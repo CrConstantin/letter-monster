@@ -13,5 +13,6 @@ from _letter_monster import LetterMonster
 
 lm = LetterMonster()
 lm.DEBUG = True
+lm.Number_Of_Threads = 1
 lm.Load( 'Bug.lmgl' ) # Change LMGL file here.
 lm.Render( 'pygame', size=(250,510) )
