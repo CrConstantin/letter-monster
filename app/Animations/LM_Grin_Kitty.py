@@ -9,7 +9,7 @@ Check her profile : http://cryztaldreamz.deviantart.com
 '''
 
 import os, sys
-sys.path.insert( 0, os.getcwd().replace('Examples','')[:-1] )
+sys.path.insert( 0, os.getcwd().replace('Animations','')[:-1] )
 from _letter_monster import LetterMonster
 
 lm = LetterMonster()

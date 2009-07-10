@@ -48,7 +48,7 @@ del r
 print( 'Added data...' )
 try: os.remove( 'test_bord.lmgl' )
 except: pass
-lm.Save( 'test_bord.lmgl', mode='y:bz2' )
+lm.Save( 'test_bord.lmgl' )
 
 os.system( 'echo Done.&pause' )
 

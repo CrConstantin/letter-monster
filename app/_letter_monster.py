@@ -369,13 +369,14 @@ or returns the result.\n\
             #
             self.__lock.acquire() # This code is multithreaded, so must ensure that only ONE function can access it.
             #
-            if self.body.has_key('onrender'): # If there is a layer called OnRender and it's visible.
-                #try: 
-                self._Execute( self.body['onrender'].call_macro )          # Try to execute affected macro. Else, exit.
-                #except: print( 'Letter-Monster snarls: "Flatten Layers - Cannot execute OnRender instruction!"' ) ; vThreaded = False ; return False
+            if self.body.has_key('onrender'):                          # If there is a layer called OnRender.
+                try: self._Execute( self.body['onrender'].call_macro ) # Try to execute affected macro. Else, exit.
+                except:
+                    print( 'Letter-Monster snarls: "Flatten Layers - Cannot execute OnRender instruction!"' )
+                    vThreaded = False ; return False
             #
             self.fps_nr += 1 # Auto-Increment frame number.
-            print '- frame number', self.fps_nr
+            if self.DEBUG: print '- frame nr', self.fps_nr
             #
             self.__lock.release() # Ok, now can release lock.
             #
@@ -436,7 +437,7 @@ LMGL file format is nothing more than a cPickle / YAML dump of LetterMonster bod
         self.body = vLmgl # On load, old body is COMPLETELY overwritten!
         vInput.close() ; del vInput
         #
-        #if self.body.has_key('onload'): # If there is a layer called OnLoad and it's visible.
+        #if self.body.has_key('onload'): # If there is a layer called OnLoad...
         #    try: self._Execute( self.body['onload'].call_macro ) # Try to execute affected macro. Else, pass.
         #    except: print( 'Letter-Monster snarls: "Cannot execute ONLOAD instruction!"' )
         #
@@ -461,7 +462,7 @@ You should also check Load function.\n\
         #
         ti = clock()
         #
-        #if self.body.has_key('onsave'): # If there is a layer called OnSave and it's visible.
+        #if self.body.has_key('onsave'): # If there is a layer called OnSave...
         #    try: self._Execute( self.body['onsave'].call_macro ) # Try to execute affected macro. Else, pass.
         #    except: print( 'Letter-Monster snarls: "Cannot execute ONSAVE instruction!"' )
         #
